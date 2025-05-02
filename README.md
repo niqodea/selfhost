@@ -1,4 +1,4 @@
-# Home Infrastructure
+# selfhost
 
 This is a collection of interconnected Docker Compose files of services I self-host on my server.
 Each Docker Compose file represents a container or a set of tightly coupled containers that are supposed to work together to provide a single service.
