@@ -1,7 +1,6 @@
 version: "2.1"
 services:
   librespeed:
-    image: lscr.io/linuxserver/librespeed@sha256:a0fb51b5ecee687470d9861cdccd41ef8f2d7117e550bab41a58f8aeba1c8ffa
     image: "\
       linuxserver/librespeed@sha256:\
       6eb3a38fdab18af72e6c505cb98a0a239a6e38a06066fe38b2852876c5a3e1c7\
