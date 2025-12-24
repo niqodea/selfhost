@@ -40,10 +40,11 @@ if [ -e "$startup_target_path" ]; then
 fi
 cp "$startup_source_path" "$startup_target_path"
 
-startup_service_source_path="$root/startup@.service"
-startup_service_target_path='/etc/systemd/system/selfhost-startup@.service'
+startup_service_name='selfhost-startup.service'
+startup_service_source_path="$root/startup.service"
+startup_service_target_path="/etc/systemd/system/$startup_service_name"
 if [ -e "$startup_service_target_path" ]; then
     sudo mv "$startup_service_target_path" "$backup_path"
 fi
 sudo cp "$startup_service_source_path" "$startup_service_target_path"
-sudo systemctl enable "selfhost-startup@$USER.service"
+sudo systemctl enable "$startup_service_name"

@@ -6,8 +6,6 @@ After=docker.service
 [Service]
 ExecStart=/opt/selfhost/startup
 RemainAfterExit=yes
-User=%i
-Group=%i
 
 [Install]
 WantedBy=multi-user.target

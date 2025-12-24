@@ -4,7 +4,6 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-for app in "$root/"*; do
-    app_path="$root/$app"
+for app_path in "$root/"*'/'; do
     docker compose --project-directory "$app_path" up --detach
 done
