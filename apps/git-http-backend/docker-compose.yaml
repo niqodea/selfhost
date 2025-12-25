@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   git-http-backend:
     container_name: git-http-backend
