@@ -1,8 +1,8 @@
 # After having run the Wireguard container to generate the file in volumes/config/wg0.conf,
 # edit the file to include the last three additional PostUp rules below.
 [Interface]
-Address = 0.0.0.0
-ListenPort = 00000
+Address = ${WIREGUARD_NETWORK_SERVER_ADDRESS}
+ListenPort = 51820
 PrivateKey = 0000000000000000000000000000000000000000000=
 PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth+ -j MASQUERADE
 # Custom hack to redirect Google's DNS to our local DNS server

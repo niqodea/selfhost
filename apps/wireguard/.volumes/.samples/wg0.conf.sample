@@ -1,10 +1,12 @@
 # After having run the Wireguard container to generate the file in volumes/config/wg0.conf,
 # edit the file to include the last additional PostUp rule below.
 [Interface]
-Address = 0.0.0.0
-ListenPort = 00000
+Address = ${WIREGUARD_NETWORK_SERVER_ADDRESS}
+ListenPort = 51820
 PrivateKey = 0000000000000000000000000000000000000000000=
 PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth+ -j MASQUERADE
+# Allow SSH connection to Docker host through VPN
+PostUp = iptables -t nat -A PREROUTING -d ${WIREGUARD_NETWORK_SERVER_ADDRESS} -p tcp --dport 22 -j DNAT --to-destination 172.17.0.1:22
 # Custom hack to redirect Google's DNS to our local DNS server
 # Wireguard Android is not able to change the DNS setup of some phones, which is Google's 8.8.8.8 / 8.8.4.4
 # Remember to also set the Wireguard client's DNS to match Google's for full compliance
