@@ -2,6 +2,9 @@
 
 set -eu
 
+# Compose files use 'restart: on-failure' (not 'unless-stopped') because Docker's
+# auto-restart bypasses 'depends_on'. Systemd calls this script to honor dependencies.
+
 root="$(dirname "$(realpath "$0")")"
 
 for app_path in "$root/"*'/'; do
