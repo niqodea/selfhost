@@ -9,6 +9,7 @@
 - Add health checks to services with `depends_on: { condition: service_healthy }` for proper startup order
 - Add resource limits (CPU/memory) to containers to prevent resource exhaustion
 - Set 600 permissions for sensitive files (like env files)
+- Check if it makes sense to use native images instead of those provided by linuxserver.io (what do they add?)
 
 ## Modernization: Replace SWAG with Caddy
 
