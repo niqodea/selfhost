@@ -10,3 +10,4 @@
 - Add resource limits (CPU/memory) to containers to prevent resource exhaustion
 - Set 600 permissions for sensitive files (like env files)
 - Check if it makes sense to use native images instead of those provided by linuxserver.io (what do they add?)
+- Review usage of `HOST_NETWORK_SUBNET`
