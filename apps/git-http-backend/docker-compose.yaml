@@ -2,6 +2,7 @@ services:
   git-http-backend:
     container_name: git-http-backend
     image: git-http-backend
+    pull_policy: build
     build:
       context: .
       dockerfile: Dockerfile
