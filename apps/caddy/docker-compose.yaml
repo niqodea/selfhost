@@ -1,0 +1,35 @@
+services:
+  caddy:
+    container_name: caddy
+    image: caddy
+    pull_policy: build
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DUCKDNS_TOKEN=${DUCKDNS_TOKEN}
+      - DUCKDNS_SUBDOMAIN=${DUCKDNS_SUBDOMAIN}
+    ports:
+      - 443:443
+      - 443:443/udp  # HTTP/3
+      - 80:80  # For HTTP->HTTPS redirect
+    networks:
+      main-network:
+        ipv4_address: ${MAIN_NETWORK_CADDY_ADDRESS}
+      caddy-network:
+    volumes:
+      - .volumes/Caddyfile:/etc/caddy/Caddyfile:ro
+      - .volumes/data:/data
+      - .volumes/config:/config
+    restart: on-failure
+
+networks:
+  main-network:
+    name: ${MAIN_NETWORK}
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${MAIN_NETWORK_SUBNET}
+          ip_range: ${MAIN_NETWORK_IP_RANGE}
+  caddy-network:
+    name: ${CADDY_NETWORK}

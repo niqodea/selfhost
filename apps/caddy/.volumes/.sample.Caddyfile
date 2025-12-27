@@ -1,0 +1,38 @@
+# Global options
+{
+	email your-email@example.com
+	# Uncomment for debug logging
+	# log {
+	# 	level DEBUG
+	# }
+}
+
+# Wildcard cert for all subdomains
+*.{$DUCKDNS_SUBDOMAIN}.duckdns.org {
+	tls {
+		dns duckdns {env.DUCKDNS_TOKEN}
+	}
+
+	# Jellyfin
+	@jellyfin host jellyfin.{$DUCKDNS_SUBDOMAIN}.duckdns.org
+	handle @jellyfin {
+		reverse_proxy jellyfin:8096
+	}
+
+	# qBittorrent
+	@qbittorrent host qbittorrent.{$DUCKDNS_SUBDOMAIN}.duckdns.org
+	handle @qbittorrent {
+		reverse_proxy qbittorrent:8080
+	}
+
+	# LibreSpeed
+	@librespeed host librespeed.{$DUCKDNS_SUBDOMAIN}.duckdns.org
+	handle @librespeed {
+		reverse_proxy librespeed:80
+	}
+
+	# Fallback for unmatched hosts
+	handle {
+		respond "Not found" 404
+	}
+}

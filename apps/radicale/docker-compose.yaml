@@ -11,5 +11,5 @@ services:
 
 networks:
   default:
-    name: ${SWAG_NETWORK}
+    name: ${CADDY_NETWORK}
     external: true

@@ -7,7 +7,7 @@ Each Docker Compose file represents a container or a set of tightly coupled cont
 
 ### Main services
 
-- SWAG reverse proxy to handle of Let's Encrypt SSL certificates and expose locally hosted services in subdomains
+- Caddy as a reverse proxy to handle Let's Encrypt SSL certificates and expose locally hosted services in subdomains
 - DuckDNS service to keep the domain-IP mapping up to date (especially useful if your ISP provider does not grant you a static public IP)
 - Wireguard VPN to access locally hosted services from outside the network
 - Wireguard VPN with Gluetun to also tunnel all external traffic through a third-party VPN
@@ -34,7 +34,7 @@ Each Docker Compose file might depend on one or more of the following files that
 - configuration files in the Docker volumes, created from `/$SERVICE_NAME/volumes-samples/*.sample` files by following the specific instructions they contain
 
 After creation of the files the Docker Compose file depends on, you can run it to launch the corresponding service.
-In case of services behind proxy, you should also run SWAG to make them accessible to the local network.
+In case of services behind proxy, you should also run Caddy to make them accessible to the local network.
 
 ## Environment setup
 

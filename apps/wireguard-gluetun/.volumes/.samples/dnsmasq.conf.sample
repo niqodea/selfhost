@@ -1,7 +1,7 @@
 # Put this in volumes/dnsmasq.conf
 interface=wg0
 
-address=/${DUCKDNS_SUBDOMAIN}.duckdns.org/${MAIN_NETWORK_SWAG_ADDRESS}
+address=/${DUCKDNS_SUBDOMAIN}.duckdns.org/${MAIN_NETWORK_CADDY_ADDRESS}
 
 log-queries
 log-facility=/var/log/dnsmasq.log
