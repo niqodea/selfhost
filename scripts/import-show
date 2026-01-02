@@ -8,34 +8,11 @@ import re
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Generic, TypeVar
 
 
+@dataclass(frozen=True, order=True)
 class Id:
-    """File identifier."""
-
-
-@dataclass(frozen=True, order=True)
-class PartialId(Id):
-    """Partial file identifier."""
-
-    episode: int
-
-    def __str__(self) -> str:
-        return f"EP{self.episode:02d}"
-
-    class Format(Enum):
-        EP = re.compile(r"ep.?(\d+)")
-        EPISODE = re.compile(r"episode.?(\d+)")
-        FIRST_NUMBER = re.compile(r"(\d+)")
-        SECOND_NUMBER = re.compile(r"\d+.*?(\d+)")
-        THIRD_NUMBER = re.compile(r"\d+.*?\d+.*?(\d+)")
-        FOURTH_NUMBER = re.compile(r"\d+.*?\d+.*?\d+.*?(\d+)")
-
-
-@dataclass(frozen=True, order=True)
-class CompleteId(Id):
-    """Complete file identifier."""
+    """Complete file identifier with season and episode numbers."""
 
     season: int
     episode: int
@@ -43,98 +20,29 @@ class CompleteId(Id):
     def __str__(self) -> str:
         return f"S{self.season:02d}E{self.episode:02d}"
 
-    class Format(Enum):
-        SXXEXX = re.compile(r"s(\d+)e(\d+)", re.IGNORECASE)
-        SEASON_EPISODE = re.compile(r"season\s*(\d+)\s*episode\s*(\d+)", re.IGNORECASE)
+
+class CompleteFormat(Enum):
+    """Supported formats for season and episode info."""
+
+    SXXEXX = re.compile(r"s(\d+)e(\d+)", re.IGNORECASE)
+    SEASON_EPISODE = re.compile(r"season\s*(\d+)\s*episode\s*(\d+)", re.IGNORECASE)
 
 
-T = TypeVar("T", bound=Id)
+class PartialFormat(Enum):
+    """Supported formats for episode info only."""
+
+    E_XX = re.compile(r"e[-_\.\s]?(\d+)", re.IGNORECASE)
+    EP_XX = re.compile(r"ep[-_\.\s]?(\d+)", re.IGNORECASE)
+    EPISODE_XX = re.compile(r"episode[-_\.\s]?(\d+)", re.IGNORECASE)
+    FIRST_NUMBER = re.compile(r"(\d+)", re.IGNORECASE)
+    SECOND_NUMBER = re.compile(r"\d+.*?(\d+)", re.IGNORECASE)
+    THIRD_NUMBER = re.compile(r"\d+.*?\d+.*?(\d+)", re.IGNORECASE)
+    FOURTH_NUMBER = re.compile(r"\d+.*?\d+.*?\d+.*?(\d+)", re.IGNORECASE)
 
 
-class IdMap(Generic[T]):
-    def get_keys(self) -> list[T]: ...
-
-    def get(self, id_: T) -> Path: ...
-
-
-class PartialIdMap(IdMap[PartialId]):
-    def __init__(self) -> None:
-        self._paths: dict[PartialId, Path] = {}
-
-    def get_keys(self) -> list[PartialId]:
-        return list(self._paths.keys())
-
-    def get(self, id_: PartialId) -> Path:
-        return self._paths[id_]
-
-    def add(self, id_: PartialId, path: Path) -> None:
-        self._paths[id_] = path
-
-    def has(self, id_: PartialId) -> bool:
-        return id_ in self._paths
-
-    def to_complete(self, season: int) -> CompleteIdMap:
-        completed_id_map = CompleteIdMap()
-        for id_, path in self._paths.items():
-            completed_id = CompleteId(season=season, episode=id_.episode)
-            completed_id_map.add(completed_id, path)
-        return completed_id_map
-
-
-class CompleteIdMap(IdMap[CompleteId]):
-    def __init__(self) -> None:
-        self._paths: dict[CompleteId, Path] = {}
-
-    def get_keys(self) -> list[CompleteId]:
-        return list(self._paths.keys())
-
-    def get(self, id_: CompleteId) -> Path:
-        return self._paths[id_]
-
-    def add(self, id_: CompleteId, path: Path) -> None:
-        self._paths[id_] = path
-
-    def has(self, id_: CompleteId) -> bool:
-        return id_ in self._paths
-
-
-def get_partial_id_map(
-    files: list[Path], format_: PartialId.Format,
-) -> PartialIdMap | None:
-    partial_id_map = PartialIdMap()
-    for file in files:
-        if (match := format_.value.search(file.stem)) is None:
-            return None
-        episode = int(match.group(1))
-        id_ = PartialId(episode=episode)
-
-        if partial_id_map.has(id_):
-            return None
-
-        partial_id_map.add(id_, file)
-
-    return partial_id_map
-
-
-def get_complete_id_map(
-    files: list[Path], format_: CompleteId.Format,
-) -> CompleteIdMap | None:
-    complete_id_map = CompleteIdMap()
-    for file in files:
-        if (match := format_.value.search(file.stem)) is None:
-            return None
-        season, episode = map(int, match.groups())
-        id_ = CompleteId(season=season, episode=episode)
-
-        if complete_id_map.has(id_):
-            return None
-
-        complete_id_map.add(id_, file)
-
-    return complete_id_map
-
-
-def main(source: Path, target: Path, *, update: bool) -> None:
+def main(
+    source: Path, target: Path, assumed_season: int | None, *, update: bool,
+) -> None:
     """Link TV show files with standardized names."""
     files = [f for f in source.glob("*") if f.is_file()]
 
@@ -142,66 +50,118 @@ def main(source: Path, target: Path, *, update: bool) -> None:
         msg = f"No files found in {source}"
         raise SystemExit(msg)
 
-    for complete_id_format in CompleteId.Format:
-        if (complete_id_map := get_complete_id_map(files, complete_id_format)) is None:
-            continue
+    if assumed_season is None:
+        id_map = apply_complete_formats(files)
+    else:
+        id_map = apply_partial_formats(files, assumed_season)
 
-        if not is_format_confirmed(complete_id_format.name, complete_id_map):
-            continue
+    if id_map is None:
+        msg = "No suitable format found"
+        raise SystemExit(msg)
 
-        write(complete_id_map, target, update=update)
-        raise SystemExit
-
-    for partial_id_format in PartialId.Format:
-        if (partial_id_map := get_partial_id_map(files, partial_id_format)) is None:
-            continue
-
-        if not is_format_confirmed(partial_id_format.name, partial_id_map):
-            continue
-
-        season = int(input("\nPlease input season number: "))
-        completed_id_map = partial_id_map.to_complete(season)
-
-        # TODO: Maybe add a guardrail not to write immediately after inputting something
-        write(completed_id_map, target, update=update)
-        raise SystemExit
-
-    msg = "No suitable format found"
-    raise SystemExit(msg)
-
-
-def is_format_confirmed(format_name: str, id_map: IdMap) -> bool:
-    print(f"Detected format: {format_name}")
-    for id_ in sorted(id_map.get_keys()):
-        file = id_map.get(id_)
-        print(f"- {id_}: {file.name}")
-
-    return input("\nProceed? [Y/n] ").strip().lower() != "n"
-
-
-def write(id_map: IdMap[CompleteId], target: Path, *, update: bool) -> None:
     if not update:
         target.mkdir()
 
-    ids = id_map.get_keys()
-
-    for id_ in ids:
-        file = id_map.get(id_)
+    for id_, file in id_map.items():
         target_file = target / f"{id_}{file.suffix}"
         target_file.hardlink_to(file)
 
-    print(f"\nLinked {len(ids)} files to {target}")
+    print(f"\nLinked {len(id_map)} files to {target}")
+
+
+def apply_complete_formats(files: list[Path]) -> dict[Id, Path] | None:
+    for complete_format in CompleteFormat:
+        if (id_map := apply_complete_format(complete_format, files)) is None:
+            continue
+
+        if not is_id_map_confirmed(complete_format.name, id_map):
+            continue
+
+        return id_map
+    return None
+
+
+def apply_complete_format(
+    format_: CompleteFormat,
+    files: list[Path],
+) -> dict[Id, Path] | None:
+    """Use the given complete format to extract ids from files."""
+    id_map: dict[Id, Path] = {}
+    for file in files:
+        if (match := format_.value.search(file.stem)) is None:
+            return None
+        season, episode = map(int, match.groups())
+        id_ = Id(season=season, episode=episode)
+
+        if id_ in id_map:
+            return None
+
+        id_map[id_] = file
+
+    return id_map
+
+
+def apply_partial_formats(
+    files: list[Path], assumed_season: int,
+) -> dict[Id, Path] | None:
+    for partial_format in PartialFormat:
+        if (
+            id_map := apply_partial_format(partial_format, assumed_season, files)
+        ) is None:
+            continue
+
+        if not is_id_map_confirmed(partial_format.name, id_map):
+            continue
+
+        return id_map
+    return None
+
+
+def apply_partial_format(
+    format_: PartialFormat,
+    season: int,
+    files: list[Path],
+) -> dict[Id, Path]:
+    """Use the given partial format and season to extract ids from files."""
+    id_map: dict[Id, Path] = {}
+    for file in files:
+        if (match := format_.value.search(file.stem)) is None:
+            return None
+        episode = int(match.group(1))
+        id_ = Id(season=season, episode=episode)
+
+        if id_ in id_map:
+            return None
+
+        id_map[id_] = file
+
+    return id_map
+
+
+def is_id_map_confirmed(format_name: str, id_map: dict[Id, Path]) -> bool:
+    """Display detected file ids and prompt for confirmation."""
+    print(f"Detected format: {format_name}")
+    for id_, file in sorted(id_map.items()):
+        print(f"- {id_}: {file.name}")
+
+    return input("\nProceed? [y/N] ").strip().lower() == "y"
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("target", type=Path)
+    parser.add_argument("--assumed-season", type=int)
     parser.add_argument(
         "--update",
         action="store_true",
-        help="Create target directory (error if exists)",
+        help="Update existing target directory",
     )
     args = parser.parse_args()
 
-    main(source=args.source, target=args.target, update=args.update)
+    main(
+        source=args.source,
+        target=args.target,
+        assumed_season=args.assumed_season,
+        update=args.update,
+    )
