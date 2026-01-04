@@ -12,5 +12,5 @@ services:
       - TOKEN=${DUCKDNS_TOKEN}
       - LOG_FILE=true
     volumes:
-      - .volumes/config:/config
+      - volumes/config:/config
     restart: on-failure

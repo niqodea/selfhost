@@ -10,7 +10,7 @@ services:
     environment:
       - WEBSOCKET_ENABLED=true
     volumes:
-      - .volumes/data:/data
+      - volumes/data:/data
     restart: on-failure
 
 networks:

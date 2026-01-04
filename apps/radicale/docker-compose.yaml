@@ -7,7 +7,7 @@ services:
     container_name: radicale
     restart: on-failure
     volumes:
-      - .volumes/data:/data
+      - volumes/data:/data
 
 networks:
   default:

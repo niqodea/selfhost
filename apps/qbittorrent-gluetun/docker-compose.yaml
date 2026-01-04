@@ -9,8 +9,8 @@ services:
     env_file:
       - .env-files/linuxserverio.env
     volumes:
-      - .volumes/config:/config
-      - .volumes/downloads:/downloads
+      - volumes/config:/config
+      - volumes/downloads:/downloads
     depends_on:
       - qbittorrent-gluetun
     restart: on-failure
@@ -31,7 +31,7 @@ services:
       # Expose health service externally
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
     volumes:
-      - .volumes/gluetun:/gluetun
+      - volumes/gluetun:/gluetun
     restart: on-failure
 
 networks:

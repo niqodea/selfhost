@@ -24,7 +24,7 @@ services:
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
     volumes:
-      - .volumes/config:/config
+      - volumes/config:/config
     depends_on:
       - wireguard-gluetun
     restart: on-failure
@@ -41,7 +41,7 @@ services:
     cap_add:
       - NET_ADMIN
     volumes:
-      - .volumes/dnsmasq.conf:/etc/dnsmasq.conf
+      - volumes/dnsmasq.conf:/etc/dnsmasq.conf
     depends_on:
       - wireguard-gluetun-internal
     restart: on-failure
@@ -66,7 +66,7 @@ services:
     ports:
       - ${WIREGUARD_GLUETUN_SERVERPORT}:51820/udp
     volumes:
-      - .volumes/gluetun:/gluetun
+      - volumes/gluetun:/gluetun
     restart: on-failure
 
 networks:

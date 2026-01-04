@@ -21,7 +21,7 @@ services:
     ports:
       - ${WIREGUARD_SERVERPORT}:51820/udp
     volumes:
-      - .volumes/config:/config
+      - volumes/config:/config
     restart: on-failure
 
   # We use dnsmasq instead of wireguard's built-in coredns
@@ -32,7 +32,7 @@ services:
     cap_add:
       - NET_ADMIN
     volumes:
-      - .volumes/dnsmasq.conf:/etc/dnsmasq.conf
+      - volumes/dnsmasq.conf:/etc/dnsmasq.conf
     depends_on:
       - wireguard
     restart: on-failure

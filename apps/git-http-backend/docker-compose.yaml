@@ -9,7 +9,7 @@ services:
       args:
         ROOT: /var/www/git
     volumes:
-      - .volumes/root:/var/www/git
+      - volumes/root:/var/www/git
     restart: on-failure
 
 networks:

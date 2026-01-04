@@ -18,9 +18,9 @@ services:
         ipv4_address: ${MAIN_NETWORK_CADDY_ADDRESS}
       caddy-network:
     volumes:
-      - .volumes/Caddyfile:/etc/caddy/Caddyfile:ro
-      - .volumes/data:/data
-      - .volumes/config:/config
+      - volumes/Caddyfile:/etc/caddy/Caddyfile:ro
+      - volumes/data:/data
+      - volumes/config:/config
     restart: on-failure
 
 networks:

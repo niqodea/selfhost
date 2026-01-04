@@ -10,9 +10,9 @@ services:
     ports:
       - 8096:8096
     volumes:
-      - .volumes/config:/config
-      - .volumes/movies:/data/movies
-      - .volumes/shows:/data/shows
+      - volumes/config:/config
+      - volumes/movies:/data/movies
+      - volumes/shows:/data/shows
     restart: on-failure
 
 networks:
