@@ -6,7 +6,7 @@ services:
     "  # 10.11.5
     container_name: jellyfin
     env_file:
-      - .env-files/linuxserverio.env
+      - env-files/linuxserverio.env
     ports:
       - 8096:8096
     volumes:

@@ -6,7 +6,7 @@ services:
     "  # 1.33.2-alpine
     container_name: vaultwarden
     env_file:
-      - .env-files/private.env
+      - env-files/private.env
     environment:
       - WEBSOCKET_ENABLED=true
     volumes:
