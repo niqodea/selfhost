@@ -7,7 +7,7 @@ services:
     container_name: qbittorrent-gluetun-internal
     network_mode: service:qbittorrent-gluetun
     env_file:
-      - .env-files/linuxserverio.env
+      - env-files/linuxserverio.env
     volumes:
       - volumes/config:/config
       - volumes/downloads:/downloads
@@ -24,7 +24,7 @@ services:
     cap_add:
       - NET_ADMIN
     env_file:
-      - .env-files/gluetun.env
+      - env-files/gluetun.env
     environment:
       # Allow access to host local network
       - FIREWALL_OUTBOUND_SUBNETS=${HOST_NETWORK_SUBNET}

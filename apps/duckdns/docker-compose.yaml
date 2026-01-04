@@ -6,7 +6,7 @@ services:
     "  # version-04546c3e
     container_name: duckdns
     env_file:
-      - .env-files/linuxserverio.env
+      - env-files/linuxserverio.env
     environment:
       - SUBDOMAINS=${DUCKDNS_SUBDOMAIN}  # comma-separated list
       - TOKEN=${DUCKDNS_TOKEN}

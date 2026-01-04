@@ -6,7 +6,7 @@ services:
     "  # 5.4.1
     container_name: librespeed
     env_file:
-      - .env-files/linuxserverio.env
+      - env-files/linuxserverio.env
     volumes:
       - volumes/config:/config
     restart: on-failure

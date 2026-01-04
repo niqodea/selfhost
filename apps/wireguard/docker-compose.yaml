@@ -9,8 +9,8 @@ services:
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     env_file:
-      - .env-files/wireguard.env
-      - .env-files/linuxserverio.env
+      - env-files/wireguard.env
+      - env-files/linuxserverio.env
     environment:
       - SERVERURL=${DUCKDNS_SUBDOMAIN}.duckdns.org
       - SERVERPORT=${WIREGUARD_SERVERPORT}
