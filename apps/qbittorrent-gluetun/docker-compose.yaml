@@ -10,7 +10,7 @@ services:
       - .env-files/linuxserverio.env
     volumes:
       - .volumes/config:/config
-      - ${MEDIA_VOLUME}/downloads:/downloads
+      - .volumes/downloads:/downloads
     depends_on:
       - qbittorrent-gluetun
     restart: on-failure

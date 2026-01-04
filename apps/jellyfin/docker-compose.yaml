@@ -11,8 +11,8 @@ services:
       - 8096:8096
     volumes:
       - .volumes/config:/config
-      - ${MEDIA_VOLUME}/movies:/data/movies
-      - ${MEDIA_VOLUME}/shows:/data/shows
+      - .volumes/movies:/data/movies
+      - .volumes/shows:/data/shows
     restart: on-failure
 
 networks:
