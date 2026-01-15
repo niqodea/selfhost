@@ -1,0 +1,23 @@
+services:
+  ddns-updater:
+    image: "\
+      qmcgaw/ddns-updater@sha256:\
+      ed73f1fb7ab54a8a8fa26001eecc77cc8be56cdf3fb0ca91fee831124bcbb696\
+    "  # v2.9.0
+    container_name: ddns-updater
+    environment:
+      CONFIG: |
+        {
+          "settings": [
+            {
+              "provider": "dynu",
+              "domain": "${DOMAIN}",
+              "username": "${DYNU_USERNAME}",
+              "password": "${DYNU_PASSWORD}"
+            }
+          ]
+        }
+      SERVER_ENABLED: no
+    volumes:
+      - ./volumes/data:/updater/data
+    restart: on-failure
