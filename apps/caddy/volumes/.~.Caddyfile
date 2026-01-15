@@ -8,30 +8,26 @@
 }
 
 # Wildcard cert for all subdomains
-*.{$DUCKDNS_SUBDOMAIN}.duckdns.org {
+*.{$DOMAIN} {
 	tls {
-		dns duckdns {env.DUCKDNS_TOKEN}
+		dns dynu {env.DYNU_API_KEY}
 	}
 
-	# Jellyfin
-	@jellyfin host jellyfin.{$DUCKDNS_SUBDOMAIN}.duckdns.org
+	@jellyfin host jellyfin.{$DOMAIN}
 	handle @jellyfin {
 		reverse_proxy jellyfin:8096
 	}
 
-	# qBittorrent
-	@qbittorrent host qbittorrent.{$DUCKDNS_SUBDOMAIN}.duckdns.org
+	@qbittorrent host qbittorrent.{$DOMAIN}
 	handle @qbittorrent {
 		reverse_proxy qbittorrent:8080
 	}
 
-	# LibreSpeed
-	@librespeed host librespeed.{$DUCKDNS_SUBDOMAIN}.duckdns.org
+	@librespeed host librespeed.{$DOMAIN}
 	handle @librespeed {
 		reverse_proxy librespeed:80
 	}
 
-	# Fallback for unmatched hosts
 	handle {
 		respond "Not found" 404
 	}

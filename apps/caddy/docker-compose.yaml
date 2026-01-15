@@ -7,8 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - DUCKDNS_TOKEN=${DUCKDNS_TOKEN}
-      - DUCKDNS_SUBDOMAIN=${DUCKDNS_SUBDOMAIN}
+      - DOMAIN=${DOMAIN}
+      - DYNU_API_KEY=${DYNU_API_KEY}
     ports:
       - 443:443
       - 443:443/udp  # HTTP/3

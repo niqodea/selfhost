@@ -12,7 +12,7 @@ services:
       - env-files/wireguard.env
       - env-files/linuxserverio.env
     environment:
-      - SERVERURL=${DUCKDNS_SUBDOMAIN}.duckdns.org
+      - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_SERVERPORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${HOST_NETWORK_SUBNET}

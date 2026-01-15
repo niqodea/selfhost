@@ -16,7 +16,7 @@ services:
       - env-files/wireguard.env
       - env-files/linuxserverio.env
     environment:
-      - SERVERURL=${DUCKDNS_SUBDOMAIN}.duckdns.org
+      - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_GLUETUN_SERVERPORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       # Tunnel everything through vpn
