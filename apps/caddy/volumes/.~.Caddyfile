@@ -10,7 +10,7 @@
 # Wildcard cert for all subdomains
 *.{$DOMAIN} {
 	tls {
-		dns dynu {env.DYNU_API_KEY}
+		dns dynu {$DYNU_API_KEY}
 	}
 
 	@jellyfin host jellyfin.{$DOMAIN}
