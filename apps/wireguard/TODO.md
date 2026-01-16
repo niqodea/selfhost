@@ -1,1 +1,0 @@
-- Understand why sometimes dnsmasq does not get access to the wg0 interface. For now, `docker compose up --force-recreate` usually solves the problem temporarily.

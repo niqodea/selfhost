@@ -18,6 +18,9 @@ services:
       - SERVERPORT=${WIREGUARD_DEV_SERVERPORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${HOST_NETWORK_SUBNET}
+      # Use a custom DNS server
+      - PEERDNS=${MAIN_NETWORK_DNSMASQ_ADDRESS}
+      # Disable unused default DNS server
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
     ports:
@@ -25,19 +28,6 @@ services:
     volumes:
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - ./volumes/config:/config
-    restart: on-failure
-
-  # We use dnsmasq instead of wireguard's built-in coredns
-  wireguard-dev-dnsmasq:
-    image: strm/dnsmasq
-    container_name: wireguard-dev-dnsmasq
-    network_mode: service:wireguard-dev
-    cap_add:
-      - NET_ADMIN
-    volumes:
-      - ./volumes/dnsmasq.conf:/etc/dnsmasq.conf:ro
-    depends_on:
-      - wireguard-dev
     restart: on-failure
 
 networks:
