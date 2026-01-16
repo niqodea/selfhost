@@ -1,10 +1,9 @@
 services:
 
   wireguard-gluetun-internal:
-    image: "\
-      linuxserver/wireguard@sha256:\
-      c095b08123345cefa1a8a589a417c56690c046ba925d292f4657f3fefcce1dfd\
-    "  # 1.0.20210914
+    image: "lscr.io/linuxserver/wireguard\
+      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29\
+    "  # v1.0.20210914-ls126
     container_name: wireguard-gluetun-internal
     network_mode: service:wireguard-gluetun
     cap_add:

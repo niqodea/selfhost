@@ -1,7 +1,9 @@
 services:
 
   wireguard:
-    image: lscr.io/linuxserver/wireguard@sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29
+    image: "lscr.io/linuxserver/wireguard\
+      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29\
+    "  # v1.0.20210914-ls126
     container_name: wireguard
     cap_add:
       - NET_ADMIN
