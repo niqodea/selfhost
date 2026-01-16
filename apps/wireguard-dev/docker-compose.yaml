@@ -1,0 +1,43 @@
+services:
+
+  wireguard-dev:
+    image: lscr.io/linuxserver/wireguard@sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29
+    container_name: wireguard-dev
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    env_file:
+      - env-files/wireguard.env
+      - env-files/linuxserverio.env
+    environment:
+      - SERVERURL=${DOMAIN}
+      - SERVERPORT=${WIREGUARD_DEV_SERVERPORT}
+      - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
+      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${HOST_NETWORK_SUBNET}
+      # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
+      - USE_COREDNS=false
+    ports:
+      - ${WIREGUARD_DEV_SERVERPORT}:51820/udp
+    volumes:
+      - ./volumes/config:/config
+    restart: on-failure
+
+  # We use dnsmasq instead of wireguard's built-in coredns
+  wireguard-dev-dnsmasq:
+    image: strm/dnsmasq
+    container_name: wireguard-dev-dnsmasq
+    network_mode: service:wireguard-dev
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ./volumes/dnsmasq.conf:/etc/dnsmasq.conf
+    depends_on:
+      - wireguard-dev
+    restart: on-failure
+
+networks:
+  default:
+    name: ${MAIN_NETWORK}
+    external: true

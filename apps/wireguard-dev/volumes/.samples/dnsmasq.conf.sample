@@ -1,0 +1,7 @@
+# Put this in volumes/dnsmasq.conf
+interface=wg0
+
+address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+
+log-queries
+log-facility=/var/log/dnsmasq.log
