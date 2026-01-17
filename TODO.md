@@ -16,3 +16,6 @@
   - healthchecks + condition dependencies
   - dnsmasq as separate container wireguard points to
   - investigate new functionalities of the wireguard container to configure dns
+- Improve naming of docker resources and yaml fields and reduce namespace aliasing
+- Check if it's possible to enforce volume existence when running docker compose
+- Add dnsmasq-gluetun
