@@ -1,29 +1,37 @@
-# ADR: Gluetun - Multiple Instances vs Single Gateway
+# ADR: Gluetun - Single Centralized Gateway
 
-**Decision:** Keep separate Gluetun instances per service stack.
+**Decision:** Use one Gluetun instance as a shared VPN gateway via host iptables.
 
 ## Context
 
-Tried to consolidate multiple Gluetun containers into one shared VPN gateway. The idea was to have other containers use Gluetun's IP as their default gateway.
+Previously ran separate Gluetun instances per service stack due to Docker's inability to designate a container as a network gateway.
 
-## Why It Doesn't Work
+## Solution
 
-**Docker doesn't support using a container as a gateway.** The `--gateway` flag assigns an IP to the bridge interface, not to a container. This is a fundamental Docker limitation, not a configuration issue.
+Centralize routing at the host level.
+Create a dedicated Docker network (`gluetun-network`) and configure host iptables to route all traffic from its bridge interface (`br-gluetun`) through the Gluetun container.
 
-Relevant issues (all unresolved):
-- [moby/moby#48193](https://github.com/moby/moby/issues/48193) — "Address already in use" when trying to assign gateway IP to container
-- [moby/moby#20758](https://github.com/moby/moby/issues/20758) — Feature request from 2016, still open
+Containers needing VPN:
+1. Join `gluetun-network` with `gw_priority: 1` (makes it default route)
+2. Join other networks for inbound connectivity (since Docker port forwarding breaks when routed through VPN)
 
-## Alternatives Considered
+Inbound port forwarding is handled manually via host iptables, targeting the container's non-VPN network IP.
+This is critical for `wireguard-wan`, as Docker's `ports:` directive routes through the `gw_priority` network (`gluetun-network`), so responses would exit via VPN and never reach clients.
 
-| Approach                        | Problem                                                                             |
-|---------------------------------|-------------------------------------------------------------------------------------|
-| `network_mode: service:gluetun` | Port collisions — all services share one network namespace, so ports must be unique |
-| SOCKS5/HTTP proxy               | Not all apps support it; doesn't capture all traffic; DNS leaks                     |
-| Host iptables hacks             | Fragile, doesn't survive restarts                                                   |
+## Why This Works
 
-The Gluetun maintainer [has confirmed](https://github.com/qdm12/gluetun/discussions/1084) port collision is unavoidable with shared network mode.
+Docker can't assign a container as a network's gateway ([moby/moby#48193](https://github.com/moby/moby/issues/48193), [moby/moby#20758](https://github.com/moby/moby/issues/20758)).
+But host iptables can intercept traffic at the bridge interface level, bypassing Docker's routing entirely.
+The complexity moves from multiple Gluetun instances to a single iptables configuration.
+
+## Trade-offs
+
+| Pros                 | Cons                                 |
+|----------------------|--------------------------------------|
+| Single VPN instance  | Requires host iptables configuration |
+| No port collisions   | Port forwarding needs manual setup   |
+| Lower resource usage |                                      |
 
 ## Conclusion
 
-Multiple Gluetun instances is the intended pattern. The memory cost (~55MB each with tuning) is acceptable. Port-number-as-service-identifier is an anti-pattern worth avoiding.
+Host iptables centralization beats per-service Gluetun instances.

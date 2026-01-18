@@ -1,0 +1,27 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    env_file:
+      - env-files/local.env
+    environment:
+      # Allow access to host local network
+      # TODO: remove?
+      # - FIREWALL_OUTBOUND_SUBNETS=${HOST_NETWORK_SUBNET}
+      # Expose health service externally
+      - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
+    networks:
+      main-network:
+        ipv4_address: ${MAIN_NETWORK_GLUETUN_ADDRESS}
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: on-failure
+
+networks:
+  gluetun-network:
+    name: ${GLUETUN_NETWORK}
+  main-network:
+    name: ${MAIN_NETWORK}
+    external: true

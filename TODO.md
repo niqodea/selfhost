@@ -1,7 +1,6 @@
 # TODO
 
 - Commit some volumes files containing configurations we want to persist
-- Use a gateway container to easily encrypt traffic from multiple containers with a single gluetun container (this might be useful: https://stackoverflow.com/a/69055795)
 - Implement consistency checks (e.g. dnsmasq.conf vs docker-compose.yml addresses) (maybe a library might come out of it?)
 - Do not crash when first running containers due to dead symlinks
 - Clearly define the flow of things to set up before running docker compose up
@@ -11,11 +10,5 @@
 - Set 600 permissions for sensitive files (like env files)
 - Check if it makes sense to use native images instead of those provided by linuxserver.io (what do they add?)
 - Review usage of `HOST_NETWORK_SUBNET`
-- Solve wireguard-dnsmasq race conditions. Possible solutions:
-  - bind-dynamic in dnsmasq -> didn't work, dnsmasq sometimes gets no access to wireguard interfaces
-  - healthchecks + condition dependencies
-  - dnsmasq as separate container wireguard points to
-  - investigate new functionalities of the wireguard container to configure dns
 - Improve naming of docker resources and yaml fields and reduce namespace aliasing
 - Check if it's possible to enforce volume existence when running docker compose
-- Add dnsmasq-gluetun

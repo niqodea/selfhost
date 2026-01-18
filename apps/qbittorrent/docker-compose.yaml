@@ -1,0 +1,25 @@
+services:
+  qbittorrent:
+    image: "\
+      linuxserver/qbittorrent@sha256:\
+      94e1c4fb34b38e9b529867aefc1185a10710ea4868dcb1c4f395780d1a4c297b\
+    "  # 5.0.3
+    container_name: qbittorrent
+    networks:
+      vpn_network:
+        gw_priority: 1
+      caddy_network:
+    env_file:
+      - env-files/linuxserverio.env
+    volumes:
+      - ./volumes/config:/config
+      - ./volumes/downloads:/downloads
+    restart: on-failure
+
+networks:
+  vpn_network:
+    name: vpn_network
+    external: true
+  caddy_network:
+    name: ${CADDY_NETWORK}
+    external: true

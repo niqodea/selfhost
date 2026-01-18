@@ -1,0 +1,66 @@
+services:
+
+  wireguard-wan:
+    image: "lscr.io/linuxserver/wireguard\
+      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29\
+    "  # v1.0.20210914-ls126
+    container_name: wireguard-wan
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    env_file:
+      - env-files/wireguard.env
+      - env-files/linuxserverio.env
+    environment:
+      - SERVERURL=${DOMAIN}
+      - SERVERPORT=${WIREGUARD_WAN_SERVERPORT}
+      - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
+      # Tunnel everything through vpn
+      - ALLOWEDIPS=0.0.0.0/0  # or 0.0.0.0/1,128.0.0.0/1 for Windows clients
+      # Disable default DNS server since we run dnsmasq instead
+      # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
+      - USE_COREDNS=false
+    # NOTE: Port forwarding omitted.
+    # Docker's port forwarding uses the network gateway, which routes through
+    # gluetun's tunnel in this setup, breaking connections back to clients.
+    # We handle port forwarding manually on the host to enable port forwarding
+    # via main network instead, see ./configure-port-forwarding for how.
+    # ports:
+    #   - ${WIREGUARD_WAN_SERVERPORT}:51820/udp
+    volumes:
+      - ./volumes/server-template.conf:/config/templates/server.conf:ro
+      - ./volumes/config:/config
+    networks:
+      gluetun-network:
+        gw_priority: 1
+      main-network:
+        ipv4_address: ${MAIN_NETWORK_WIREGUARD_WAN_ADDRESS}
+    restart: on-failure
+
+  wireguard-wan-dnsmasq:
+    image: "\
+      strm/dnsmasq\
+      @sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39\
+    "  # unversioned, the only available version for now
+    container_name: wireguard-wan-dnsmasq
+    command:
+      - -k
+      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --no-resolv  # ignore servers in /etc/resolv.conf
+      - --server=${WIREGUARD_WAN_DNSMASQ_SERVER}
+      - --log-queries
+      - --log-facility=-  # shows up in docker logs
+    cap_add:
+      - NET_ADMIN
+    network_mode: service:wireguard-wan
+    restart: on-failure
+
+networks:
+  gluetun-network:
+    name: ${GLUETUN_NETWORK}
+    external: true
+  main-network:
+    name: ${MAIN_NETWORK}
+    external: true
