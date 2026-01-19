@@ -15,7 +15,7 @@ services:
       - env-files/linuxserverio.env
     environment:
       - SERVERURL=${DOMAIN}
-      - SERVERPORT=${WIREGUARD_WAN_SERVERPORT}
+      - SERVERPORT=${WIREGUARD_WAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       # Tunnel everything through vpn
       - ALLOWEDIPS=0.0.0.0/0  # or 0.0.0.0/1,128.0.0.0/1 for Windows clients
@@ -28,7 +28,7 @@ services:
     # We handle port forwarding manually on the host to enable port forwarding
     # via main network instead, see ./configure-port-forwarding for how.
     # ports:
-    #   - ${WIREGUARD_WAN_SERVERPORT}:51820/udp
+    #   - ${WIREGUARD_WAN_HOST_PORT}:51820/udp
     volumes:
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - ./volumes/config:/config

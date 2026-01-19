@@ -15,14 +15,14 @@ services:
       - env-files/linuxserverio.env
     environment:
       - SERVERURL=${DOMAIN}
-      - SERVERPORT=${WIREGUARD_LAN_DEV_SERVERPORT}
+      - SERVERPORT=${WIREGUARD_LAN_DEV_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${HOST_NETWORK_SUBNET}
       # Disable default DNS server since we run dnsmasq instead
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
     ports:
-      - ${WIREGUARD_LAN_DEV_SERVERPORT}:51820/udp
+      - ${WIREGUARD_LAN_DEV_HOST_PORT}:51820/udp
     volumes:
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - ./volumes/config:/config
