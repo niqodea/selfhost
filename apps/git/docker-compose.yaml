@@ -1,5 +1,5 @@
 services:
-  git-http-backend:
+  git:
     pull_policy: build
     build:
       args:
@@ -7,7 +7,7 @@ services:
         ROOT: /var/www/git
     networks:
       caddy:
-        aliases: ["${CADDY_NETWORK_GIT_HTTP_BACKEND_ALIAS}"]
+        aliases: ["${CADDY_NETWORK_GIT_ALIAS}"]
     volumes:
       - ./volumes/root:/var/www/git
     restart: ${DOCKER_RESTART}
