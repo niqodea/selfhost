@@ -12,3 +12,5 @@
 - Review usage of `HOST_NETWORK_SUBNET`
 - Improve naming of docker resources and yaml fields and reduce namespace aliasing
 - Check if it's possible to enforce volume existence when running docker compose
+- Figure out latest best practice for docker vs host user ownership and move away from linuxserverio's PUID/PGID if possible
+- Evaluate whether to go back to unless-stopped restart policy now that we do not have `depends_on` in services
