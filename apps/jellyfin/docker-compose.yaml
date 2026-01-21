@@ -1,21 +1,19 @@
 services:
   jellyfin:
-    image: "\
-      linuxserver/jellyfin@sha256:\
-      747bc6725c5e4f1330e693b50d787e2106e52ac5b25c4174ca5f58915fc17ec8\
-    "  # 10.11.5
-    container_name: jellyfin
-    env_file:
-      - env-files/linuxserverio.env
-    ports:
-      - 8096:8096
+    image: "linuxserver/jellyfin:10.11.5\
+      @sha256:747bc6725c5e4f1330e693b50d787e2106e52ac5b25c4174ca5f58915fc17ec8"
+    networks:
+      caddy:
+        aliases: ["${CADDY_NETWORK_JELLYFIN_ALIAS}"]
     volumes:
       - ./volumes/config:/config
       - ./volumes/movies:/data/movies
       - ./volumes/shows:/data/shows
-    restart: on-failure
+    env_file:
+      - env-files/linuxserverio.env
+    restart: ${DOCKER_RESTART}
 
 networks:
-  default:
-    name: ${CADDY_NETWORK}
+  caddy:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}

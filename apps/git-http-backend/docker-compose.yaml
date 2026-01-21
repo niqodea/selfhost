@@ -1,18 +1,18 @@
 services:
   git-http-backend:
-    container_name: git-http-backend
-    image: git-http-backend
     pull_policy: build
     build:
-      context: .
-      dockerfile: Dockerfile
       args:
+        # TODO: refactor this as a runtime setting, not build time
         ROOT: /var/www/git
+    networks:
+      caddy:
+        aliases: ["${CADDY_NETWORK_GIT_HTTP_BACKEND_ALIAS}"]
     volumes:
       - ./volumes/root:/var/www/git
-    restart: on-failure
+    restart: ${DOCKER_RESTART}
 
 networks:
-  default:
-    name: ${CADDY_NETWORK}
+  caddy:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}

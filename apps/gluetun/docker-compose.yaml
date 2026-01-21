@@ -1,9 +1,10 @@
 services:
   gluetun:
-    image: qmcgaw/gluetun
-    container_name: gluetun
-    cap_add:
-      - NET_ADMIN
+    image: "qmcgaw/gluetun:v3.41.0\
+      @sha256:6b54856716d0de56e5bb00a77029b0adea57284cf5a466f23aad5979257d3045"
+    networks:
+      main:
+        ipv4_address: ${MAIN_NETWORK_GLUETUN_ADDRESS}
     env_file:
       - env-files/local.env
     environment:
@@ -12,16 +13,15 @@ services:
       # - FIREWALL_OUTBOUND_SUBNETS=${HOST_NETWORK_SUBNET}
       # Expose health service externally
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
-    networks:
-      main-network:
-        ipv4_address: ${MAIN_NETWORK_GLUETUN_ADDRESS}
+    cap_add:
+      - NET_ADMIN
     sysctls:
       - net.ipv4.ip_forward=1
-    restart: on-failure
+    restart: ${DOCKER_RESTART}
 
 networks:
-  gluetun-network:
-    name: ${GLUETUN_NETWORK}
-  main-network:
-    name: ${MAIN_NETWORK}
+  main:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+  gluetun:
+    name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}

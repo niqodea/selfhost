@@ -1,31 +1,33 @@
 services:
   caddy:
-    container_name: caddy
-    image: caddy
     pull_policy: build
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - DOMAIN=${DOMAIN}
-      - DYNU_API_KEY=${DYNU_API_KEY}
+    build: .
     networks:
-      main-network:
+      caddy:
+      main:
         ipv4_address: ${MAIN_NETWORK_CADDY_ADDRESS}
-      caddy-network:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./volumes/data:/data
       - ./volumes/config:/config
-    restart: on-failure
+    environment:
+      - DOMAIN=${DOMAIN}
+      - DYNU_API_KEY=${DYNU_API_KEY}
+      # Services
+      - GIT_HTTP_BACKEND_ALIAS=${CADDY_NETWORK_GIT_HTTP_BACKEND_ALIAS}
+      - JELLYFIN_ALIAS=${CADDY_NETWORK_JELLYFIN_ALIAS}
+      - LIBRESPEED_ALIAS=${CADDY_NETWORK_LIBRESPEED_ALIAS}
+      - QBITTORRENT_ALIAS=${CADDY_NETWORK_QBITTORRENT_ALIAS}
+      - RADICALE_ALIAS=${CADDY_NETWORK_RADICALE_ALIAS}
+      - VAULTWARDEN_ALIAS=${CADDY_NETWORK_VAULTWARDEN_ALIAS}
+    restart: ${DOCKER_RESTART}
 
 networks:
-  main-network:
-    name: ${MAIN_NETWORK}
-    driver: bridge
+  caddy:
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+  main:  # TODO: Move this out in a centralized docker-compose.yaml, perhaps at top level?
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
     ipam:
       config:
         - subnet: ${MAIN_NETWORK_SUBNET}
           ip_range: ${MAIN_NETWORK_IP_RANGE}
-  caddy-network:
-    name: ${CADDY_NETWORK}

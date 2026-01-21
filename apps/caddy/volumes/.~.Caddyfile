@@ -1,31 +1,31 @@
-# Global options
 {
-	email your-email@example.com
-	# Uncomment for debug logging
+	# email your-email@example.com
 	# log {
 	# 	level DEBUG
 	# }
 }
 
-# Wildcard cert for all subdomains
 *.{$DOMAIN} {
 	tls {
-		dns dynu {$DYNU_API_KEY}
+		dns dynu {
+            api_token {$DYNU_API_KEY}
+            own_domain {$DOMAIN}
+        }
 	}
 
 	@jellyfin host jellyfin.{$DOMAIN}
 	handle @jellyfin {
-		reverse_proxy jellyfin:8096
+		reverse_proxy {$JELLYFIN_ALIAS}:8096
 	}
 
 	@qbittorrent host qbittorrent.{$DOMAIN}
 	handle @qbittorrent {
-		reverse_proxy qbittorrent:8080
+		reverse_proxy {$QBITTORRENT_ALIAS}:8080
 	}
 
 	@librespeed host librespeed.{$DOMAIN}
 	handle @librespeed {
-		reverse_proxy librespeed:80
+		reverse_proxy {$LIBRESPEED_ALIAS}:80
 	}
 
 	handle {

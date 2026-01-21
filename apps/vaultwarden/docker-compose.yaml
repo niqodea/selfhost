@@ -1,19 +1,20 @@
 services:
   vaultwarden:
-    image: "\
-      vaultwarden/server@sha256:\
-      63cce7624f655f83ad5bab66ef62bc3e3327116b068704bfbbda5d0c1b3003be\
-    "  # 1.33.2-alpine
-    container_name: vaultwarden
-    env_file:
-      - env-files/private.env
-    environment:
-      - WEBSOCKET_ENABLED=true
+    image: "vaultwarden/server:1.33.2-alpine\
+      @sha256:63cce7624f655f83ad5bab66ef62bc3e3327116b068704bfbbda5d0c1b3003be"
+    networks:
+      caddy:
+        aliases: ["${CADDY_NETWORK_VAULTWARDEN_ALIAS}"]
     volumes:
       - ./volumes/data:/data
-    restart: on-failure
+    env_file:
+      - env-files/local.env
+    environment:
+      # TODO: what does this do in practice?
+      - WEBSOCKET_ENABLED=true
+    restart: ${DOCKER_RESTART}
 
 networks:
-  default:
-    name: ${CADDY_NETWORK}
+  caddy:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}

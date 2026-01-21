@@ -1,17 +1,17 @@
 services:
   librespeed:
-    image: "\
-      linuxserver/librespeed@sha256:\
-      6eb3a38fdab18af72e6c505cb98a0a239a6e38a06066fe38b2852876c5a3e1c7\
-    "  # 5.4.1
-    container_name: librespeed
-    env_file:
-      - env-files/linuxserverio.env
+    image: "linuxserver/librespeed:5.4.1\
+      @sha256:6eb3a38fdab18af72e6c505cb98a0a239a6e38a06066fe38b2852876c5a3e1c7"
+    networks:
+      caddy:
+        aliases: ["${CADDY_NETWORK_LIBRESPEED_ALIAS}"]
     volumes:
       - ./volumes/config:/config
-    restart: on-failure
+    env_file:
+      - env-files/linuxserverio.env
+    restart: ${DOCKER_RESTART}
 
 networks:
-  default:
-    name: ${CADDY_NETWORK}
+  caddy:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}

@@ -1,15 +1,16 @@
 services:
 
   wireguard-wan:
-    image: "lscr.io/linuxserver/wireguard\
-      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29\
-    "  # v1.0.20210914-ls126
-    container_name: wireguard-wan
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
+    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
+      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    networks:
+      gluetun:
+        gw_priority: 1
+      main:
+        ipv4_address: ${MAIN_NETWORK_WIREGUARD_WAN_ADDRESS}
+    volumes:
+      - ./volumes/server-template.conf:/config/templates/server.conf:ro
+      - ./volumes/config:/config
     env_file:
       - env-files/wireguard.env
       - env-files/linuxserverio.env
@@ -29,22 +30,18 @@ services:
     # via main network instead, see ./configure-port-forwarding for how.
     # ports:
     #   - ${WIREGUARD_WAN_HOST_PORT}:51820/udp
-    volumes:
-      - ./volumes/server-template.conf:/config/templates/server.conf:ro
-      - ./volumes/config:/config
-    networks:
-      gluetun-network:
-        gw_priority: 1
-      main-network:
-        ipv4_address: ${MAIN_NETWORK_WIREGUARD_WAN_ADDRESS}
-    restart: on-failure
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: ${DOCKER_RESTART}
 
   wireguard-wan-dnsmasq:
-    image: "\
-      strm/dnsmasq\
+    image: "strm/dnsmasq\
       @sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39\
     "  # unversioned, the only available version for now
-    container_name: wireguard-wan-dnsmasq
+    network_mode: service:wireguard-wan
     command:
       - -k
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
@@ -54,13 +51,12 @@ services:
       - --log-facility=-  # shows up in docker logs
     cap_add:
       - NET_ADMIN
-    network_mode: service:wireguard-wan
-    restart: on-failure
+    restart: ${DOCKER_RESTART}
 
 networks:
-  gluetun-network:
-    name: ${GLUETUN_NETWORK}
+  gluetun:
     external: true
-  main-network:
-    name: ${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
+  main:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}

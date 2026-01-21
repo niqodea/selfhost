@@ -1,25 +1,23 @@
 services:
   qbittorrent:
-    image: "\
-      linuxserver/qbittorrent@sha256:\
-      94e1c4fb34b38e9b529867aefc1185a10710ea4868dcb1c4f395780d1a4c297b\
-    "  # 5.0.3
-    container_name: qbittorrent
+    image: "linuxserver/qbittorrent:5.0.3\
+      @sha256:94e1c4fb34b38e9b529867aefc1185a10710ea4868dcb1c4f395780d1a4c297b"
     networks:
-      vpn_network:
+      gluetun:
         gw_priority: 1
-      caddy_network:
-    env_file:
-      - env-files/linuxserverio.env
+      caddy:
+        aliases: ["${CADDY_NETWORK_QBITTORRENT_ALIAS}"]
     volumes:
       - ./volumes/config:/config
       - ./volumes/downloads:/downloads
-    restart: on-failure
+    env_file:
+      - env-files/linuxserverio.env
+    restart: ${DOCKER_RESTART}
 
 networks:
-  vpn_network:
-    name: vpn_network
+  gluetun:
     external: true
-  caddy_network:
-    name: ${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
+  caddy:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}

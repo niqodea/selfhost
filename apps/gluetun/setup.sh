@@ -21,10 +21,10 @@ iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 # for gluetunned wireguard
 # Warning: broader than specifying i/o interface
 sudo iptables -t nat -A DOCKER -p udp --dport 51822 -j DNAT --to-destination 10.0.0.4:51820
-sudo iptables -I DOCKER -p udp -d 10.0.0.4 --dport 51820 -j ACCEPT  
+sudo iptables -I DOCKER -p udp -d 10.0.0.4 --dport 51820 -j ACCEPT
 # More specific
 sudo iptables -t nat -A DOCKER ! -i br-ad0dfc7ef8f5 -p udp --dport 51822 -j DNAT --to-destination 10.0.0.4:51820
-sudo iptables -I DOCKER -p udp ! -i br-ad0dfc7ef8f5 -o br-ad0dfc7ef8f5 -d 10.0.0.4 --dport 51820 -j ACCEPT  
+sudo iptables -I DOCKER -p udp ! -i br-ad0dfc7ef8f5 -o br-ad0dfc7ef8f5 -d 10.0.0.4 --dport 51820 -j ACCEPT
 
 # Hack to have the docker container go through the interface it originally received the packet from, instead of the default gateway
 sudo iptables -t nat -A POSTROUTING -p udp -d 10.0.0.4 --dport 51820 -j MASQUERADE
