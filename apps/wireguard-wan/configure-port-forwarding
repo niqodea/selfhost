@@ -1,0 +1,57 @@
+#!/bin/sh
+
+set -eu
+
+case "${1:-}" in
+    up)
+        NAT_OP="-A"
+        FILTER_OP="-I"
+        ;;
+    down)
+        NAT_OP="-D"
+        FILTER_OP="-D"
+        ;;
+    *)
+        echo "Usage: $0 {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+get_env_var() {
+    sed -n "s/^$1=//p" .env
+}
+
+WIREGUARD_WAN_SERVERPORT=$(get_env_var 'WIREGUARD_WAN_SERVERPORT')
+MAIN_NETWORK_BRIDGE=$(get_env_var 'MAIN_NETWORK_BRIDGE')
+MAIN_NETWORK_WIREGUARD_WAN_ADDRESS=$(get_env_var 'MAIN_NETWORK_WIREGUARD_WAN_ADDRESS')
+
+WIREGUARD_INTERNAL_SERVERPORT=51820
+
+iptables \
+    -t nat \
+    "$NAT_OP" DOCKER \
+    ! -i "$MAIN_NETWORK_BRIDGE" \
+    -p udp \
+    --dport "$WIREGUARD_WAN_SERVERPORT" \
+    -j DNAT \
+    --to-destination "$MAIN_NETWORK_WIREGUARD_WAN_ADDRESS:$WIREGUARD_INTERNAL_SERVERPORT"
+
+iptables \
+    "$FILTER_OP" DOCKER \
+    -p udp \
+    ! -i "$MAIN_NETWORK_BRIDGE" \
+    -o "$MAIN_NETWORK_BRIDGE" \
+    -d "$MAIN_NETWORK_WIREGUARD_WAN_ADDRESS" \
+    --dport "$WIREGUARD_INTERNAL_SERVERPORT" \
+    -j ACCEPT
+
+# Hack to have the docker container go through the interface it originally
+# received the packet from, instead of the default gateway
+iptables \
+    -t nat \
+    "$NAT_OP" POSTROUTING \
+    -p udp \
+    -o "$MAIN_NETWORK_BRIDGE" \
+    -d "$MAIN_NETWORK_WIREGUARD_WAN_ADDRESS" \
+    --dport "$WIREGUARD_INTERNAL_SERVERPORT" \
+    -j MASQUERADE
