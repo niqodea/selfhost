@@ -6,6 +6,10 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
+"$root"/configure up
+# using "--all-resources create" since "up" won't work if no service is defined
+docker compose --project-directory "$root" --all-resources create
+
 for app_path in "$root"/*; do
     if ! [ -d "$app_path" ]; then
         continue

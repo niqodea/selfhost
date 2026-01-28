@@ -20,8 +20,5 @@ services:
 
 networks:
   gluetun:
+    external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
-    ipam:
-      config:
-        - subnet: ${GLUETUN_NETWORK_SUBNET}
-          ip_range: ${GLUETUN_NETWORK_IP_RANGE}

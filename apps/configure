@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eux
+
+get_env_var() {
+    value="$(sed -n "s/^$1=//p" .env)"
+    if [ -z "$value" ]; then
+        >&2 echo "Error: $1 not found in .env"
+        return 1
+    fi
+    printf '%s' "$value"
+}
+
+GLUETUN_NETWORK_GATEWAY_ADDRESS="$(get_env_var 'GLUETUN_NETWORK_GATEWAY_ADDRESS')"
+GLUETUN_NETWORK_SUBNET="$(get_env_var 'GLUETUN_NETWORK_SUBNET')"
+GLUETUN_TABLE="$(get_env_var 'GLUETUN_TABLE')"
+
+case "${1:-}" in
+    up)
+        OP="add"
+        ;;
+    down)
+        OP="del"
+        ;;
+    *)
+        echo "Usage: $0 {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+ip \
+    rule "$OP" \
+    from "$GLUETUN_NETWORK_SUBNET" \
+    blackhole

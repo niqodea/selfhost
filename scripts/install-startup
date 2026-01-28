@@ -40,6 +40,20 @@ if [ -e "$startup_target_path" ]; then
 fi
 cp "$startup_source_path" "$startup_target_path"
 
+configure_source_path="$root/apps/configure"
+configure_target_path="$deployment_path/configure"
+if [ -e "$configure_target_path" ]; then
+    mv "$configure_target_path" "$backup_path"
+fi
+cp "$configure_source_path" "$configure_target_path"
+
+docker_compose_source_path="$root/apps/docker-compose.yaml"
+docker_compose_target_path="$deployment_path/docker-compose.yaml"
+if [ -e "$docker_compose_target_path" ]; then
+    mv "$docker_compose_target_path" "$backup_path"
+fi
+cp "$docker_compose_source_path" "$docker_compose_target_path"
+
 startup_service_name='selfhost-startup.service'
 startup_service_source_path="$root/startup.service"
 startup_service_target_path="/etc/systemd/system/$startup_service_name"

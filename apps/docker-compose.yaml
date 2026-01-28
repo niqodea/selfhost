@@ -1,0 +1,13 @@
+networks:
+  main:
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    ipam:
+      config:
+        - subnet: ${MAIN_NETWORK_SUBNET}
+          ip_range: ${MAIN_NETWORK_IP_RANGE}
+  gluetun:
+    name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
+    ipam:
+      config:
+        - subnet: ${GLUETUN_NETWORK_SUBNET}
+          ip_range: ${GLUETUN_NETWORK_IP_RANGE}
