@@ -4,7 +4,7 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")/..root"
 
-deployment_path="$root/deployment"
+deployment_path="${SELFHOST_DEPLOYMENT_PATH:-/opt/selfhost}"
 
 if [ ! -d "$(realpath "$deployment_path")" ]; then
     >&2 echo Error: deployment not setup

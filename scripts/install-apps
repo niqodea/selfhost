@@ -4,7 +4,8 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")/..root"
 apps_path="$root/apps"
-deployment_path="$root/deployment"
+
+deployment_path="${SELFHOST_DEPLOYMENT_PATH:-/opt/selfhost}"
 
 if [ "$#" -eq 0 ]; then
     # Install all modules
