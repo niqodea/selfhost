@@ -25,6 +25,7 @@ services:
 networks:
   caddy:
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    internal: true
   main:  # TODO: Move this out in a centralized docker-compose.yaml, perhaps at top level?
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
     ipam:

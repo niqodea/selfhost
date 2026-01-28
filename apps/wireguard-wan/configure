@@ -1,0 +1,51 @@
+#!/bin/sh
+
+set -eux
+
+case "${1:-}" in
+    up)
+        NAT_OP="-A"
+        FILTER_OP="-I"
+        ;;
+    down)
+        NAT_OP="-D"
+        FILTER_OP="-D"
+        ;;
+    *)
+        echo "Usage: $0 {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+get_env_var() {
+    sed -n "s/^$1=//p" .env
+}
+
+MAIN_NETWORK_SUBNET=$(get_env_var 'MAIN_NETWORK_SUBNET')
+MAIN_NETWORK_WIREGUARD_WAN_ADDRESS=$(get_env_var 'MAIN_NETWORK_WIREGUARD_WAN_ADDRESS')
+WIREGUARD_WAN_HOST_PORT=$(get_env_var 'WIREGUARD_WAN_HOST_PORT')
+
+WIREGUARD_INTERNAL_PORT=51820
+
+# DNAT external traffic to the WireGuard container
+iptables -t nat "$NAT_OP" PREROUTING \
+    -p udp \
+    --dport "$WIREGUARD_WAN_HOST_PORT" \
+    ! -s "$MAIN_NETWORK_SUBNET" \
+    -j DNAT --to-destination "$MAIN_NETWORK_WIREGUARD_WAN_ADDRESS:$WIREGUARD_INTERNAL_PORT"
+
+# Allow forwarded traffic to reach the container
+iptables "$FILTER_OP" FORWARD \
+    -p udp \
+    -d "$MAIN_NETWORK_WIREGUARD_WAN_ADDRESS" \
+    --dport "$WIREGUARD_INTERNAL_PORT" \
+    ! -s "$MAIN_NETWORK_SUBNET" \
+    -j ACCEPT
+
+# SNAT so replies route back through the correct interface
+iptables -t nat "$NAT_OP" POSTROUTING \
+    -p udp \
+    -d "$MAIN_NETWORK_WIREGUARD_WAN_ADDRESS" \
+    --dport "$WIREGUARD_INTERNAL_PORT" \
+    ! -s "$MAIN_NETWORK_SUBNET" \
+    -j MASQUERADE

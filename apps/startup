@@ -6,6 +6,14 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-for app_path in "$root/"*'/'; do
+for app_path in "$root"/*; do
+    if ! [ -d "$app_path" ]; then
+        continue
+    fi
+
+    if [ -f "$app_path/configure" ]; then
+        "$app_path/configure" up
+    fi
+
     docker compose --project-directory "$app_path" up --detach
 done

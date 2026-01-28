@@ -3,6 +3,8 @@ services:
   wireguard-wan:
     image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
       @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    dns:
+      - ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
     networks:
       gluetun:
         gw_priority: 1
@@ -46,7 +48,7 @@ services:
       - -k
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --no-resolv  # ignore servers in /etc/resolv.conf
-      - --server=${WIREGUARD_WAN_DNSMASQ_SERVER}
+      - --server=127.0.0.11  # fallback to docker container's dns
       - --log-queries
       - --log-facility=-  # shows up in docker logs
     cap_add:
