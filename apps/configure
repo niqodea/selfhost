@@ -10,9 +10,7 @@ get_env_var() {
     printf '%s' "$value"
 }
 
-GLUETUN_NETWORK_GATEWAY_ADDRESS="$(get_env_var 'GLUETUN_NETWORK_GATEWAY_ADDRESS')"
 GLUETUN_NETWORK_SUBNET="$(get_env_var 'GLUETUN_NETWORK_SUBNET')"
-GLUETUN_TABLE="$(get_env_var 'GLUETUN_TABLE')"
 
 case "${1:-}" in
     up)
@@ -27,7 +25,13 @@ case "${1:-}" in
         ;;
 esac
 
+# drop traffic by default
 ip \
     rule "$OP" \
     from "$GLUETUN_NETWORK_SUBNET" \
     blackhole
+# allow local traffic
+ip rule "$OP" \
+    from "$GLUETUN_NETWORK_SUBNET" \
+    to "$GLUETUN_NETWORK_SUBNET" \
+    lookup main

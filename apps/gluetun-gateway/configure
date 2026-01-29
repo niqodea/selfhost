@@ -27,20 +27,12 @@ case "${1:-}" in
         ;;
 esac
 
+# workaround to define gateway for a docker network
 ip \
     route "$OP" \
     default via "$GLUETUN_NETWORK_GATEWAY_ADDRESS" \
     table "$GLUETUN_TABLE"
-
 ip \
     rule "$OP" \
     from "$GLUETUN_NETWORK_SUBNET" \
     table "$GLUETUN_TABLE"
-ip \
-    rule "$OP" \
-    from "$GLUETUN_NETWORK_GATEWAY_ADDRESS" \
-    lookup main
-ip rule "$OP" \
-    from "$GLUETUN_NETWORK_SUBNET" \
-    to "$GLUETUN_NETWORK_SUBNET" \
-    lookup main
