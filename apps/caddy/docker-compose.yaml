@@ -3,9 +3,10 @@ services:
     pull_policy: build
     build: .
     networks:
-      caddy:
       main:
+        gw_priority: 1
         ipv4_address: ${MAIN_NETWORK_CADDY_ADDRESS}
+      caddy:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./volumes/data:/data
@@ -14,7 +15,7 @@ services:
       - DOMAIN=${DOMAIN}
       - DYNU_API_KEY=${DYNU_API_KEY}
       # Services
-      - GIT_ALIAS=${CADDY_NETWORK_GIT_HTTP_BACKEND_ALIAS}
+      - GIT_ALIAS=${CADDY_NETWORK_GIT_ALIAS}
       - JELLYFIN_ALIAS=${CADDY_NETWORK_JELLYFIN_ALIAS}
       - LIBRESPEED_ALIAS=${CADDY_NETWORK_LIBRESPEED_ALIAS}
       - QBITTORRENT_ALIAS=${CADDY_NETWORK_QBITTORRENT_ALIAS}
@@ -26,6 +27,6 @@ networks:
   caddy:
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
     internal: true
-  main:  # TODO: Move this out in a centralized docker-compose.yaml, perhaps at top level?
+  main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}

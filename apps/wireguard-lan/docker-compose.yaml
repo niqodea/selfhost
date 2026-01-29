@@ -35,6 +35,7 @@ services:
     network_mode: service:wireguard-lan
     command:
       - -k
+      - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --log-queries
       - --log-facility=-  # shows up in docker logs
