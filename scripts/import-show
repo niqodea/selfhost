@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -40,27 +41,30 @@ class PartialFormat(Enum):
     FOURTH_NUMBER = re.compile(r"\d+.*?\d+.*?\d+.*?(\d+)", re.IGNORECASE)
 
 
-def main(
-    source: Path, target: Path, assumed_season: int | None, *, update: bool,
-) -> None:
+def main(source: Path, target: Path, *, season: int | None, select: bool) -> None:
     """Link TV show files with standardized names."""
-    files = [f for f in source.glob("*") if f.is_file()]
+    glob_files = [f for f in source.glob("*") if f.is_file()]
 
-    if len(files) == 0:
+    if len(glob_files) == 0:
         msg = f"No files found in {source}"
         raise SystemExit(msg)
 
-    if assumed_season is None:
-        id_map = apply_complete_formats(files)
+    if not select:
+        files = glob_files
     else:
-        id_map = apply_partial_formats(files, assumed_season)
+        files = select_files(glob_files)
+        if len(files) == 0:
+            msg = "No files selected"
+            raise SystemExit(msg)
+
+    if season is not None:
+        id_map = apply_partial_formats(files, season)
+    else:
+        id_map = apply_complete_formats(files)
 
     if id_map is None:
         msg = "No suitable format found"
         raise SystemExit(msg)
-
-    if not update:
-        target.mkdir()
 
     for id_, file in id_map.items():
         target_file = target / f"{id_}{file.suffix}"
@@ -69,7 +73,23 @@ def main(
     print(f"\nLinked {len(id_map)} files to {target}")
 
 
+def select_files(files: list[Path]) -> list[Path]:
+    """Use fzf to select files to process."""
+    input_data = "\n".join(f.name for f in files)
+    result = subprocess.run(
+        ["fzf", "--multi"],
+        input=input_data,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return []
+    selected = {name.strip() for name in result.stdout.strip().split("\n") if name}
+    return [f for f in files if f.name in selected]
+
+
 def apply_complete_formats(files: list[Path]) -> dict[Id, Path] | None:
+    """Try each complete format in order, returning the first confirmed match."""
     for complete_format in CompleteFormat:
         if (id_map := apply_complete_format(complete_format, files)) is None:
             continue
@@ -82,8 +102,7 @@ def apply_complete_formats(files: list[Path]) -> dict[Id, Path] | None:
 
 
 def apply_complete_format(
-    format_: CompleteFormat,
-    files: list[Path],
+    format_: CompleteFormat, files: list[Path]
 ) -> dict[Id, Path] | None:
     """Use the given complete format to extract ids from files."""
     id_map: dict[Id, Path] = {}
@@ -101,13 +120,10 @@ def apply_complete_format(
     return id_map
 
 
-def apply_partial_formats(
-    files: list[Path], assumed_season: int,
-) -> dict[Id, Path] | None:
+def apply_partial_formats(files: list[Path], season: int) -> dict[Id, Path] | None:
+    """Try each partial format in order, returning the first confirmed match."""
     for partial_format in PartialFormat:
-        if (
-            id_map := apply_partial_format(partial_format, assumed_season, files)
-        ) is None:
+        if (id_map := apply_partial_format(partial_format, season, files)) is None:
             continue
 
         if not is_id_map_confirmed(partial_format.name, id_map):
@@ -118,10 +134,8 @@ def apply_partial_formats(
 
 
 def apply_partial_format(
-    format_: PartialFormat,
-    season: int,
-    files: list[Path],
-) -> dict[Id, Path]:
+    format_: PartialFormat, season: int, files: list[Path]
+) -> dict[Id, Path] | None:
     """Use the given partial format and season to extract ids from files."""
     id_map: dict[Id, Path] = {}
     for file in files:
@@ -151,17 +165,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("target", type=Path)
-    parser.add_argument("--assumed-season", type=int)
-    parser.add_argument(
-        "--update",
-        action="store_true",
-        help="Update existing target directory",
-    )
+    parser.add_argument("--season", type=int)
+    parser.add_argument("--select", action="store_true", help="use fzf to select files")
     args = parser.parse_args()
 
     main(
-        source=args.source,
-        target=args.target,
-        assumed_season=args.assumed_season,
-        update=args.update,
+        args.source,
+        args.target,
+        season=args.season,
+        select=args.select,
     )
