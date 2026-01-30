@@ -1,9 +1,8 @@
 services:
   git:
-    pull_policy: build
     build:
+      tags: [git:local]
       args:
-        # TODO: refactor this as a runtime setting, not build time
         ROOT: /var/www/git
     networks:
       caddy:
