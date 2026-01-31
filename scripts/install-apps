@@ -5,27 +5,24 @@ set -eu
 root="$(dirname "$(realpath "$0")")/..root"
 apps_path="$root/apps"
 
-deployment_path="${SELFHOST_DEPLOYMENT_PATH:-/opt/selfhost}"
+deployment_path="$1"
+
+shift
 
 if [ "$#" -eq 0 ]; then
-    # Install all modules
     apps=$(find "$apps_path/"* -maxdepth 0 -type d -exec basename {} \;)
 else
     apps="$*"
 fi
-
-backups_path="$deployment_path/.backups"
-backup_path="$backups_path/$(date +%Y%m%d_%H%M%S)"
-mkdir -p "$backup_path"
-echo "Backing up existing files in $backup_path"
 
 for app in $apps; do
     source_app_path="$apps_path/$app"
     target_app_path="$deployment_path/$app"
 
     if [ -e "$target_app_path" ]; then
-        mv "$target_app_path" "$backup_path"
+        >&2 echo "File already exists at $target_app_path"
+        exit 1
     fi
 
-    cp -r "$source_app_path" "$target_app_path"
+    rsync -rl --exclude='._.*' "$source_app_path/" "$target_app_path"
 done

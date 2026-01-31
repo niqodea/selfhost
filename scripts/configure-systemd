@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+root="$(dirname "$(realpath "$0")")/..root"
+
+deployment_path="$1"
+
+case "${2:-}" in
+    up)
+        OP='enable'
+        ;;
+    down)
+        OP='disable'
+        ;;
+    *)
+        echo "Usage: $0 {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+for file in 'startup' 'configure' 'docker-compose.yaml'; do
+    if [ ! -e "$deployment_path/$file" ]; then
+        >&2 echo "Missing base file $deployment_path/$file"
+        exit 1
+    fi
+done
+
+systemd_escaped_deployment_path="$(systemd-escape --path "$deployment_path")"
+systemctl "$OP" "selfhost-startup@${systemd_escaped_deployment_path}.service"

@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+
+root="$(dirname "$(realpath "$0")")/..root"
+
+startup_service_target_path="/etc/systemd/system/selfhost-startup@.service"
+
+if [ -e "$startup_service_target_path" ]; then
+    >&2 echo "Error: file already exists at $startup_service_target_path"
+    exit 1
+fi
+
+cat > "$startup_service_target_path" << 'EOF'
+[Unit]
+Description=Start selfhost apps at %f
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%f
+ExecStart=./startup
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "Installed at $startup_service_target_path"
+
+echo 'Reloading daemon...'
+systemctl daemon-reload
+
+echo 'Success!'
