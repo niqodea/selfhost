@@ -1,16 +1,18 @@
+# Caddy's default format uses tabs
+# Ref: https://caddy.community/t/caddyfile-warning/13701/2
 {
 	# email your-email@example.com
 	# log {
-	# 	level DEBUG
+	#	level DEBUG
 	# }
 }
 
 *.{$DOMAIN} {
 	tls {
 		dns dynu {
-            api_token {$DYNU_API_KEY}
-            own_domain {$DOMAIN}
-        }
+			api_token {$DYNU_API_KEY}
+			own_domain {$DOMAIN}
+		}
 	}
 
 	@jellyfin host jellyfin.{$DOMAIN}
