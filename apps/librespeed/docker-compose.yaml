@@ -1,14 +1,15 @@
 services:
   librespeed:
-    image: "linuxserver/librespeed:5.4.1\
-      @sha256:6eb3a38fdab18af72e6c505cb98a0a239a6e38a06066fe38b2852876c5a3e1c7"
+    image: "ghcr.io/librespeed/speedtest:5.5.1-alpine\
+       @sha256:f68487eda17f8abb8c88a43c0b9d1a2fa4db75c2de0fee75a6c69972bb383e87"
     networks:
       caddy:
         aliases: ["${CADDY_NETWORK_LIBRESPEED_ALIAS}"]
-    volumes:
-      - ./volumes/config:/config
+    environment:
+      - MODE=standalone
+      - TELEMETRY=false
     env_file:
-      - env-files/linuxserverio.env
+      - common.env
     restart: ${DOCKER_RESTART}
 
 networks:
