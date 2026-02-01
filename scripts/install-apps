@@ -26,3 +26,5 @@ for app in $apps; do
 
     rsync -rl --exclude='._.*' "$source_app_path/" "$target_app_path"
 done
+
+echo 'Success!'
