@@ -9,6 +9,7 @@ services:
         aliases: ["${CADDY_NETWORK_GIT_ALIAS}"]
     volumes:
       - ./volumes/root:/var/www/git
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:

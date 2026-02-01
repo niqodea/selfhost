@@ -17,4 +17,5 @@ services:
           ]
         }
       SERVER_ENABLED: no
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}

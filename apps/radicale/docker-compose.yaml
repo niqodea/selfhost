@@ -7,6 +7,7 @@ services:
         aliases: ["${CADDY_NETWORK_RADICALE_ALIAS}"]
     volumes:
       - ./volumes/data:/data
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:

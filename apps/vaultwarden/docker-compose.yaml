@@ -12,6 +12,7 @@ services:
       - WEBSOCKET_ENABLED=true
     env_file:
       - local.env
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:

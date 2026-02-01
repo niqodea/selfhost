@@ -54,8 +54,7 @@ services:
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --log-queries
       - --log-facility=-  # shows up in docker logs
-    cap_add:
-      - NET_ADMIN
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
