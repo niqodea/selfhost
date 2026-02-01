@@ -27,7 +27,8 @@ case "${1:-}" in
         ;;
 esac
 
-# workaround to define gateway for a docker network
+# Workaround: Docker can't use container as network gateway
+# Ref: https://github.com/moby/moby/issues/48193
 ip \
     route "$OP" \
     default via "$GLUETUN_NETWORK_GATEWAY_ADDRESS" \
