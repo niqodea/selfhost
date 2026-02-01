@@ -10,10 +10,10 @@ services:
     volumes:
       - ./volumes/iptables-post-rules.txt:/iptables/post-rules.txt:ro
       - ./volumes/config:/gluetun
-    env_file:
-      - env-files/local.env
     environment:
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
+    env_file:
+      - local.env
     cap_add:
       - NET_ADMIN
     sysctls:

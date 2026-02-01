@@ -5,10 +5,13 @@ root="$(dirname "$(realpath "$0")")/..root"
 
 deployment_path="$1"
 
+
 if [ ! -d "$deployment_path" ]; then
     >&2 echo "Error: no directory found at $deployment_path"
     exit 1
 fi
+
+# TODO: just use rsync
 
 for file in 'startup' 'configure' 'docker-compose.yaml'; do
     if [ -e "$deployment_path/$file" ]; then
@@ -18,21 +21,12 @@ for file in 'startup' 'configure' 'docker-compose.yaml'; do
     cp "$root/apps/$file" "$deployment_path/$file"
 done
 
-for symlink in '.env' '..apps'; do
+for symlink in '.env' '.common.env' '..apps'; do
     if [ -e "$deployment_path/$symlink" ]; then
         >&2 echo "File already exists at $deployment_path/$file"
         exit 1
     fi
     cp -P "$root/apps/$symlink" "$deployment_path/$symlink"
-done
-
-
-for directory in '.env-files'; do
-    if [ -e "$deployment_path/$directory" ]; then
-        >&2 echo "File already exists at $deployment_path/$file"
-        exit 1
-    fi
-    rsync -rl --exclude='._.*' "$root/apps/$directory/" "$deployment_path/$directory"
 done
 
 echo 'Success!'

@@ -11,9 +11,6 @@ services:
     volumes:
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - ./volumes/config:/config
-    env_file:
-      - local.env
-      - common.env
     environment:
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
@@ -26,6 +23,9 @@ services:
       # switch to PUID/PGID env vars after init
       - PUID=${PUID}
       - PGID=${PGID}
+    env_file:
+      - local.env
+      - common.env
     cap_add:
       - NET_ADMIN
       - SYS_MODULE

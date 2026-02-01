@@ -7,11 +7,11 @@ services:
         aliases: ["${CADDY_NETWORK_VAULTWARDEN_ALIAS}"]
     volumes:
       - ./volumes/data:/data
-    env_file:
-      - env-files/local.env
     environment:
       # TODO: what does this do in practice?
       - WEBSOCKET_ENABLED=true
+    env_file:
+      - local.env
     restart: ${DOCKER_RESTART}
 
 networks:
