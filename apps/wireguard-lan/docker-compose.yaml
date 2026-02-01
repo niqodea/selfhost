@@ -1,6 +1,7 @@
 services:
 
   wireguard-lan:
+    # No official Docker image exists, using linuxserver.io community image
     image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
       @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
     networks:
@@ -11,8 +12,8 @@ services:
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - ./volumes/config:/config
     env_file:
-      - env-files/wireguard.env
-      - env-files/linuxserverio.env
+      - local.env
+      - common.env
     environment:
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
@@ -21,6 +22,10 @@ services:
       # Disable default DNS server since we run dnsmasq instead
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
+      # root is required for network setup, so 'user:' directive won't work
+      # switch to PUID/PGID env vars after init
+      - PUID=${PUID}
+      - PGID=${PGID}
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
