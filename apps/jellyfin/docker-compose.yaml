@@ -1,7 +1,7 @@
 services:
   jellyfin:
-    image: "linuxserver/jellyfin:10.11.5\
-      @sha256:747bc6725c5e4f1330e693b50d787e2106e52ac5b25c4174ca5f58915fc17ec8"
+    image: "jellyfin/jellyfin:10.11.6\
+      @sha256:333b647716631443a43c7fabac4b0c46b4e2f036bad19547e00958f10f721b85"
     networks:
       main:
         gw_priority: 1
@@ -9,10 +9,12 @@ services:
         aliases: ["${CADDY_NETWORK_JELLYFIN_ALIAS}"]
     volumes:
       - ./volumes/config:/config
+      - ./volumes/cache:/cache
       - ./volumes/movies:/data/movies
       - ./volumes/shows:/data/shows
     env_file:
-      - env-files/linuxserverio.env
+      - common.env
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
