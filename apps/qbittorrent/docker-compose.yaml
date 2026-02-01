@@ -1,7 +1,7 @@
 services:
   qbittorrent:
-    image: "linuxserver/qbittorrent:5.0.3\
-      @sha256:94e1c4fb34b38e9b529867aefc1185a10710ea4868dcb1c4f395780d1a4c297b"
+    image: "qbittorrentofficial/qbittorrent-nox:5.1.4-2\
+       @sha256:85fe2690f418dabffc4907276b3cdffcb7880c7114157b32f932d3b97bac45af"
     dns: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
     networks:
       gluetun:
@@ -11,8 +11,11 @@ services:
     volumes:
       - ./volumes/config:/config
       - ./volumes/downloads:/downloads
+    environment:
+      - QBT_LEGAL_NOTICE=confirm
     env_file:
-      - env-files/linuxserverio.env
+      - common.env
+    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
