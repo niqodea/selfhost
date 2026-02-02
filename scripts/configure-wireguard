@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+# Centralized WireGuard kernel module setup for the host.
+#
+# WireGuard containers use the kernel-space WireGuard module on the host.
+# By loading the module at the host level with this targeted script, we avoid
+# granting containers the dangerous SYS_MODULE capability, which would allow
+# them to load arbitrary kernel modules.
+
+
+MODULE_FILE='/etc/modules-load.d/wireguard.conf'
+
+case "${1:-}" in
+    up)
+        modprobe wireguard
+        echo 'wireguard' > "$MODULE_FILE"
+        ;;
+    down)
+        rm "$MODULE_FILE"
+        modprobe -r wireguard
+        ;;
+    *)
+        echo "Usage: $0 {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+echo 'Success!'
