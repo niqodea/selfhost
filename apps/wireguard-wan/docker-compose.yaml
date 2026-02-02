@@ -18,6 +18,7 @@ services:
     # ports:
     #   - ${WIREGUARD_WAN_HOST_PORT}:51820/udp
     volumes:
+      # read-only mount causes harmless chown warning at startup
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - ./volumes/config:/config
     environment:
@@ -39,7 +40,7 @@ services:
     cap_add:
       - NET_ADMIN
     sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.conf.all.src_valid_mark=1  # for wireguard routing
     restart: ${DOCKER_RESTART}
 
   wireguard-wan-dnsmasq:

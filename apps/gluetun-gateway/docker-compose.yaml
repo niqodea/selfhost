@@ -21,7 +21,7 @@ services:
     cap_add:
       - NET_ADMIN
     sysctls:
-      - net.ipv4.ip_forward=1
+      - net.ipv4.ip_forward=1  # to act as a router
     restart: ${DOCKER_RESTART}
 
 networks:
