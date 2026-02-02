@@ -53,7 +53,7 @@ services:
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --log-queries
-      - --log-facility=-  # shows up in docker logs
+      - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
