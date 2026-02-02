@@ -12,5 +12,4 @@
 - Check if it's possible to enforce volume existence when running docker compose
 - Figure out latest best practice for docker vs host user ownership
 - Evaluate whether to go back to unless-stopped restart policy now that we do not have `depends_on` in services
-- Define hub.docker.com prefix for image urls to not assume docker registry as default
 - Consider using ipvlan/macvlan/external networks instead of docker-managed ones to make hacks more explicit (or add an adr for why we stick to docker networks)

@@ -1,6 +1,6 @@
 services:
   radicale:
-    image: "tomsquest/docker-radicale:3.4.1.0\
+    image: "docker.io/tomsquest/docker-radicale:3.4.1.0\
       @sha256:8b50b8c664d9557e47f723e18064d8f5f822e39d4e8a3d2385947ee13a2f8222"
     networks:
       caddy:

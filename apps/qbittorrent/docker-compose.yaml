@@ -1,6 +1,6 @@
 services:
   qbittorrent:
-    image: "qbittorrentofficial/qbittorrent-nox:5.1.4-2\
+    image: "docker.io/qbittorrentofficial/qbittorrent-nox:5.1.4-2\
        @sha256:85fe2690f418dabffc4907276b3cdffcb7880c7114157b32f932d3b97bac45af"
     dns: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
     networks:
