@@ -46,7 +46,7 @@ services:
   wireguard-wan-dnsmasq:
     image: "strm/dnsmasq\
       @sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39\
-    "  # unversioned, the only available version for now
+    "  # untagged, the only available image for now (version 2.80)
     network_mode: service:wireguard-wan
     command:
       - -k
