@@ -1,52 +1,46 @@
-# ADR: Systemd-Managed Startup with On-Failure Restart Policy
+# ADR: Systemd-Managed Startup with Pre-Docker Failsafe Routing
 
-**Decision:** Use systemd to orchestrate container startup order, with `on-failure` restart policy instead of `unless-stopped`.
+**Decision:** Use systemd to configure a failsafe blackhole route before Docker starts, then run a startup script that handles app-specific routes and containers.
 
 ## Context
 
-Docker Compose's `depends_on` only controls initial startup order and doesn't affect restarts.
-When using `unless-stopped` or `always` restart policies, Docker's restart mechanism bypasses `depends_on` entirely.
+Containers routing through Gluetun require host-level ip rules and iptables configuration.
+These aren't persistent across reboots and must be in place before containers start, or traffic leaks.
 
-This creates race conditions: if the host reboots, containers restart in arbitrary order.
-A service might start before its dependency (e.g., a database client before the database), causing failures or undefined behavior.
+We use the `on-failure` restart policy for runtime crash recovery since it's useful and hard to reimplement.
+However, Docker's `on-failure` policy [restarts containers on daemon/system boot](https://github.com/moby/moby/issues/47846) if they exited with a non-zero code, which can happen during shutdown if a container doesn't handle SIGTERM gracefully or coincidentally errors as the system goes down.
+This means Docker may auto-restart containers on boot before routes are ready.
+Ideally we'd use a policy that only restarts on actual container failure (not on boot), but Docker doesn't support this behavior.
+
+Docker has no pre-start hooks. Without them, `unless-stopped`/`always` policies offer no advantage over managing startup ourselves via systemd.
+Running `docker compose up` ourselves also guarantees correct `depends_on` ordering across the stack.
 
 ## Solution
 
-Delegate startup orchestration to systemd:
+### selfhost-route-failsafe (Before Docker)
 
-1. Set all containers to `restart: on-failure` (not `unless-stopped`)
-2. Create a systemd unit that runs after `docker.service`
-3. The unit executes a startup script that iterates through apps and runs `docker compose up --detach`
+Configures a blackhole on the Gluetun network so any prematurely-started container drops traffic rather than leaking it.
 
-On reboot:
-- Docker starts but doesn't auto-restart containers (they exited cleanly, not from failure)
-- Systemd triggers the startup script after Docker is ready
-- Script starts stacks sequentially, honoring implicit dependency order
+A systemd drop-in makes `docker.service` depend on this unit (`Requires=` + `After=`), ensuring the failsafe is always active before Docker can start containers.
 
-On crash:
-- `on-failure` lets Docker handle immediate recovery
-- No systemd intervention needed for transient failures
+### selfhost-startup (After Docker)
 
-## Why This Works
+For each app: runs `./route` if present, then `docker compose up --detach`.
+App-specific routes are configured immediately before their containers start.
 
-The key insight: clean shutdown is not a failure.
-Containers stopped during `systemctl stop` or reboot exit with code 0.
-`on-failure` only triggers on non-zero exits, so Docker won't auto-restart them.
+Technically, since this runs after `docker.service`, there's a race condition where rogue containers might start before app-specific routes are configured.
+However, the upstream blackhole failsafe ensures traffic is safely dropped rather than leaked during this window.
 
-This gives us the best of both worlds:
-- Systemd handles boot-time orchestration
-- Docker handles runtime crash recovery
+## Boot Sequence
+
+1. `selfhost-route-failsafe` -> blackhole active
+2. `docker.service` starts -> rogue containers hit blackhole
+3. `selfhost-startup` -> configures routes, starts containers properly
 
 ## Trade-offs
 
-| Pros                               | Cons                                              |
-|------------------------------------|---------------------------------------------------|
-| Honors dependency order on boot    | Extra systemd configuration                       |
-| Single source of truth for startup | Must remember `on-failure` vs `unless-stopped`    |
-| Works with existing `depends_on`   | Script-based ordering (implicit, not declarative) |
-| Crash recovery still automatic     |                                                   |
-
-## Conclusion
-
-Systemd as the boot-time orchestrator, Docker as the runtime supervisor.
-Each tool handles what it's designed for.
+| Pros                             | Cons                                  |
+|----------------------------------|---------------------------------------|
+| Traffic safety via blackhole     | Two systemd services                  |
+| Correct `depends_on` ordering    | Failsafe must complete before Docker  |
+| Runtime crash recovery preserved | Works around Docker policy limitation |

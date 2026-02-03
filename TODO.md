@@ -9,5 +9,4 @@
 - Set 600 permissions for sensitive files (like env files) (maybe update plug util for that)
 - Check if it's possible to enforce volume existence when running docker compose
 - Figure out latest best practice for docker vs host user ownership
-- Evaluate whether to go back to unless-stopped restart policy now that we do not have `depends_on` in services
 - Consider usage of list-like include files to add/remove apps with simple sed commands (Caddyfile, root docker-compose.yaml)

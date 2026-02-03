@@ -6,7 +6,6 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-"$root"/configure up
 # using "--all-resources create" since "up" won't work if no service is defined
 docker compose --project-directory "$root" --all-resources create
 
@@ -15,8 +14,8 @@ for app_path in "$root"/*; do
         continue
     fi
 
-    if [ -f "$app_path/configure" ]; then
-        "$app_path/configure" up
+    if [ -f "$app_path/route" ]; then
+        "$app_path/route" up
     fi
 
     docker compose --project-directory "$app_path" up --detach

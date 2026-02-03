@@ -4,26 +4,44 @@ set -eu
 root="$(dirname "$(realpath "$0")")/..root"
 
 deployment_path="$1"
+systemd_escaped_deployment_path="$(systemd-escape --path "$deployment_path")"
 
-case "${2:-}" in
-    up)
-        OP='enable'
-        ;;
-    down)
-        OP='disable'
-        ;;
-    *)
-        echo "Usage: $0 {up|down}" >&2
-        exit 1
-        ;;
-esac
-
-for file in 'startup' 'configure' 'docker-compose.yaml'; do
+for file in 'route-failsafe' 'startup'; do
     if [ ! -e "$deployment_path/$file" ]; then
         >&2 echo "Missing base file $deployment_path/$file"
         exit 1
     fi
 done
 
-systemd_escaped_deployment_path="$(systemd-escape --path "$deployment_path")"
-systemctl "$OP" "selfhost-startup@${systemd_escaped_deployment_path}.service"
+docker_dropins_path="/etc/systemd/system/docker.service.d"
+if [ ! -e "$docker_dropins_path" ]; then
+    >&2 echo "Missing Docker service dropins units directory at $docker_dropins_path"
+    exit 1
+fi
+
+docker_dropin_path="$docker_dropins_path/selfhost-route-failsafe-$systemd_escaped_deployment_path.conf"
+docker_dropin_content="$(cat << EOF
+[Unit]
+Requires=selfhost-route-failsafe@$systemd_escaped_deployment_path.service
+After=selfhost-route-failsafe@$systemd_escaped_deployment_path.service
+EOF
+)"
+
+case "${2:-}" in
+    up)
+        systemctl enable "selfhost-route-failsafe@${systemd_escaped_deployment_path}.service"
+        printf '%s\n' "$docker_dropin_content" > "$docker_dropin_path"
+        systemctl enable "selfhost-startup@${systemd_escaped_deployment_path}.service"
+        ;;
+    down)
+        systemctl disable "selfhost-startup@${systemd_escaped_deployment_path}.service"
+        rm "$docker_dropin_path"
+        systemctl disable "selfhost-route-failsafe@${systemd_escaped_deployment_path}.service"
+        ;;
+    *)
+        echo "Usage: $0 <deployment_path> {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+echo 'Success'

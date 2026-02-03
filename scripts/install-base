@@ -13,7 +13,7 @@ fi
 
 # TODO: just use rsync
 
-for file in 'startup' 'configure' 'docker-compose.yaml'; do
+for file in 'docker-compose.yaml' 'route' 'startup-docker' 'startup-route'; do
     if [ -e "$deployment_path/$file" ]; then
         >&2 echo "File already exists at $deployment_path/$file"
         exit 1

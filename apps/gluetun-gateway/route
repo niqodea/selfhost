@@ -29,6 +29,7 @@ esac
 
 # Workaround: Docker can't use container as network gateway
 # Ref: https://github.com/moby/moby/issues/48193
+# NOTE: ip route requires target network to be up already!
 ip \
     route "$OP" \
     default via "$GLUETUN_NETWORK_GATEWAY_ADDRESS" \

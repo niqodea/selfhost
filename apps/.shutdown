@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -eu
+
+# Ref: adr/systemd-startup.md
+
+root="$(dirname "$(realpath "$0")")"
+
+for app_path in "$root"/*; do
+    if ! [ -d "$app_path" ]; then
+        continue
+    fi
+
+    docker compose --project-directory "$app_path" down
+
+    if [ -f "$app_path/route" ]; then
+        "$app_path/route" down
+    fi
+done
+
+# using "--all-resources create" since "up" won't work if no service is defined
+docker compose --project-directory "$root" --all-resources down

@@ -34,8 +34,8 @@ Both **wireguard-wan** and **qbittorrent** route their traffic through the same 
 ```
 apps/
 ├── docker-compose.yaml               # Shared Docker resources (networks)
-├── configure                         # Host-level configuration script
-├── startup                           # Boots all apps in dependency order
+├── route-failsafe                    # Network failsafe routing script
+├── startup                           # Boots all apps
 ├── .env                              # Shared config
 ├── .common.env                       # Shared container env vars
 └── <app>/
@@ -43,7 +43,7 @@ apps/
     ├── .env -> ../.env
     │
     ├── Dockerfile                    # Custom image build
-    ├── configure                     # Host-level configuration script
+    ├── route                         # Host-level network routing script
     ├── volumes/                      # Persistent data and configs
     ├── local.env                     # Container env vars
     └── common.env -> ../.common.env

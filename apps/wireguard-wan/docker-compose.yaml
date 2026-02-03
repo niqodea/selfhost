@@ -14,7 +14,7 @@ services:
     # Docker's port forwarding uses the network gateway, which routes through
     # gluetun's tunnel in this setup, breaking connections back to clients.
     # We handle port forwarding manually on the host to enable port forwarding
-    # via main network instead, see ./configure-port-forwarding for how.
+    # via main network instead, see ./route for how.
     # ports:
     #   - ${WIREGUARD_WAN_HOST_PORT}:51820/udp
     volumes:
