@@ -1,53 +1,92 @@
 # selfhost
 
-This is a collection of interconnected Docker Compose files of services I self-host on my server.
-Each Docker Compose file represents a container or a set of tightly coupled containers that are supposed to work together to provide a single service.
+A modular Docker Compose setup for self-hosting services on a personal server.
 
-## Services
+## Apps
 
-### Main services
+| App                 | Description                                       |
+|---------------------|---------------------------------------------------|
+| **caddy**           | Reverse proxy with automatic Let's Encrypt SSL    |
+| **ddns-updater**    | Dynamic DNS for servers without static IPs        |
+| **gluetun-gateway** | VPN gateway for anonymous traffic routing         |
+| **wireguard-lan**   | VPN server for remote access to local services    |
+| **wireguard-wan**   | VPN server with anonymous exit via Gluetun        |
+| **jellyfin**        | Media streaming server                            |
+| **qbittorrent**     | Torrent client with anonymous exit via Gluetun    |
+| **vaultwarden**     | Password manager (Bitwarden-compatible)           |
+| **radicale**        | CalDAV/CardDAV server for contacts and calendars  |
+| **git**             | Self-hosted Git server                            |
+| **librespeed**      | Network speed test                                |
 
-- Caddy as a reverse proxy to handle Let's Encrypt SSL certificates and expose locally hosted services in subdomains
-- DuckDNS service to keep the domain-IP mapping up to date (especially useful if your ISP provider does not grant you a static public IP)
-- Wireguard VPN to access locally hosted services from outside the network
-- Wireguard VPN with Gluetun to also tunnel all external traffic through a third-party VPN
+Both **wireguard-wan** and **qbittorrent** route their traffic through the same **gluetun-gateway** for anonymity.
 
-### Reverse proxy services
+## Getting Started
 
-- Collection of media services
-    - Sonarr to monitor TV series, automatically trigger download of episodes, and organize the media library
-    - Jackett to provide torrent links for requested episodes
-    - qBittorrent with Gluetun to download requested torrent links through a third-party VPN
-    - Jellyfin to stream the downloaded media
-- Vaultwarden to manage passwords and share them with others
-- File Browser to import/export files on the server
-- LibreSpeed to test download/upload speed
-- Uptime Kuma to monitor the uptime of services
+1. Clone the repo and create a deployment directory (e.g., `/opt/selfhost`)
+2. Install base files: `scripts/install-base /opt/selfhost`
+3. Install apps: `scripts/install-apps /opt/selfhost`
+4. Copy socket samples to create actual sockets (`.~.foo` → `._.foo`)
+5. Install systemd template: `scripts/install-systemd-template`
+6. Enable startup service: `scripts/configure-systemd /opt/selfhost up`
 
-## Getting started
+## Project Structure
 
-Each Docker Compose file might depend on one or more of the following files that you need to create yourself:
+```
+apps/
+├── docker-compose.yaml               # Shared Docker resources (networks)
+├── configure                         # Host-level configuration script
+├── startup                           # Boots all apps in dependency order
+├── .env                              # Shared config
+├── .common.env                       # Shared container env vars
+└── <app>/
+    ├── docker-compose.yaml           # Docker resources
+    ├── .env -> ../.env
+    │
+    ├── Dockerfile                    # Custom image build
+    ├── configure                     # Host-level configuration script
+    ├── volumes/                      # Persistent data and configs
+    ├── local.env                     # Container env vars
+    └── common.env -> ../.common.env
 
-- values from the `/.env` file, created from `/.env.sample`
-- environment files `/$SERVICE_NAME/*.env`, created from `/$SERVICE_NAME/*.env.sample` files
-- environment files `/.environment/*.env`, created from `/.environment/*.env.sample` files
-- configuration files in the Docker volumes, created from `/$SERVICE_NAME/volumes-samples/*.sample` files by following the specific instructions they contain
+scripts/                              # Installation and configuration scripts
+adr/                                  # Architecture Decision Records
+```
 
-After creation of the files the Docker Compose file depends on, you can run it to launch the corresponding service.
-In case of services behind proxy, you should also run Caddy to make them accessible to the local network.
+## Design Patterns
 
-## Environment setup
+### Gluetun as Network Gateway
 
-We leverage symbolic links and centralized `env` files to keep configurations consistent to the extent that is possible.
+Docker can't natively use a container as a network gateway.
+A few iptables rules on the host solve this, routing all traffic from the `gluetun` network through the Gluetun container.
 
-- The `/.env` file contains:
-    - variables used both in a Compose files and as environment in a container
-    - variables used in multiple Compose files
-    - variables with personal data used in a Compose file
-- The files in `/.environment/*.env` contain variables used as environment in multiple containers
-- The files in `/$SERVICE_NAME/*.env` contain variables with personal data used as environment in a container
+Services opt into VPN routing by joining the network with `gw_priority: 1` and setting `dns` to the gateway address.
+One Gluetun instance serves all services that need anonymous egress.
 
-All other variables are hardcoded in the Compose files to keep it simple.
+### Breadcrumbs
 
-Unfortunately some consistencies are not currently enforced this way, mainly due to the fact that some images do not offer easy configuration via environment variables.
+Breadcrumbs are a navigation pattern using specially-named symlinks (prefixed with `..`) that create a trail back to target directories.
+Each breadcrumb points either further up the chain (`../..foo`) or to the current directory (`.`) when the target is reached.
 
+```
+apps/caddy/..apps  ->  ../..apps       (points up one level)
+apps/..apps        ->  .               (marks arrival at apps/)
+```
+
+This approach provides more explicit and self-documenting navigation than using bare `../` in symlinks: the breadcrumb name tells you _what_ you're pointing to, not just _where_.
+Learn more at the [breadcrumbs repo](https://github.com/niqodea/breadcrumbs).
+
+### Plugs
+
+File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
+- **Plug** (committed): `local.env -> ._.local.env` points to the socket
+- **Socket** (gitignored): `._.local.env` contains or links to the actual file
+- **Sample** (committed): `.~.local.env` shows expected structure with placeholder values
+
+Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
+
+This makes dependencies visible in version control without committing environment-specific paths or secrets.
+Learn more at the [plugs repo](https://github.com/niqodea/plugs).
+
+## License
+
+MIT
