@@ -12,13 +12,14 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **wireguard-lan**   | VPN server for remote access to local services    |
 | **wireguard-wan**   | VPN server with anonymous exit via Gluetun        |
 | **jellyfin**        | Media streaming server                            |
+| **prowlarr**        | Indexer manager with anonymous exit via Gluetun   |
 | **qbittorrent**     | Torrent client with anonymous exit via Gluetun    |
 | **vaultwarden**     | Password manager (Bitwarden-compatible)           |
 | **radicale**        | CalDAV/CardDAV server for contacts and calendars  |
 | **git**             | Self-hosted Git server                            |
 | **librespeed**      | Network speed test                                |
 
-Both **wireguard-wan** and **qbittorrent** route their traffic through the same **gluetun-gateway** for anonymity.
+**wireguard-wan**, **prowlarr**, and **qbittorrent** route their traffic through the same **gluetun-gateway** for anonymity.
 
 ## Getting Started
 

@@ -1,0 +1,27 @@
+services:
+  prowlarr:
+    image: "lscr.io/linuxserver/prowlarr:version-2.3.0.5236\
+      @sha256:5339e9050cfcc0cb5331e9c98610ed9d4ce70ef481a5461ea664a13dda3f1eb0"
+    dns: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
+    networks:
+      gluetun:
+        gw_priority: 1
+      caddy:
+        aliases: ["${CADDY_NETWORK_PROWLARR_ALIAS}"]
+    volumes:
+      - ./volumes/config:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=Etc/UTC
+    env_file:
+      - common.env
+    restart: ${DOCKER_RESTART}
+
+networks:
+  gluetun:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
+  caddy:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
