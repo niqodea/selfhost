@@ -1,7 +1,6 @@
 services:
   caddy:
-    build:
-      tags: [caddy:local]
+    build: .
     networks:
       main:
         gw_priority: 1

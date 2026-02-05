@@ -1,7 +1,6 @@
 services:
   git:
     build:
-      tags: [git:local]
       args:
         ROOT: /var/www/git
     networks:
