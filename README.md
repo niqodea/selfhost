@@ -62,6 +62,18 @@ A few iptables rules on the host solve this, routing all traffic from the `gluet
 Services opt into VPN routing by joining the network with `gw_priority: 1` and setting `dns` to the gateway address.
 One Gluetun instance serves all services that need anonymous egress.
 
+### Plugs
+
+File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
+- **Plug** (committed): `local.env -> ._.local.env` points to the socket
+- **Socket** (gitignored): `._.local.env` contains or links to the actual file
+- **Sample** (committed): `.~.local.env` shows expected structure with placeholder values
+
+Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
+
+This makes dependencies visible in version control without committing environment-specific paths or secrets.
+Learn more at the [plugs repo](https://github.com/niqodea/plugs).
+
 ### Breadcrumbs
 
 Breadcrumbs are a navigation pattern using specially-named symlinks (prefixed with `..`) that create a trail back to target directories.
@@ -74,18 +86,6 @@ apps/..apps        ->  .               (marks arrival at apps/)
 
 This approach provides more explicit and self-documenting navigation than using bare `../` in symlinks: the breadcrumb name tells you _what_ you're pointing to, not just _where_.
 Learn more at the [breadcrumbs repo](https://github.com/niqodea/breadcrumbs).
-
-### Plugs
-
-File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
-- **Plug** (committed): `local.env -> ._.local.env` points to the socket
-- **Socket** (gitignored): `._.local.env` contains or links to the actual file
-- **Sample** (committed): `.~.local.env` shows expected structure with placeholder values
-
-Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
-
-This makes dependencies visible in version control without committing environment-specific paths or secrets.
-Learn more at the [plugs repo](https://github.com/niqodea/plugs).
 
 ## License
 
