@@ -1,5 +1,6 @@
 # TODO
 
+- Verify whether we can do without some git/NOTES.md chores, or maybe write scripts to streamline such actions
 - Commit some volumes files containing configurations we want to persist
 - Implement consistency checks (e.g. dnsmasq.conf vs docker-compose.yml addresses) (maybe a library might come out of it?)
 - Do not crash when first running containers due to dead symlinks
