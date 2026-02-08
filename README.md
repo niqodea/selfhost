@@ -24,11 +24,10 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 ## Getting Started
 
 1. Clone the repo and create a deployment directory (e.g., `/opt/selfhost`)
-2. Install base files: `scripts/install-base /opt/selfhost`
-3. Install apps: `scripts/install-apps /opt/selfhost`
-4. Copy socket samples to create actual sockets (`.~.foo` → `._.foo`)
-5. Install systemd template: `scripts/install-systemd-template`
-6. Enable startup service: `scripts/configure-systemd /opt/selfhost up`
+2. Install base systemd files: `.host-setup/install-systemd-base`
+3. Install deployment: `.host-setup/install-deployment /opt/selfhost`
+4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`)
+5. Enable startup service: `.host-setup/configure-deployment-startup /opt/selfhost up`
 
 ## Project Structure
 
@@ -49,7 +48,7 @@ apps/
     ├── local.env                     # Container env vars
     └── common.env -> ../.common.env
 
-scripts/                              # Installation and configuration scripts
+.host-setup/                          # Installation and configuration scripts
 adr/                                  # Architecture Decision Records
 ```
 

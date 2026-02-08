@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -eu
+
+root="$(dirname "$(realpath "$0")")/..root"
+
+deployment_path="$1"
+
+if [ -e "$deployment_path" ]; then
+    >&2 echo "File already exists at $deployment_path"
+    exit 1
+fi
+
+rsync -glor --exclude='._.*' "$root/apps/" "$deployment_path"
+
+echo 'Success'

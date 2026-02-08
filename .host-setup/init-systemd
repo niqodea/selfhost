@@ -3,6 +3,23 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")/..root"
 
+# WireGuard containers use the host's kernel-space WireGuard module.
+# By loading the module at the host level, we avoid granting containers the
+# dangerous SYS_MODULE capability, which would allow them to load arbitrary
+# kernel modules.
+# NOTE: This configures module loading at boot. To load immediately in the
+# current session, run `modprobe wireguard`
+wireguard_module_path='/etc/modules-load.d/wireguard.conf'
+if [ -e "$path" ]; then
+    >&2 echo "Error: file already exists at $wireguard_module_path"
+    exit 1
+fi
+echo 'wireguard' > '/etc/modules-load.d/wireguard.conf'
+
+docker_dropins_path='/etc/systemd/system/docker.service.d'
+mkdir "$docker_dropins_path"
+echo "Initialized Docker service drop-in units directory at $docker_dropins_path"
+
 route_failsafe_service_path="/etc/systemd/system/selfhost-route-failsafe@.service"
 startup_service_path="/etc/systemd/system/selfhost-startup@.service"
 
@@ -25,7 +42,6 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
-
 echo "Installed at $route_failsafe_service_path"
 
 cat > "$startup_service_path" << 'EOF'
@@ -42,14 +58,8 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
-
 echo "Installed at $startup_service_path"
 
-docker_dropins_path='/etc/systemd/system/docker.service.d'
-mkdir "$docker_dropins_path"
-echo "Initialized Docker service drop-in units directory at $docker_dropins_path"
-
-echo 'Reloading daemon...'
 systemctl daemon-reload
 
 echo 'Success'

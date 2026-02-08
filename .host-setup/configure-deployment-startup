@@ -4,6 +4,8 @@ set -eu
 root="$(dirname "$(realpath "$0")")/..root"
 
 deployment_path="$1"
+action="$2"
+
 systemd_escaped_deployment_path="$(systemd-escape --path "$deployment_path")"
 
 for file in 'route-failsafe' 'startup'; do
@@ -27,7 +29,7 @@ After=selfhost-route-failsafe@$systemd_escaped_deployment_path.service
 EOF
 )"
 
-case "${2:-}" in
+case "$action" in
     up)
         systemctl enable "selfhost-route-failsafe@${systemd_escaped_deployment_path}.service"
         printf '%s\n' "$docker_dropin_content" > "$docker_dropin_path"
@@ -43,5 +45,7 @@ case "${2:-}" in
         exit 1
         ;;
 esac
+
+systemctl daemon-reload
 
 echo 'Success'
