@@ -34,7 +34,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 ```
 docker-compose.yaml               # Shared Docker resources (networks)
 route-failsafe                    # Network failsafe routing script
-startup                           # Boots all modules
+startup                           # Start the services
 .env                              # Shared config
 .common.env                       # Shared container env vars
 <module>/
@@ -79,8 +79,8 @@ Breadcrumbs are a navigation pattern using specially-named symlinks (prefixed wi
 Each breadcrumb points either further up the chain (`../..foo`) or to the current directory (`.`) when the target is reached.
 
 ```
-./caddy/..apps  ->  ../..apps       (points up one level)
-./..apps        ->  .               (marks arrival at ./)
+./caddy/..selfhost  ->  ../..selfhost       (points up one level)
+./..selfhost        ->  .                   (marks arrival at ./)
 ```
 
 This approach provides more explicit and self-documenting navigation than using bare `../` in symlinks: the breadcrumb name tells you _what_ you're pointing to, not just _where_.

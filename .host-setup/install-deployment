@@ -2,7 +2,7 @@
 
 set -eu
 
-root="$(dirname "$(realpath "$0")")/..root"
+root="$(dirname "$(realpath "$0")")/..selfhost"
 
 deployment_path="$1"
 
@@ -20,7 +20,7 @@ rsync -glor \
     --include='/startup' \
     --include='/.env' \
     --include='/.common.env' \
-    --include='/..apps' \
+    --include='/..selfhost' \
     --exclude='/.*' \
     --include='/*/' \
     --exclude='/*' \

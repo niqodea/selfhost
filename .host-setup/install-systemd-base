@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-root="$(dirname "$(realpath "$0")")/..root"
+root="$(dirname "$(realpath "$0")")/..selfhost"
 
 # WireGuard containers use the host's kernel-space WireGuard module.
 # By loading the module at the host level, we avoid granting containers the
@@ -46,7 +46,7 @@ echo "Installed at $route_failsafe_service_path"
 
 cat > "$startup_service_path" << 'EOF'
 [Unit]
-Description=Start apps for selfhost at %f
+Description=Start selfhost at %f
 Requires=docker.service
 After=docker.service
 
