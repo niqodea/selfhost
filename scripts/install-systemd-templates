@@ -4,7 +4,7 @@ set -eu
 root="$(dirname "$(realpath "$0")")/..root"
 
 route_failsafe_service_path="/etc/systemd/system/selfhost-route-failsafe@.service"
-startup_service_path="/etc/systemd/system/selfhost-docker@.service"
+startup_service_path="/etc/systemd/system/selfhost-startup@.service"
 
 for path in "$route_failsafe_service_path" "$startup_service_path"; do
     if [ -e "$path" ]; then
@@ -19,8 +19,7 @@ Description=Network failsafe routing for selfhost at %f
 
 [Service]
 Type=oneshot
-WorkingDirectory=%f
-ExecStart=./route-failsafe up
+ExecStart=%f/route-failsafe up
 RemainAfterExit=yes
 
 [Install]
@@ -37,8 +36,7 @@ After=docker.service
 
 [Service]
 Type=oneshot
-WorkingDirectory=%f
-ExecStart=./startup
+ExecStart=%f/startup
 RemainAfterExit=yes
 
 [Install]
@@ -54,4 +52,4 @@ echo "Initialized Docker service drop-in units directory at $docker_dropins_path
 echo 'Reloading daemon...'
 systemctl daemon-reload
 
-echo 'Success!'
+echo 'Success'

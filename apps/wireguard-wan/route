@@ -2,6 +2,8 @@
 
 set -eux
 
+root="$(dirname "$(realpath "$0")")"
+
 case "${1:-}" in
     up)
         NAT_OP="-A"
@@ -18,7 +20,12 @@ case "${1:-}" in
 esac
 
 get_env_var() {
-    sed -n "s/^$1=//p" .env
+    value="$(sed -n "s/^$1=//p" "$root/.env")"
+    if [ -z "$value" ]; then
+        >&2 echo "Error: $1 not found in .env"
+        return 1
+    fi
+    printf '%s' "$value"
 }
 
 MAIN_NETWORK_SUBNET=$(get_env_var 'MAIN_NETWORK_SUBNET')

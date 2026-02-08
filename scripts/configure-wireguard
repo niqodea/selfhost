@@ -26,4 +26,4 @@ case "${1:-}" in
         ;;
 esac
 
-echo 'Success!'
+echo 'Success'

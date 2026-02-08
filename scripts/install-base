@@ -13,7 +13,7 @@ fi
 
 # TODO: just use rsync
 
-for file in 'docker-compose.yaml' 'route' 'startup-docker' 'startup-route'; do
+for file in 'route-failsafe' 'startup' 'docker-compose.yaml'; do
     if [ -e "$deployment_path/$file" ]; then
         >&2 echo "File already exists at $deployment_path/$file"
         exit 1
@@ -29,4 +29,4 @@ for symlink in '.env' '.common.env' '..apps'; do
     cp -P "$root/apps/$symlink" "$deployment_path/$symlink"
 done
 
-echo 'Success!'
+echo 'Success'
