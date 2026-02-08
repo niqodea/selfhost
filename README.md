@@ -32,24 +32,23 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 ## Project Structure
 
 ```
-apps/
-├── docker-compose.yaml               # Shared Docker resources (networks)
-├── route-failsafe                    # Network failsafe routing script
-├── startup                           # Boots all apps
-├── .env                              # Shared config
-├── .common.env                       # Shared container env vars
-└── <app>/
-    ├── docker-compose.yaml           # Docker resources
-    ├── .env -> ../.env
-    │
-    ├── Dockerfile                    # Custom image build
-    ├── route                         # Host-level network routing script
-    ├── volumes/                      # Persistent data and configs
-    ├── local.env                     # Container env vars
-    └── common.env -> ../.common.env
+docker-compose.yaml               # Shared Docker resources (networks)
+route-failsafe                    # Network failsafe routing script
+startup                           # Boots all modules
+.env                              # Shared config
+.common.env                       # Shared container env vars
+<module>/
+├── docker-compose.yaml           # Docker resources
+├── .env -> ../.env
+│
+├── Dockerfile                    # Custom image build
+├── route                         # Host-level network routing script
+├── volumes/                      # Persistent data and configs
+├── local.env                     # Container env vars
+└── common.env -> ../.common.env
 
 .host-setup/                          # Installation and configuration scripts
-adr/                                  # Architecture Decision Records
+.adr/                                 # Architecture Decision Records
 ```
 
 ## Design Patterns
@@ -80,8 +79,8 @@ Breadcrumbs are a navigation pattern using specially-named symlinks (prefixed wi
 Each breadcrumb points either further up the chain (`../..foo`) or to the current directory (`.`) when the target is reached.
 
 ```
-apps/caddy/..apps  ->  ../..apps       (points up one level)
-apps/..apps        ->  .               (marks arrival at apps/)
+./caddy/..apps  ->  ../..apps       (points up one level)
+./..apps        ->  .               (marks arrival at ./)
 ```
 
 This approach provides more explicit and self-documenting navigation than using bare `../` in symlinks: the breadcrumb name tells you _what_ you're pointing to, not just _where_.

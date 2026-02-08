@@ -11,6 +11,20 @@ if [ -e "$deployment_path" ]; then
     exit 1
 fi
 
-rsync -glor --exclude='._.*' "$root/apps/" "$deployment_path"
+# - Install key top-level files
+# - Install non-hidden top-level directories
+# - Ignore sockets anywhere
+rsync -glor \
+    --include='/docker-compose.yaml' \
+    --include='/route-failsafe' \
+    --include='/startup' \
+    --include='/.env' \
+    --include='/.common.env' \
+    --include='/..apps' \
+    --exclude='/.*' \
+    --include='/*/' \
+    --exclude='/*' \
+    --exclude='._.*' \
+    "$root/" "$deployment_path"
 
 echo 'Success'
