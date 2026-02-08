@@ -1,1 +1,0 @@
-HDD_DEVICE_PATH=/dev/disk/by-uuid/${HDD_UUID}
