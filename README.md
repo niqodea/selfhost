@@ -47,8 +47,8 @@ startup                           # Start the services
 ├── local.env                     # Container env vars
 └── common.env -> ../.common.env
 
-.host-setup/                          # Installation and configuration scripts
-.adr/                                 # Architecture Decision Records
+.host-setup/                      # Installation and configuration scripts
+.adr/                             # Architecture Decision Records
 ```
 
 ## Design Patterns
