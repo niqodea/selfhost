@@ -1,0 +1,33 @@
+services:
+  ntfy:
+    image: docker.io/binwiederhier/ntfy:latest
+    command: serve
+    networks:
+      main:
+        gw_priority: 1
+      caddy:
+        aliases: ["${CADDY_NETWORK_NTFY_ALIAS}"]
+    volumes:
+      - ./volumes/cache:/var/cache/ntfy
+    environment:
+      - NTFY_BASE_URL=https://${CADDY_NETWORK_NTFY_ALIAS}.${DOMAIN}
+      - NTFY_BEHIND_PROXY=true
+    user: ${PUID}:${PGID}
+    restart: ${DOCKER_RESTART}
+
+  watchdog:
+    build: .
+    network_mode: service:ntfy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - COMPOSE_PROJECT=${COMPOSE_PROJECT_NAME}
+    restart: ${DOCKER_RESTART}
+
+networks:
+  main:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+  caddy:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}

@@ -25,6 +25,11 @@
 		reverse_proxy {$LIBRESPEED_ALIAS}:80
 	}
 
+	@ntfy host ntfy.{$DOMAIN}
+	handle @ntfy {
+		reverse_proxy {$NTFY_ALIAS}:80
+	}
+
 	@prowlarr host prowlarr.{$DOMAIN}
 	handle @prowlarr {
 		reverse_proxy {$PROWLARR_ALIAS}:9696

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -eu
+
+project="$COMPOSE_PROJECT"
+
+docker events \
+    --filter type=container \
+    --filter event=die \
+    --filter label=com.docker.compose.project="$project" \
+    --format '{{.Actor.Attributes.name}} {{.Actor.Attributes.exitCode}}' \
+| while read -r name exit_code; do
+    if [ "$exit_code" = "0" ]; then
+        continue
+    fi
+
+    wget -q -O /dev/null \
+        --header "Title: Container crashed: $name" \
+        --header "Priority: high" \
+        --post-data "Container '$name' exited with code $exit_code" \
+        "http://localhost/$project"
+done
