@@ -35,6 +35,11 @@
 		reverse_proxy {$QBITTORRENT_ALIAS}:8080
 	}
 
+	@syncthing host syncthing.{$DOMAIN}
+	handle @syncthing {
+		reverse_proxy {$SYNCTHING_ALIAS}:8384
+	}
+
 	handle {
 		respond "Not found" 404
 	}

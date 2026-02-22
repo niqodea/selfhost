@@ -1,0 +1,22 @@
+services:
+  syncthing:
+    image: "docker.io/syncthing/syncthing:2.0.14\
+      @sha256:6d2ab058383b533e045cf2c32fc4c6bbe87c612c92bc2aca9f552fb099b2e123"
+    networks:
+      internal:
+        gw_priority: 1
+        ipv4_address: ${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
+      caddy:
+        aliases: ["${CADDY_NETWORK_SYNCTHING_ALIAS}"]
+    volumes:
+      - ./volumes/data:/var/syncthing
+    user: ${PUID}:${PGID}
+    restart: ${DOCKER_RESTART}
+
+networks:
+  caddy:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+  internal:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}
