@@ -6,6 +6,8 @@ services:
       @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
     networks:
       main:
+        gw_priority: 1
+      internal:
     ports:
       - ${WIREGUARD_LAN_HOST_PORT}:51820/udp
     volumes:
@@ -16,7 +18,7 @@ services:
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
-      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET}
+      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${INTERNAL_NETWORK_SUBNET}
       # Disable default DNS server since we run dnsmasq instead
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
@@ -42,6 +44,7 @@ services:
       - -k
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --address=/syncthing-bare.${DOMAIN}/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     user: ${PUID}:${PGID}
@@ -51,3 +54,6 @@ networks:
   main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+  internal:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}

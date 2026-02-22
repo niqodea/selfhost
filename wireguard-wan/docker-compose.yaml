@@ -10,6 +10,7 @@ services:
         gw_priority: 1
       main:
         ipv4_address: ${MAIN_NETWORK_WIREGUARD_WAN_ADDRESS}
+      internal:
     # NOTE: Port forwarding omitted.
     # Docker's port forwarding uses the network gateway, which routes through
     # gluetun's tunnel in this setup, breaking connections back to clients.
@@ -52,6 +53,7 @@ services:
       - -k
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --address=/syncthing-bare.${DOMAIN}/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     user: ${PUID}:${PGID}
@@ -64,3 +66,6 @@ networks:
   main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+  internal:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}

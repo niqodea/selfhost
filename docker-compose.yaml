@@ -11,3 +11,10 @@ networks:
       config:
         - subnet: ${GLUETUN_NETWORK_SUBNET}
           ip_range: ${GLUETUN_NETWORK_IP_RANGE}
+  internal:
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}
+    internal: true
+    ipam:
+      config:
+        - subnet: ${INTERNAL_NETWORK_SUBNET}
+          ip_range: ${INTERNAL_NETWORK_IP_RANGE}
