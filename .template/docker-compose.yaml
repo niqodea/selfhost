@@ -1,0 +1,23 @@
+services:
+  app:
+    image: "docker.io/org/app:tag\
+      @sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    networks:
+      caddy:
+        aliases: ["${CADDY_NETWORK_APP_ALIAS}"]
+    volumes:
+      - ./volumes/config:/app/config
+      - ./volumes/data:/app/data
+    environment:
+      VAR_1: value-1
+      VAR_2: value-2
+    env_file:
+      - local.env
+      - common.env
+    user: ${PUID}:${PGID}
+    restart: ${DOCKER_RESTART}
+
+networks:
+  caddy:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
