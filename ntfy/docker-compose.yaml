@@ -1,4 +1,5 @@
 services:
+
   ntfy:
     image: docker.io/binwiederhier/ntfy:latest
     command: serve
@@ -9,9 +10,9 @@ services:
         aliases: ["${CADDY_NETWORK_NTFY_ALIAS}"]
     volumes:
       - ./volumes/cache:/var/cache/ntfy
-    environment:
-      - NTFY_BASE_URL=https://${CADDY_NETWORK_NTFY_ALIAS}.${DOMAIN}
-      - NTFY_BEHIND_PROXY=true
+    # environment:
+    #   - NTFY_BASE_URL=https://${CADDY_NETWORK_NTFY_ALIAS}.${DOMAIN}
+    #   - NTFY_BEHIND_PROXY=true
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 

@@ -1,22 +1,39 @@
 #!/bin/sh
-
 set -eu
 
 project="$COMPOSE_PROJECT"
 
-docker events \
-    --filter type=container \
-    --filter event=die \
-    --filter label=com.docker.compose.project="$project" \
-    --format '{{.Actor.Attributes.name}} {{.Actor.Attributes.exitCode}}' \
-| while read -r name exit_code; do
-    if [ "$exit_code" = "0" ]; then
-        continue
-    fi
-
+notify() {
+    title="$1"
+    body="$2"
+    priority="$3"
     wget -q -O /dev/null \
-        --header "Title: Container crashed: $name" \
-        --header "Priority: high" \
-        --post-data "Container '$name' exited with code $exit_code" \
+        --header "Title: $title" \
+        --header "Priority: $priority" \
+        --post-data "$body" \
         "http://localhost/$project"
+}
+
+docker events \
+    --filter "label=com.docker.compose.project=$project" \
+    --filter 'type=container' \
+    --filter 'event=die' \
+    --filter 'event=health_status' \
+    --format '{{.Action}}|{{.Actor.Attributes.name}}|{{.Actor.Attributes.exitCode}}' \
+| while IFS='|' read -r action name exit_code; do
+    case "$action" in
+        'die')
+            if [ "$exit_code" = '0' ]; then
+                continue
+            fi
+            notify "Container crashed: $name" \
+                "Container '$name' exited with code $exit_code" \
+                "high"
+            ;;
+        'health_status: unhealthy')
+            notify "Container unhealthy: $name" \
+                "Health check failing for '$name'" \
+                "high"
+            ;;
+    esac
 done
