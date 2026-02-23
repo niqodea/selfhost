@@ -5,7 +5,7 @@ services:
         ROOT: /var/www/git
     networks:
       caddy:
-        aliases: ["${CADDY_NETWORK_GIT_ALIAS}"]
+        aliases: ["${GIT_ID}"]
     volumes:
       - ./volumes/root:/var/www/git
     user: ${PUID}:${PGID}

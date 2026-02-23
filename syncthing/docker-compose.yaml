@@ -7,7 +7,7 @@ services:
         gw_priority: 1
         ipv4_address: ${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
       caddy:
-        aliases: ["${CADDY_NETWORK_SYNCTHING_ALIAS}"]
+        aliases: ["${SYNCTHING_ID}"]
     volumes:
       - ./volumes/data:/var/syncthing
     user: ${PUID}:${PGID}

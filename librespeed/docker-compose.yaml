@@ -4,7 +4,7 @@ services:
        @sha256:f68487eda17f8abb8c88a43c0b9d1a2fa4db75c2de0fee75a6c69972bb383e87"
     networks:
       caddy:
-        aliases: ["${CADDY_NETWORK_LIBRESPEED_ALIAS}"]
+        aliases: ["${LIBRESPEED_ID}"]
     environment:
       - MODE=standalone
       - TELEMETRY=false
