@@ -53,7 +53,7 @@ services:
       - -k
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
-      - --address=/syncthing-bare.${DOMAIN}/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
+      - --address=/${SYNCTHING_ID}-bare.${DOMAIN}/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     user: ${PUID}:${PGID}

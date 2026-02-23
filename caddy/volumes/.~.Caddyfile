@@ -15,29 +15,29 @@
 		}
 	}
 
-	@jellyfin host jellyfin.{$DOMAIN}
-	handle @jellyfin {
-		reverse_proxy {$JELLYFIN_ALIAS}:8096
+	@{$JELLYFIN_ID} host {$JELLYFIN_ID}.{$DOMAIN}
+	handle @{$JELLYFIN_ID} {
+		reverse_proxy {$JELLYFIN_ID}:8096
 	}
 
-	@librespeed host librespeed.{$DOMAIN}
-	handle @librespeed {
-		reverse_proxy {$LIBRESPEED_ALIAS}:80
+	@{$LIBRESPEED_ID} host {$LIBRESPEED_ID}.{$DOMAIN}
+	handle @{$LIBRESPEED_ID} {
+		reverse_proxy {$LIBRESPEED_ID}:80
 	}
 
-	@prowlarr host prowlarr.{$DOMAIN}
-	handle @prowlarr {
-		reverse_proxy {$PROWLARR_ALIAS}:9696
+	@{$PROWLARR_ID} host {$PROWLARR_ID}.{$DOMAIN}
+	handle @{$PROWLARR_ID} {
+		reverse_proxy {$PROWLARR_ID}:9696
 	}
 
-	@qbittorrent host qbittorrent.{$DOMAIN}
-	handle @qbittorrent {
-		reverse_proxy {$QBITTORRENT_ALIAS}:8080
+	@{$QBITTORRENT_ID} host {$QBITTORRENT_ID}.{$DOMAIN}
+	handle @{$QBITTORRENT_ID} {
+		reverse_proxy {$QBITTORRENT_ID}:8080
 	}
 
-	@syncthing host syncthing.{$DOMAIN}
-	handle @syncthing {
-		reverse_proxy {$SYNCTHING_ALIAS}:8384
+	@{$SYNCTHING_ID} host {$SYNCTHING_ID}.{$DOMAIN}
+	handle @{$SYNCTHING_ID} {
+		reverse_proxy {$SYNCTHING_ID}:8384
 	}
 
 	handle {

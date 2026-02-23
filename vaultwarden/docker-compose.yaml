@@ -4,7 +4,7 @@ services:
       @sha256:63cce7624f655f83ad5bab66ef62bc3e3327116b068704bfbbda5d0c1b3003be"
     networks:
       caddy:
-        aliases: ["${CADDY_NETWORK_VAULTWARDEN_ALIAS}"]
+        aliases: ["${VAULTWARDEN_ID}"]
     volumes:
       - ./volumes/data:/data
     environment:

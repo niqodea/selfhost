@@ -7,7 +7,7 @@ services:
       gluetun:
         gw_priority: 1
       caddy:
-        aliases: ["${CADDY_NETWORK_QBITTORRENT_ALIAS}"]
+        aliases: ["${QBITTORRENT_ID}"]
     volumes:
       - ./volumes/config:/config
       - ./volumes/downloads:/downloads

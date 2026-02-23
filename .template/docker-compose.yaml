@@ -4,7 +4,7 @@ services:
       @sha256:0000000000000000000000000000000000000000000000000000000000000000"
     networks:
       caddy:
-        aliases: ["${CADDY_NETWORK_APP_ALIAS}"]
+        aliases: ["APP_ID"]
     volumes:
       - ./volumes/config:/app/config
       - ./volumes/data:/app/data
