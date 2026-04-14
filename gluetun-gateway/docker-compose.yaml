@@ -11,6 +11,7 @@ services:
       - ./volumes/iptables-post-rules.txt:/iptables/post-rules.txt:ro
       - ./volumes/config:/gluetun
     environment:
+      - UPDATER_PERIOD=24h
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
       # root is required for network setup, so 'user:' directive won't work
       # switch to PUID/PGID env vars after init
