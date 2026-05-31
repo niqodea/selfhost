@@ -22,7 +22,7 @@
 
 	@{$LIBRESPEED_ID} host {$LIBRESPEED_ID}.{$DOMAIN}
 	handle @{$LIBRESPEED_ID} {
-		reverse_proxy {$LIBRESPEED_ID}:80
+		reverse_proxy {$LIBRESPEED_ID}:8080
 	}
 
 	@{$PROWLARR_ID} host {$PROWLARR_ID}.{$DOMAIN}
