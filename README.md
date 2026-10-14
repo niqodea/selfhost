@@ -11,6 +11,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **gluetun-gateway** | VPN gateway for anonymous traffic routing         |
 | **wireguard-lan**   | VPN server for remote access to local services    |
 | **wireguard-wan**   | VPN server with anonymous exit via Gluetun        |
+| **immich**          | Photo and video backup                            |
 | **jellyfin**        | Media streaming server                            |
 | **prowlarr**        | Indexer manager with anonymous exit via Gluetun   |
 | **qbittorrent**     | Torrent client with anonymous exit via Gluetun    |

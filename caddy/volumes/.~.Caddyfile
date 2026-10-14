@@ -15,6 +15,11 @@
 		}
 	}
 
+	@immich host immich.{$DOMAIN}
+	handle @immich {
+		reverse_proxy immich:2283
+	}
+
 	@jellyfin host jellyfin.{$DOMAIN}
 	handle @jellyfin {
 		reverse_proxy jellyfin:8096
