@@ -42,7 +42,7 @@ services:
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
-      - --addn-hosts=/etc/dnsmasq/blocklist.hosts
+      - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
       - --log-queries
       - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     user: ${PUID}:${PGID}
