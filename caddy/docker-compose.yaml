@@ -18,8 +18,8 @@ services:
 
 networks:
   caddy:
+    external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
-    internal: true
   main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
