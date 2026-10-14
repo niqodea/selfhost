@@ -10,7 +10,7 @@ root="$(dirname "$(realpath "$0")")/..selfhost"
 # NOTE: This configures module loading at boot. To load immediately in the
 # current session, run `modprobe wireguard`
 wireguard_module_path='/etc/modules-load.d/wireguard.conf'
-if [ -e "$path" ]; then
+if [ -e "$wireguard_module_path" ]; then
     >&2 echo "Error: file already exists at $wireguard_module_path"
     exit 1
 fi
