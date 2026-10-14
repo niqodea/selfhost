@@ -35,15 +35,14 @@ services:
     restart: ${DOCKER_RESTART}
 
   wireguard-lan-dnsmasq:
-    image: "docker.io/strm/dnsmasq\
-      @sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39\
-    "  # untagged, the only available image for now (version 2.80)
+    build: .
     network_mode: service:wireguard-lan
     command:
       - -k
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
+      - --addn-hosts=/etc/dnsmasq/blocklist.hosts
       - --log-queries
       - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     user: ${PUID}:${PGID}
