@@ -36,7 +36,6 @@ docker-compose.yaml               # Shared Docker resources (networks)
 route-failsafe                    # Network failsafe routing script
 startup                           # Start the services
 .env                              # Shared config
-.common.env                       # Shared container env vars
 <module>/
 ├── docker-compose.yaml           # Docker resources
 ├── .env -> ../.env
@@ -44,8 +43,7 @@ startup                           # Start the services
 ├── Dockerfile                    # Custom image build
 ├── route                         # Host-level network routing script
 ├── volumes/                      # Persistent data and configs
-├── local.env                     # Container env vars
-└── common.env -> ../.common.env
+└── local.env                     # Container env vars
 
 .host-setup/                      # Installation and configuration scripts
 .adr/                             # Architecture Decision Records

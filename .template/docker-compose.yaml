@@ -12,7 +12,6 @@ services:
       VAR_2: value-2
     env_file:
       - local.env
-      - common.env
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 

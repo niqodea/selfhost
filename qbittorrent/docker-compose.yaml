@@ -12,8 +12,6 @@ services:
       - ./volumes/downloads:/downloads
     environment:
       - QBT_LEGAL_NOTICE=confirm
-    env_file:
-      - common.env
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 

@@ -12,9 +12,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=Etc/UTC
-    env_file:
-      - common.env
     restart: ${DOCKER_RESTART}
 
 networks:

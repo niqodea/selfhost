@@ -11,8 +11,6 @@ services:
       - ./volumes/cache:/cache
       - ./volumes/movies:/data/movies
       - ./volumes/shows:/data/shows
-    env_file:
-      - common.env
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 

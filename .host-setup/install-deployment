@@ -19,7 +19,6 @@ rsync -glor \
     --include='/route-failsafe' \
     --include='/startup' \
     --include='/.env' \
-    --include='/.common.env' \
     --include='/..selfhost' \
     --exclude='/.*' \
     --include='/*/' \

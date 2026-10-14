@@ -28,7 +28,6 @@ services:
       - PGID=${PGID}
     env_file:
       - local.env
-      - common.env
     cap_add:
       - NET_ADMIN
     sysctls:
