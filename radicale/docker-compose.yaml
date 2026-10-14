@@ -4,7 +4,6 @@ services:
       @sha256:8b50b8c664d9557e47f723e18064d8f5f822e39d4e8a3d2385947ee13a2f8222"
     networks:
       caddy:
-        aliases: ["${RADICALE_ID}"]
     volumes:
       - ./volumes/data:/data
     user: ${PUID}:${PGID}

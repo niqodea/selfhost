@@ -15,29 +15,29 @@
 		}
 	}
 
-	@{$JELLYFIN_ID} host {$JELLYFIN_ID}.{$DOMAIN}
-	handle @{$JELLYFIN_ID} {
-		reverse_proxy {$JELLYFIN_ID}:8096
+	@jellyfin host jellyfin.{$DOMAIN}
+	handle @jellyfin {
+		reverse_proxy jellyfin:8096
 	}
 
-	@{$LIBRESPEED_ID} host {$LIBRESPEED_ID}.{$DOMAIN}
-	handle @{$LIBRESPEED_ID} {
-		reverse_proxy {$LIBRESPEED_ID}:8080
+	@librespeed host librespeed.{$DOMAIN}
+	handle @librespeed {
+		reverse_proxy librespeed:8080
 	}
 
-	@{$PROWLARR_ID} host {$PROWLARR_ID}.{$DOMAIN}
-	handle @{$PROWLARR_ID} {
-		reverse_proxy {$PROWLARR_ID}:9696
+	@prowlarr host prowlarr.{$DOMAIN}
+	handle @prowlarr {
+		reverse_proxy prowlarr:9696
 	}
 
-	@{$QBITTORRENT_ID} host {$QBITTORRENT_ID}.{$DOMAIN}
-	handle @{$QBITTORRENT_ID} {
-		reverse_proxy {$QBITTORRENT_ID}:8080
+	@qbittorrent host qbittorrent.{$DOMAIN}
+	handle @qbittorrent {
+		reverse_proxy qbittorrent:8080
 	}
 
-	@{$SYNCTHING_ID} host {$SYNCTHING_ID}.{$DOMAIN}
-	handle @{$SYNCTHING_ID} {
-		reverse_proxy {$SYNCTHING_ID}:8384
+	@syncthing host syncthing.{$DOMAIN}
+	handle @syncthing {
+		reverse_proxy syncthing:8384
 	}
 
 	handle {

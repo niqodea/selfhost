@@ -13,15 +13,6 @@ services:
     environment:
       - DOMAIN=${DOMAIN}
       - DYNU_API_KEY=${DYNU_API_KEY}
-      # Services
-      - GIT_ID=${GIT_ID}
-      - JELLYFIN_ID=${JELLYFIN_ID}
-      - LIBRESPEED_ID=${LIBRESPEED_ID}
-      - PROWLARR_ID=${PROWLARR_ID}
-      - QBITTORRENT_ID=${QBITTORRENT_ID}
-      - RADICALE_ID=${RADICALE_ID}
-      - SYNCTHING_ID=${SYNCTHING_ID}
-      - VAULTWARDEN_ID=${VAULTWARDEN_ID}
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 

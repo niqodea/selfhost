@@ -7,7 +7,6 @@ services:
       gluetun:
         gw_priority: 1
       caddy:
-        aliases: ["${PROWLARR_ID}"]
     volumes:
       - ./volumes/config:/config
     environment:

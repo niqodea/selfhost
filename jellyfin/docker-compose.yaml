@@ -6,7 +6,6 @@ services:
       main:
         gw_priority: 1
       caddy:
-        aliases: ["${JELLYFIN_ID}"]
     volumes:
       - ./volumes/config:/config
       - ./volumes/cache:/cache
