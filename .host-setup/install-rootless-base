@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+# Host prerequisites for running a deployment on rootless Docker as $1
+# Ref: https://docs.docker.com/engine/security/rootless/
+
+user="$1"
+
+# Containers map their users and file owners to the user's subordinate IDs
+for file in '/etc/subuid' '/etc/subgid'; do
+    if ! grep --quiet "^$user:" "$file"; then
+        >&2 echo "Error: no subordinate ID range for $user in $file"
+        exit 1
+    fi
+done
+
+# rootlesskit and dockerd-rootless.sh run the daemon in a user namespace
+apt-get install --yes docker-ce-rootless-extras
+# newuidmap and newgidmap map the subordinate IDs into the user namespace, which
+# takes a privilege only root can grant
+apt-get install --yes uidmap
+# pasta connects the containers' network namespace to the outside
+apt-get install --yes passt
+# The daemon asks the user's systemd for container cgroups over the user D-Bus
+apt-get install --yes dbus-user-session
+
+echo 'Success'

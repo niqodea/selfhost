@@ -30,6 +30,20 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`)
 5. Enable startup service: `.host-setup/configure-deployment-startup /opt/selfhost up`
 
+### Rootless
+
+A deployment can also run on rootless Docker, which needs `sudo` only once and does not start on boot.
+
+1. Install host prerequisites: `sudo .host-setup/install-rootless-base <user>`
+2. Install deployment and sockets, as above, as `<user>` (e.g., `~/selfhost`)
+3. In `._..env`, set `PUID=0` and `PGID=0`, since root in a rootless container is `<user>`, and `DOCKER_RESTART=no`, since nothing may start before the routes
+4. After every boot, from an SSH session or tmux:
+   - `.rootless/start-daemon`
+   - `.rootless/route-failsafe-up ~/selfhost`
+   - `.rootless/startup ~/selfhost`
+
+The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes the containers and their routes with it.
+
 ## Project Structure
 
 ```
@@ -47,6 +61,7 @@ startup                           # Start the services
 └── local.env                     # Container env vars
 
 .host-setup/                      # Installation and configuration scripts
+.rootless/                        # Rootless deployment scripts
 .adr/                             # Architecture Decision Records
 ```
 
