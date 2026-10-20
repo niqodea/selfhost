@@ -8,10 +8,7 @@ services:
         gw_priority: 1
       caddy:
     volumes:
-      - ./volumes/config:/config
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
+      - prowlarr-config:/config
     restart: ${DOCKER_RESTART}
 
 networks:
@@ -21,3 +18,11 @@ networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  prowlarr-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/config

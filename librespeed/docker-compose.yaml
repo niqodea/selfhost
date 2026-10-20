@@ -7,8 +7,6 @@ services:
     environment:
       - MODE=standalone
       - TELEMETRY=false
-    # Not setting user: PUID/PGID - image expects root for entrypoint setup
-    # No volumes mounted so root permissions pose minimal risk
     restart: ${DOCKER_RESTART}
 
 networks:

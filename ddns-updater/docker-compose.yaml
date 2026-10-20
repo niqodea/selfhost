@@ -3,7 +3,7 @@ services:
     image: "docker.io/qmcgaw/ddns-updater:v2.9.0\
       @sha256:ed73f1fb7ab54a8a8fa26001eecc77cc8be56cdf3fb0ca91fee831124bcbb696"
     volumes:
-      - ./volumes/data:/updater/data
+      - ddns-updater-data:/updater/data
     environment:
       CONFIG: |
         {
@@ -17,5 +17,12 @@ services:
           ]
         }
       SERVER_ENABLED: no
-    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
+
+volumes:
+  ddns-updater-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/data

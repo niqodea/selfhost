@@ -8,11 +8,14 @@ services:
         gw_priority: 1
       caddy:
     volumes:
-      - ./volumes/config:/config
+      - qbittorrent-config:/config
       - ./volumes/downloads:/downloads
     environment:
       - QBT_LEGAL_NOTICE=confirm
-    user: ${PUID}:${PGID}
+      # The entrypoint switches to these IDs, so downloads belong to the
+      # deployment owner
+      - PUID=${PUID}
+      - PGID=${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
@@ -22,3 +25,11 @@ networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  qbittorrent-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/config

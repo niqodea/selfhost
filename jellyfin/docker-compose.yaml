@@ -7,11 +7,10 @@ services:
         gw_priority: 1
       caddy:
     volumes:
-      - ./volumes/config:/config
-      - ./volumes/cache:/cache
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
       - ./volumes/movies:/data/movies
       - ./volumes/shows:/data/shows
-    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
@@ -21,3 +20,17 @@ networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  jellyfin-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/config
+  jellyfin-cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/cache

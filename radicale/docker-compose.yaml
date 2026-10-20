@@ -5,11 +5,18 @@ services:
     networks:
       caddy:
     volumes:
-      - ./volumes/data:/data
-    user: ${PUID}:${PGID}
+      - radicale-data:/data
     restart: ${DOCKER_RESTART}
 
 networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  radicale-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/data

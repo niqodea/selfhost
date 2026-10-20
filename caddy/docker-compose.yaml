@@ -8,12 +8,11 @@ services:
       caddy:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./volumes/data:/data
-      - ./volumes/config:/config
+      - caddy-data:/data
+      - caddy-config:/config
     environment:
       - DOMAIN=${DOMAIN}
       - DYNU_API_KEY=${DYNU_API_KEY}
-    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
@@ -23,3 +22,17 @@ networks:
   main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+
+volumes:
+  caddy-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/data
+  caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/config

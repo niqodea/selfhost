@@ -5,17 +5,30 @@ services:
     networks:
       caddy:
     volumes:
-      - ./volumes/config:/app/config
-      - ./volumes/data:/app/data
+      - app-config:/app/config
+      - app-data:/app/data
     environment:
       VAR_1: value-1
       VAR_2: value-2
     env_file:
       - local.env
-    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  app-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/config
+  app-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/data

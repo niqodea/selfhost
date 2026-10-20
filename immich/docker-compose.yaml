@@ -7,7 +7,7 @@ services:
       immich:
       caddy:
     volumes:
-      - ./volumes/data:/data
+      - immich-data:/data
     environment:
       DB_HOSTNAME: immich-postgres
       DB_USERNAME: admin
@@ -17,7 +17,6 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
-    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
   immich-redis:
@@ -25,7 +24,6 @@ services:
       @sha256:c123e3715db63d06d4ad6964884037aa0d5d4d703939b9929954112889708e1d"
     networks:
       immich:
-    # Not setting user: PUID/PGID - image expects root for entrypoint setup
     restart: ${DOCKER_RESTART}
 
   immich-postgres:
@@ -34,14 +32,13 @@ services:
     networks:
       immich:
     volumes:
-      - ./volumes/postgres:/var/lib/postgresql/data
+      - immich-postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: --data-checksums
     shm_size: 128mb
-    # Not setting user: PUID/PGID - image expects root for entrypoint setup
     restart: ${DOCKER_RESTART}
 
 networks:
@@ -50,3 +47,17 @@ networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  immich-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/data
+  immich-postgres:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/postgres

@@ -5,16 +5,23 @@ services:
     networks:
       caddy:
     volumes:
-      - ./volumes/data:/data
+      - vaultwarden-data:/data
     environment:
       # Enable more efficient multi-device sync
       - WEBSOCKET_ENABLED=true
     env_file:
       - local.env
-    user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+
+volumes:
+  vaultwarden-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/data

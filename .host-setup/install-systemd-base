@@ -16,6 +16,8 @@ if [ -e "$wireguard_module_path" ]; then
 fi
 echo 'wireguard' > '/etc/modules-load.d/wireguard.conf'
 
+# TODO: Enable userns-remap in /etc/docker/daemon.json, so that a container
+# whose image runs as root is not root on the host
 docker_dropins_path='/etc/systemd/system/docker.service.d'
 mkdir "$docker_dropins_path"
 echo "Initialized Docker service drop-in units directory at $docker_dropins_path"

@@ -60,6 +60,15 @@ A few iptables rules on the host solve this, routing all traffic from the `gluet
 Services opt into VPN routing by joining the network with `gw_priority: 1` and setting `dns` to the gateway address.
 One Gluetun instance serves all services that need anonymous egress.
 
+### Volume Ownership
+
+Each volume is one of three kinds, and the kind decides who owns its files:
+- **App state** (databases, app configs, caches): a named volume backed by the app's folder in `volumes/`, with a name that starts with the app's name. The app runs as its image's default user.
+- **Shared content** (downloads, synced folders, git repositories): a plain bind mount owned by the deployment owner, whose IDs are `PUID` and `PGID`. Only the apps that write there run as those IDs.
+- **Config you write** (Caddyfile, templates): a read-only bind mount.
+
+See [the ADR](.adr/volume-ownership.md) for why.
+
 ### Plugs
 
 File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:

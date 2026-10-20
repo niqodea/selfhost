@@ -9,14 +9,10 @@ services:
         ipv4_address: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
     volumes:
       - ./volumes/iptables-post-rules.txt:/iptables/post-rules.txt:ro
-      - ./volumes/config:/gluetun
+      - gluetun-gateway-config:/gluetun
     environment:
       - UPDATER_PERIOD=24h
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
-      # root is required for network setup, so 'user:' directive won't work
-      # switch to PUID/PGID env vars after init
-      - PUID=${PUID}
-      - PGID=${PGID}
     env_file:
       - local.env
     cap_add:
@@ -32,3 +28,11 @@ networks:
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
+
+volumes:
+  gluetun-gateway-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./volumes/config
