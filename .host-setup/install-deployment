@@ -27,4 +27,13 @@ rsync -glor \
     --exclude='.=.*' \
     "$root/" "$deployment_path"
 
+# The checkout's socket files are the exp deployment's config, so they become
+# samples for this deployment's own sockets
+find -H "$root" \( -path "$root/.*" -type d -o -name '.=.*' \) -prune \
+    -o -type f -name '._.*' -print | while IFS= read -r socket; do
+    relative_path="${socket#"$root"/}"
+    socket_name="$(basename "$relative_path")"
+    cp "$socket" "$deployment_path/$(dirname "$relative_path")/.~.${socket_name#._.}"
+done
+
 echo 'Success'
