@@ -1,9 +1,9 @@
 #!/bin/sh
 set -eu
 
-# Runs route-failsafe of the deployment at $1 in the rootless daemon's network
+# Runs route-failsafe of this checkout in the rootless daemon's network
 
-deployment_path="$1"
+root="$(dirname "$(realpath "$0")")/..selfhost"
 
 state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
 
@@ -11,4 +11,4 @@ state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
 # which is only mounted inside rootlesskit's mount namespace
 # Ref: https://github.com/rootless-containers/rootlesskit/blob/master/docs/network.md
 nsenter --preserve-credentials --user --mount --target "$(cat "$state_path/child_pid")" -- \
-    nsenter --net="$state_path/netns" "$deployment_path/route-failsafe" up
+    nsenter --net="$state_path/netns" "$root/route-failsafe" up

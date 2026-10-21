@@ -30,17 +30,16 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`)
 5. Enable startup service: `.host-setup/configure-deployment-startup /opt/selfhost up`
 
-### Rootless
+### Exp
 
-A deployment can also run on rootless Docker, which needs `sudo` only once and does not start on boot.
+The exp deployment runs from the repo checkout itself, on rootless Docker, which needs `sudo` only once and does not start on boot.
+Its config is the checkout's socket files, which are committed, so an edit takes effect on the next start.
 
 1. Install host prerequisites: `sudo .host-setup/install-rootless-base <user>`
-2. Install deployment and sockets, as above, as `<user>` (e.g., `~/selfhost`)
-3. In `._..env`, set `PUID=0` and `PGID=0`, since root in a rootless container is `<user>`, and `DOCKER_RESTART=no`, since nothing may start before the routes
-4. After every boot, from an SSH session or tmux:
-   - `.rootless/start-daemon`
-   - `.rootless/route-failsafe-up ~/selfhost`
-   - `.rootless/startup ~/selfhost`
+2. After every boot, from an SSH session or tmux, as `<user>`:
+   - `.exp/start-daemon`
+   - `.exp/route-failsafe-up`
+   - `.exp/startup`, which first creates the directory sockets a fresh clone lacks
 
 The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes the containers and their routes with it.
 
@@ -61,7 +60,7 @@ startup                           # Start the services
 └── local.env                     # Container env vars
 
 .host-setup/                      # Installation and configuration scripts
-.rootless/                        # Rootless deployment scripts
+.exp/                             # Scripts that run the checkout as the exp deployment
 .adr/                             # Architecture Decision Records
 ```
 
@@ -88,7 +87,7 @@ See [the ADR](.adr/volume-ownership.md) for why.
 
 File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
 - **Plug** (committed): `local.env -> ._.local.env` points to the socket
-- **Socket** (gitignored): `._.local.env` contains or links to the actual file, and `.=.data` is or links to the actual directory
+- **Socket** (gitignored, except the checkout's file sockets, which are the exp deployment's config): `._.local.env` contains or links to the actual file, and `.=.data` is or links to the actual directory
 - **Sample** (committed): `.~.local.env` shows expected structure with placeholder values, as a file or a directory like its socket
 
 Bootstrap by copying the sample: `cp .~.local.env ._.local.env`

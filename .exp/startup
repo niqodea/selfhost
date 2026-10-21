@@ -1,0 +1,38 @@
+#!/bin/sh
+set -eu
+
+# Runs startup of this checkout in the rootless daemon's network
+
+root="$(dirname "$(realpath "$0")")/..selfhost"
+
+# Git does not track empty directories, so a clone has no directory sockets,
+# and one with a placeholder file in it would stop Docker from filling the
+# named volume from its image
+find "$root"/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
+    socket="$(dirname "$plug")/$(readlink "$plug")"
+    if [ -e "$socket" ]; then
+        continue
+    fi
+    case "$(basename "$socket")" in
+        .=.*)
+            mkdir "$socket"
+            ;;
+        ._.*)
+            >&2 echo "Error: missing socket file $socket"
+            exit 1
+            ;;
+        *)
+            >&2 echo "Error: $plug points to nothing at $socket"
+            exit 1
+            ;;
+    esac
+done
+
+state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
+
+# Containers live in a network namespace that rootlesskit detaches into a file,
+# which is only mounted inside rootlesskit's mount namespace
+# Ref: https://github.com/rootless-containers/rootlesskit/blob/master/docs/network.md
+nsenter --preserve-credentials --user --mount --target "$(cat "$state_path/child_pid")" -- \
+    nsenter --net="$state_path/netns" \
+    env DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" "$root/startup"

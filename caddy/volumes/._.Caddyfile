@@ -1,0 +1,51 @@
+# Caddy's default format uses tabs
+# Ref: https://caddy.community/t/caddyfile-warning/13701/2
+{
+	# email your-email@example.com
+	# log {
+	#	level DEBUG
+	# }
+}
+
+*.{$DOMAIN} {
+	tls {
+		dns dynu {
+			api_token {$DYNU_API_KEY}
+			own_domain {$DOMAIN}
+		}
+	}
+
+	@immich host immich.{$DOMAIN}
+	handle @immich {
+		reverse_proxy immich:2283
+	}
+
+	@jellyfin host jellyfin.{$DOMAIN}
+	handle @jellyfin {
+		reverse_proxy jellyfin:8096
+	}
+
+	@librespeed host librespeed.{$DOMAIN}
+	handle @librespeed {
+		reverse_proxy librespeed:8080
+	}
+
+	@prowlarr host prowlarr.{$DOMAIN}
+	handle @prowlarr {
+		reverse_proxy prowlarr:9696
+	}
+
+	@qbittorrent host qbittorrent.{$DOMAIN}
+	handle @qbittorrent {
+		reverse_proxy qbittorrent:8080
+	}
+
+	@syncthing host syncthing.{$DOMAIN}
+	handle @syncthing {
+		reverse_proxy syncthing:8384
+	}
+
+	handle {
+		respond "Not found" 404
+	}
+}
