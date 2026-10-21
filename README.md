@@ -88,8 +88,8 @@ See [the ADR](.adr/volume-ownership.md) for why.
 
 File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
 - **Plug** (committed): `local.env -> ._.local.env` points to the socket
-- **Socket** (gitignored): `._.local.env` contains or links to the actual file
-- **Sample** (committed): `.~.local.env` shows expected structure with placeholder values
+- **Socket** (gitignored): `._.local.env` contains or links to the actual file, and `.=.data` is or links to the actual directory
+- **Sample** (committed): `.~.local.env` shows expected structure with placeholder values, as a file or a directory like its socket
 
 Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
 

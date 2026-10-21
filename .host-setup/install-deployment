@@ -24,6 +24,7 @@ rsync -glor \
     --include='/*/' \
     --exclude='/*' \
     --exclude='._.*' \
+    --exclude='.=.*' \
     "$root/" "$deployment_path"
 
 echo 'Success'
