@@ -20,27 +20,16 @@ services:
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${INTERNAL_NETWORK_SUBNET}
-      # Disable default DNS server since we run dnsmasq instead
+      # Disable default DNS server since peers' DNS goes to the stack's resolver
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
+      - PEERDNS=${MAIN_NETWORK_DNS_ADDRESS}
     env_file:
       - local.env
     cap_add:
       - NET_ADMIN
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1  # for wireguard routing
-    restart: ${DOCKER_RESTART}
-
-  wireguard-lan-dnsmasq:
-    build: .
-    network_mode: service:wireguard-lan
-    command:
-      - -k
-      - --interface=wg0
-      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
-      - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
-      - --log-queries
-      - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     restart: ${DOCKER_RESTART}
 
 networks:

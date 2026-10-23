@@ -28,31 +28,16 @@ services:
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       # Tunnel everything through vpn
       - ALLOWEDIPS=0.0.0.0/0  # or 0.0.0.0/1,128.0.0.0/1 for Windows clients
-      # Disable default DNS server since we run dnsmasq instead
+      # Disable default DNS server since peers' DNS goes to the stack's resolver
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
+      - PEERDNS=${GLUETUN_NETWORK_DNS_ADDRESS}
     env_file:
       - local.env
     cap_add:
       - NET_ADMIN
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1  # for wireguard routing
-    restart: ${DOCKER_RESTART}
-
-  wireguard-wan-dnsmasq:
-    image: "docker.io/strm/dnsmasq\
-      @sha256:dcf4c0aeb69ea6b9bca81314449d732ecd2ea021588d8a34d4be7c2304f89a39\
-    "  # untagged, the only available image for now (version 2.80)
-    network_mode: service:wireguard-wan
-    command:
-      - -k
-      - --interface=wg0
-      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
-      - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
-      - --log-queries
-      - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
-    # Started as root, dnsmasq 2.80 fails with "setting capabilities failed"
-    user: nobody
     restart: ${DOCKER_RESTART}
 
 networks:

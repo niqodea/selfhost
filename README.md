@@ -79,7 +79,8 @@ One Gluetun instance serves all services that need anonymous egress.
 
 Two dnsmasq resolvers in the root `docker-compose.yaml` answer every app's DNS queries, with the StevenBlack blocklist built into one image.
 `dns-main` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
-Every app that reaches the internet sets `dns` to its network's resolver, and the WireGuard servers' own dnsmasq forwards to the same resolver.
+Every app that reaches the internet sets `dns` to its network's resolver, and each WireGuard server gives its peers its side's resolver.
+Both resolvers also answer the domain with Caddy's address and `syncthing.internal` with Syncthing's, so ddns-updater checks its record through a public resolver.
 
 ### Volume Ownership
 

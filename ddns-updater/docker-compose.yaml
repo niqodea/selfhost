@@ -20,6 +20,8 @@ services:
           ]
         }
       SERVER_ENABLED: no
+    env_file:
+      - local.env
     restart: ${DOCKER_RESTART}
 
 networks:

@@ -11,6 +11,10 @@ services:
     command:
       - -k
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
+      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
+      - --log-queries
+      - --log-facility=${DNS_LOG_FACILITY}
     restart: ${DOCKER_RESTART}
 
   dns-gluetun:
@@ -26,6 +30,10 @@ services:
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
       - --no-resolv
       - --server=${GLUETUN_NETWORK_GATEWAY_ADDRESS}
+      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
+      - --log-queries
+      - --log-facility=${DNS_LOG_FACILITY}
     restart: ${DOCKER_RESTART}
 
 networks:
