@@ -1,6 +1,7 @@
 services:
   caddy:
     build: .
+    dns: ${MAIN_NETWORK_DNS_ADDRESS}
     networks:
       main:
         gw_priority: 1

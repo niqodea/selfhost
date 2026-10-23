@@ -16,6 +16,8 @@ fi
 # - Ignore sockets anywhere
 rsync -glor \
     --include='/docker-compose.yaml' \
+    --include='/dns.Dockerfile' \
+    --include='/dns.Dockerfile.dockerignore' \
     --include='/route-failsafe' \
     --include='/startup' \
     --include='/.env' \

@@ -46,7 +46,8 @@ The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes t
 ## Project Structure
 
 ```
-docker-compose.yaml               # Shared Docker resources (networks)
+docker-compose.yaml               # Shared Docker resources (networks, DNS)
+dns.Dockerfile                    # DNS resolver with the blocklist
 route-failsafe                    # Network failsafe routing script
 startup                           # Start the services
 .env                              # Shared config
@@ -71,8 +72,14 @@ startup                           # Start the services
 Docker can't natively use a container as a network gateway.
 A few iptables rules on the host solve this, routing all traffic from the `gluetun` network through the Gluetun container.
 
-Services opt into VPN routing by joining the network with `gw_priority: 1` and setting `dns` to the gateway address.
+Services opt into VPN routing by joining the network with `gw_priority: 1` and setting `dns` to `GLUETUN_NETWORK_DNS_ADDRESS`.
 One Gluetun instance serves all services that need anonymous egress.
+
+### DNS Blocklist
+
+Two dnsmasq resolvers in the root `docker-compose.yaml` answer every app's DNS queries, with the StevenBlack blocklist built into one image.
+`dns-main` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
+Every app that reaches the internet sets `dns` to its network's resolver, and the WireGuard servers' own dnsmasq forwards to the same resolver.
 
 ### Volume Ownership
 

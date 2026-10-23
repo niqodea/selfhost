@@ -4,6 +4,7 @@ services:
     # No official Docker image exists, using linuxserver.io community image
     image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
       @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    dns: ${MAIN_NETWORK_DNS_ADDRESS}
     networks:
       main:
         gw_priority: 1
@@ -38,7 +39,6 @@ services:
       - --interface=wg0
       - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${INTERNAL_NETWORK_SYNCTHING_ADDRESS}
-      - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
       - --log-queries
       - --log-facility=${WIREGUARD_DNSMASQ_LOG_FACILITY}
     restart: ${DOCKER_RESTART}

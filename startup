@@ -6,8 +6,9 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-# using "--all-resources create" since "up" won't work if no service is defined
-docker compose --project-directory "$root" --all-resources create
+# The apps resolve names through the DNS services defined here, and
+# "--all-resources" also creates the networks those services do not join
+docker compose --project-directory "$root" --all-resources up --detach
 
 for app_path in "$root"/*; do
     if ! [ -d "$app_path" ]; then

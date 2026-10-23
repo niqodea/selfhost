@@ -2,7 +2,7 @@ services:
   prowlarr:
     image: "lscr.io/linuxserver/prowlarr:version-2.3.0.5236\
       @sha256:5339e9050cfcc0cb5331e9c98610ed9d4ce70ef481a5461ea664a13dda3f1eb0"
-    dns: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
+    dns: ${GLUETUN_NETWORK_DNS_ADDRESS}
     networks:
       gluetun:
         gw_priority: 1
