@@ -17,6 +17,10 @@ services:
       - local.env
     cap_add:
       - NET_ADMIN
+    # Without it, Gluetun creates the device node itself, which a container on
+    # rootless Docker is not allowed to do
+    devices:
+      - /dev/net/tun:/dev/net/tun
     sysctls:
       - net.ipv4.ip_forward=1  # to act as a router
     restart: ${DOCKER_RESTART}

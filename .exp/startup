@@ -36,3 +36,7 @@ state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
 nsenter --preserve-credentials --user --mount --target "$(cat "$state_path/child_pid")" -- \
     nsenter --net="$state_path/netns" \
     env DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" "$root/startup"
+
+# The fake VPN joins the networks that startup creates
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-vpn" up --detach
