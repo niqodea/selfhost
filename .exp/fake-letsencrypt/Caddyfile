@@ -1,0 +1,28 @@
+# Caddy's default format uses tabs
+# Ref: https://caddy.community/t/caddyfile-warning/13701/2
+{
+	pki {
+		# A CA certificate that is the same on every machine, so a client can
+		# trust it without a copy from the machine that runs exp
+		ca local {
+			root {
+				cert /etc/caddy/root.crt
+				key /etc/caddy/root.key
+			}
+		}
+	}
+}
+
+acme-v02.api.letsencrypt.org, acme-staging-v02.api.letsencrypt.org {
+	tls internal
+
+	# Let's Encrypt serves its ACME directory at /directory, and Caddy at
+	# /acme/local/directory
+	rewrite /directory /acme/local/directory
+
+	acme_server {
+		# Let's Encrypt checks a challenge through the public DNS
+		resolvers {$PUBLIC_RESOLVER_ADDRESS}
+		allow_wildcard_names
+	}
+}

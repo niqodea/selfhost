@@ -1,0 +1,24 @@
+services:
+  fake-dynu:
+    image: "docker.io/library/python:3.14.8-alpine3.24\
+      @sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72"
+    networks:
+      main:
+        # Dynu's clients have api.dynu.com built in, so the fake answers under
+        # that name
+        aliases:
+          - api.dynu.com
+    working_dir: /fake-dynu
+    volumes:
+      - ./server.py:/fake-dynu/server.py:ro
+      - ./..exp/certificates/fake-dynu.crt:/fake-dynu/fake-dynu.crt:ro
+      - ./..exp/certificates/fake-dynu.key:/fake-dynu/fake-dynu.key:ro
+    environment:
+      - DOMAIN=${DOMAIN}
+    command: python server.py
+    restart: ${DOCKER_RESTART}
+
+networks:
+  main:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}

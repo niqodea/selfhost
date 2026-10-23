@@ -5,6 +5,10 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")/..selfhost"
 
+# Docker creates a directory in place of a missing file it is asked to mount,
+# so the certificates exist before any container starts
+"$root/.exp/generate-certificates"
+
 # Git does not track empty directories, so a clone has no directory sockets,
 # and one with a placeholder file in it would stop Docker from filling the
 # named volume from its image
@@ -28,6 +32,18 @@ find "$root"/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug;
     esac
 done
 
+# The fakes join the networks that the shared resources create, and start
+# before the apps, because while a fake is down, its names resolve to the real
+# service
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root" --all-resources up --detach
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-vpn" up --detach
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-dynu" up --detach
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-letsencrypt" up --detach
+
 state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
 
 # Containers live in a network namespace that rootlesskit detaches into a file,
@@ -37,6 +53,3 @@ nsenter --preserve-credentials --user --mount --target "$(cat "$state_path/child
     nsenter --net="$state_path/netns" \
     env DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" "$root/startup"
 
-# The fake VPN joins the networks that startup creates
-DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
-    docker compose --project-directory "$root/.exp/fake-vpn" up --detach

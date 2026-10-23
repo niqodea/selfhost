@@ -1,0 +1,29 @@
+services:
+  fake-letsencrypt:
+    image: "docker.io/library/caddy:2.11.7\
+      @sha256:504a44d7d74bd2bc28a66afc4774912fc21223ca8a67734af1c54ab2f999b489"
+    networks:
+      main:
+        # Caddy uses Let's Encrypt's production address, and Let's Encrypt's
+        # staging address when it retries, so the fake answers under both
+        aliases:
+          - acme-v02.api.letsencrypt.org
+          - acme-staging-v02.api.letsencrypt.org
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./..exp/certificates/root.crt:/etc/caddy/root.crt:ro
+      - ./..exp/certificates/root.key:/etc/caddy/root.key:ro
+      # A CA keeps the accounts it registered, and Caddy reuses its account on
+      # every request
+      - fake-letsencrypt-data:/data
+    environment:
+      - PUBLIC_RESOLVER_ADDRESS=${PUBLIC_RESOLVER_ADDRESS}
+    restart: ${DOCKER_RESTART}
+
+networks:
+  main:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+
+volumes:
+  fake-letsencrypt-data:

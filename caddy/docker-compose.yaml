@@ -9,10 +9,14 @@ services:
       caddy:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Go trusts every certificate file in /etc/ssl/certs, on top of the image's
+      # CA bundle
+      - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
       - caddy-data:/data
       - caddy-config:/config
     environment:
       - DOMAIN=${DOMAIN}
+      - PUBLIC_RESOLVER_ADDRESS=${PUBLIC_RESOLVER_ADDRESS}
       - DYNU_API_KEY=${DYNU_API_KEY}
     restart: ${DOCKER_RESTART}
 

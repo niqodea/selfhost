@@ -7,18 +7,12 @@ services:
       main:
     volumes:
       - ddns-updater-data:/updater/data
+      # Go trusts every certificate file in /etc/ssl/certs. The image has no
+      # such files, and its built-in public CAs are Go's fallback, which Go
+      # only uses while it finds no certificate there
+      # Ref: https://pkg.go.dev/crypto/x509#SetFallbackRoots
+      - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
     environment:
-      CONFIG: |
-        {
-          "settings": [
-            {
-              "provider": "dynu",
-              "domain": "${DOMAIN}",
-              "username": "${DYNU_USERNAME}",
-              "password": "${DYNU_PASSWORD}"
-            }
-          ]
-        }
       SERVER_ENABLED: no
     env_file:
       - local.env

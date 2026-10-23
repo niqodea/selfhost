@@ -1,0 +1,71 @@
+#!/bin/sh
+set -eu
+
+# Writes the certificates of exp's fakes into .exp/certificates. The CA
+# certificate comes out byte for byte the same on every machine, so a client can
+# trust it without a copy from the machine that runs exp
+
+exp_root="$(dirname "$(realpath "$0")")/..exp"
+
+certificates_path="$exp_root/certificates"
+
+env_path="$exp_root/..selfhost/.env"
+domain="$(sed -n 's/^DOMAIN=//p' "$env_path")"
+if [ -z "$domain" ]; then
+    >&2 echo "Error: no DOMAIN in $env_path"
+    exit 1
+fi
+
+# A clone has the plug but not its socket, and mkdir cannot create a directory
+# through a dangling link
+mkdir -p "$exp_root/.=.certificates"
+
+# OpenSSL cannot derive a key from a seed, so the key itself is committed and
+# public. The CA's name constraints make clients reject any certificate it signs
+# for a name they do not list
+cat > "$certificates_path/root.key" <<'EOF'
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQglxosbzuRwMMsUHTL
+iF4ET8Oe4juYI85DbAm4uxPzg66hRANCAARab1aZa8UWTAw+qxnn36ESGo/KJCPT
+AFXoPEo9ingMnzkxmYN6BKSiHnF+zEfG0TIKwMUCtcWNSjV4v4Np828C
+-----END PRIVATE KEY-----
+EOF
+
+# -config /dev/null skips the machine's OpenSSL config, which can add
+# extensions of its own
+# A fixed serial, fixed dates and a deterministic signature (RFC 6979) make the
+# same certificate on every run. -not_before and -not_after need OpenSSL 3.4
+openssl req -config /dev/null -x509 \
+    -key "$certificates_path/root.key" \
+    -subj '/CN=exp root' \
+    -set_serial 1 \
+    -not_before 20260101000000Z \
+    -not_after 21260101000000Z \
+    -sigopt nonce-type:1 \
+    -addext 'basicConstraints=critical,CA:TRUE' \
+    -addext 'keyUsage=critical,keyCertSign,cRLSign' \
+    -addext "nameConstraints=critical,permitted;DNS:$domain,permitted;DNS:acme-v02.api.letsencrypt.org,permitted;DNS:acme-staging-v02.api.letsencrypt.org,permitted;DNS:api.dynu.com,permitted;DNS:fake-dynu" \
+    -out "$certificates_path/root.crt"
+
+# Committed and public like the CA's key, so the certificate comes out the same
+# on every run
+cat > "$certificates_path/fake-dynu.key" <<'EOF'
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgc22u4OZIpRg1vxdh
+bnOAD8qRp3DnLuELVswE2WM/qOOhRANCAATc6z0PUDfqYGH9p5zABB2J+g76WOS8
+SsV5WrwzNnWc0n8kx6l1n2jBxWzNCKnbm+/CkMKK2qXAkXwOqzbljwUX
+-----END PRIVATE KEY-----
+EOF
+
+openssl req -config /dev/null -x509 \
+    -key "$certificates_path/fake-dynu.key" \
+    -CA "$certificates_path/root.crt" \
+    -CAkey "$certificates_path/root.key" \
+    -subj '/CN=api.dynu.com' \
+    -set_serial 2 \
+    -not_before 20260101000000Z \
+    -not_after 21260101000000Z \
+    -sigopt nonce-type:1 \
+    -addext 'basicConstraints=critical,CA:FALSE' \
+    -addext 'subjectAltName=DNS:api.dynu.com,DNS:fake-dynu' \
+    -out "$certificates_path/fake-dynu.crt"
