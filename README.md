@@ -43,6 +43,8 @@ Its config is the checkout's socket files, which are committed, so an edit takes
 
 The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes the containers and their routes with it.
 
+To browse exp's apps at `https://<app>.exp.test`, connect a WireGuard client to exp's wireguard-lan, create a Firefox profile that trusts exp's CA once with `.exp/create-firefox-profile`, and open it with `firefox --profile .exp/firefox-profile --new-instance`. Creating the profile needs NSS's `certutil` and OpenSSL 3.4 or later on the `PATH`.
+
 ## Project Structure
 
 ```

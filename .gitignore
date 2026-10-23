@@ -1,3 +1,5 @@
 # Plug sockets holding data, ref: https://github.com/niqodea/plugs
 # The checkout's file sockets are the exp deployment's config
 .=.*
+# Exp's Firefox profile is browser state
+/.exp/firefox-profile/

@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+# Creates a Firefox profile of its own that trusts exp's CA, while every other
+# profile keeps trusting only the public CAs
+
+exp_root="$(dirname "$(realpath "$0")")/..exp"
+
+profile_path="$exp_root/firefox-profile"
+
+if [ -e "$profile_path" ]; then
+    >&2 echo "File already exists at $profile_path"
+    exit 1
+fi
+
+# The CA certificate comes out the same as on the machine that runs exp
+"$exp_root/generate-certificates"
+
+mkdir "$profile_path"
+cp "$exp_root/firefox-user.js" "$profile_path/user.js"
+
+# -N creates the database in -d
+certutil -N -d "sql:$profile_path" --empty-password
+# -A adds the certificate in -i under the name -n, and -t C,, trusts it to
+# issue server certificates
+certutil -A -d "sql:$profile_path" -n 'exp CA' -t 'C,,' -i "$exp_root/certificates/root.crt"
