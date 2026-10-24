@@ -49,9 +49,19 @@
 		reverse_proxy qbittorrent:8080
 	}
 
+	@radicale host radicale.{$DOMAIN}
+	handle @radicale {
+		reverse_proxy radicale:5232
+	}
+
 	@syncthing host syncthing.{$DOMAIN}
 	handle @syncthing {
 		reverse_proxy syncthing:8384
+	}
+
+	@vaultwarden host vaultwarden.{$DOMAIN}
+	handle @vaultwarden {
+		reverse_proxy vaultwarden:80
 	}
 
 	handle {
