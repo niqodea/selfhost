@@ -3,7 +3,7 @@ set -eu
 
 # Runs startup of this checkout in the rootless daemon's network
 
-root="$(dirname "$(realpath "$0")")/..selfhost"
+root="$(dirname "$(realpath "$0")")/..repo"
 
 # Docker creates a directory in place of a missing file it is asked to mount,
 # so the certificates exist before any container starts

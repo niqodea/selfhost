@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-root="$(dirname "$(realpath "$0")")/..selfhost"
+root="$(dirname "$(realpath "$0")")/..repo"
 
 # WireGuard containers use the host's kernel-space WireGuard module.
 # By loading the module at the host level, we avoid granting containers the

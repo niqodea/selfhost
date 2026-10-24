@@ -3,7 +3,7 @@ set -eu
 
 # Runs route-failsafe of this checkout in the rootless daemon's network
 
-root="$(dirname "$(realpath "$0")")/..selfhost"
+root="$(dirname "$(realpath "$0")")/..repo"
 
 state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
 
