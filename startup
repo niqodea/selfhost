@@ -6,6 +6,16 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
+# A missing directory socket means lost data, and a missing socket file means
+# missing config, so startup stops instead of creating either. Docker's errors
+# for both do not say a socket is missing
+find "$root"/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
+    if ! [ -e "$plug" ]; then
+        >&2 echo "Error: $plug points to nothing at $(readlink "$plug")"
+        exit 1
+    fi
+done
+
 # The apps resolve names through the DNS services defined here, and
 # "--all-resources" also creates the networks those services do not join
 docker compose --project-directory "$root" --all-resources up --detach

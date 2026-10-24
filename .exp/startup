@@ -14,20 +14,11 @@ root="$(dirname "$(realpath "$0")")/..repo"
 # named volume from its image
 find "$root"/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
     socket="$(dirname "$plug")/$(readlink "$plug")"
-    if [ -e "$socket" ]; then
-        continue
-    fi
     case "$(basename "$socket")" in
         .=.*)
-            mkdir "$socket"
-            ;;
-        ._.*)
-            >&2 echo "Error: missing socket file $socket"
-            exit 1
-            ;;
-        *)
-            >&2 echo "Error: $plug points to nothing at $socket"
-            exit 1
+            if ! [ -e "$socket" ]; then
+                mkdir "$socket"
+            fi
             ;;
     esac
 done
