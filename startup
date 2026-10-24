@@ -18,7 +18,8 @@ done
 
 # The apps resolve names through the DNS services defined here, and
 # "--all-resources" also creates the networks those services do not join
-docker compose --project-directory "$root" --all-resources up --detach
+# Startup never downloads or builds an image, so a boot works without network
+docker compose --project-directory "$root" --all-resources up --detach --pull never --no-build
 
 for app_path in "$root"/*; do
     if ! [ -d "$app_path" ]; then
@@ -29,5 +30,5 @@ for app_path in "$root"/*; do
         "$app_path/route" up
     fi
 
-    docker compose --project-directory "$app_path" up --detach
+    docker compose --project-directory "$app_path" up --detach --pull never --no-build
 done

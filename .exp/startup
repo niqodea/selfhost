@@ -27,13 +27,13 @@ done
 # before the apps, because while a fake is down, its names resolve to the real
 # service
 DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
-    docker compose --project-directory "$root" --all-resources up --detach
+    docker compose --project-directory "$root" --all-resources up --detach --pull never --no-build
 DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
-    docker compose --project-directory "$root/.exp/fake-vpn" up --detach
+    docker compose --project-directory "$root/.exp/fake-vpn" up --detach --pull never --no-build
 DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
-    docker compose --project-directory "$root/.exp/fake-dynu" up --detach
+    docker compose --project-directory "$root/.exp/fake-dynu" up --detach --pull never --no-build
 DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
-    docker compose --project-directory "$root/.exp/fake-letsencrypt" up --detach
+    docker compose --project-directory "$root/.exp/fake-letsencrypt" up --detach --pull never --no-build
 
 state_path="$XDG_RUNTIME_DIR/dockerd-rootless"
 

@@ -28,7 +28,10 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 2. Install base systemd files: `.host-setup/install-systemd-base`
 3. Install deployment: `.host-setup/install-deployment /opt/selfhost`
 4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`)
-5. Enable startup service: `.host-setup/configure-deployment-startup /opt/selfhost up`
+5. Download and build the images: `/opt/selfhost/prepare-images`
+6. Enable startup service: `.host-setup/configure-deployment-startup /opt/selfhost up`
+
+Startup stops if an image is missing, because it never downloads or builds one.
 
 ### Exp
 
@@ -39,6 +42,7 @@ Its config is the checkout's socket files, which are committed, so an edit takes
 2. After every boot, from an SSH session or tmux, as `<user>`:
    - `.exp/start-daemon`
    - `.exp/route-failsafe-up`
+   - `.exp/prepare-images`, which downloads and builds the images, only after a clone or a pull
    - `.exp/startup`, which first creates the directory sockets a fresh clone lacks
 
 The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes the containers and their routes with it.
@@ -51,6 +55,7 @@ To browse exp's apps at `https://<app>.exp.test`, connect a WireGuard client to 
 docker-compose.yaml               # Shared Docker resources (networks, DNS)
 dns.Dockerfile                    # DNS resolver with the blocklist
 route-failsafe                    # Network failsafe routing script
+prepare-images                    # Download and build the images
 startup                           # Start the services
 .env                              # Shared config
 <module>/

@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+# Runs prepare-images of this checkout on the rootless daemon, and also
+# downloads the images of the fakes
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" "$root/prepare-images"
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-vpn" pull
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-dynu" pull
+DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" \
+    docker compose --project-directory "$root/.exp/fake-letsencrypt" pull

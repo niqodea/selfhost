@@ -20,6 +20,7 @@ rsync -glor \
     --include='/dns.Dockerfile.dockerignore' \
     --include='/route-failsafe' \
     --include='/startup' \
+    --include='/prepare-images' \
     --include='/.env' \
     --include='/..repo' \
     --exclude='/.*' \
