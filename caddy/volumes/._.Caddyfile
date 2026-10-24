@@ -19,6 +19,11 @@
 		resolvers {$PUBLIC_RESOLVER_ADDRESS}
 	}
 
+	@git host git.{$DOMAIN}
+	handle @git {
+		reverse_proxy git:80
+	}
+
 	@immich host immich.{$DOMAIN}
 	handle @immich {
 		reverse_proxy immich:2283
