@@ -8,7 +8,7 @@ services:
     networks:
       main:
         gw_priority: 1
-      internal:
+      peers:
     ports:
       - ${WIREGUARD_LAN_HOST_PORT}:51820/udp
     volumes:
@@ -19,7 +19,7 @@ services:
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
-      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${INTERNAL_NETWORK_SUBNET}
+      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${PEERS_NETWORK_SUBNET}
       # Disable default DNS server since peers' DNS goes to the stack's resolver
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
@@ -36,9 +36,9 @@ networks:
   main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
-  internal:
+  peers:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}
 
 volumes:
   wireguard-lan-config:

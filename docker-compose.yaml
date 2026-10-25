@@ -11,13 +11,13 @@ networks:
       config:
         - subnet: ${GLUETUN_NETWORK_SUBNET}
           ip_range: ${GLUETUN_NETWORK_IP_RANGE}
-  internal:
-    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}
+  peers:
+    name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}
     internal: true
     ipam:
       config:
-        - subnet: ${INTERNAL_NETWORK_SUBNET}
-          ip_range: ${INTERNAL_NETWORK_IP_RANGE}
+        - subnet: ${PEERS_NETWORK_SUBNET}
+          ip_range: ${PEERS_NETWORK_IP_RANGE}
   caddy:
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
     internal: true

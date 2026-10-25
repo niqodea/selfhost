@@ -10,7 +10,7 @@ services:
         gw_priority: 1
       main:
         ipv4_address: ${MAIN_NETWORK_WIREGUARD_WAN_ADDRESS}
-      internal:
+      peers:
     # NOTE: Port forwarding omitted.
     # Docker's port forwarding uses the network gateway, which routes through
     # gluetun's tunnel in this setup, breaking connections back to clients.
@@ -47,9 +47,9 @@ networks:
   main:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
-  internal:
+  peers:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${INTERNAL_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}
 
 volumes:
   wireguard-wan-config:
