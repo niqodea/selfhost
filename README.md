@@ -88,7 +88,7 @@ Gluetun is in `.infra/gluetun-gateway/`, and startup starts it before the apps. 
 ### DNS Blocklist
 
 Two dnsmasq resolvers in `.infra/dns/` answer every app's DNS queries, with the StevenBlack blocklist built into one image.
-`dns-main` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
+`dns-internet` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
 Every app that reaches the internet sets `dns` to its network's resolver, and each WireGuard server gives its peers its side's resolver.
 Both resolvers also answer the domain with Caddy's address and `syncthing.internal` with Syncthing's, so Caddy and ddns-updater check their records through a public resolver.
 

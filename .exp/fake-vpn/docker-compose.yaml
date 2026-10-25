@@ -4,8 +4,8 @@ services:
     image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
       @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
     networks:
-      main:
-        ipv4_address: ${MAIN_NETWORK_FAKE_VPN_ADDRESS}
+      internet:
+        ipv4_address: ${INTERNET_NETWORK_FAKE_VPN_ADDRESS}
     volumes:
       # Without PEERS, the image brings up the wg0.conf it is given as it is
       - ./wg0.conf:/config/wg0.conf:ro
@@ -16,6 +16,6 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}

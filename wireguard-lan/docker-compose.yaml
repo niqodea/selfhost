@@ -4,9 +4,9 @@ services:
     # No official Docker image exists, using linuxserver.io community image
     image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
       @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
-    dns: ${MAIN_NETWORK_DNS_ADDRESS}
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
-      main:
+      internet:
         gw_priority: 1
       peers:
     ports:
@@ -19,11 +19,11 @@ services:
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
-      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${MAIN_NETWORK_SUBNET},${PEERS_NETWORK_SUBNET}
+      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${INTERNET_NETWORK_SUBNET},${PEERS_NETWORK_SUBNET}
       # Disable default DNS server since peers' DNS goes to the stack's resolver
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
-      - PEERDNS=${MAIN_NETWORK_DNS_ADDRESS}
+      - PEERDNS=${INTERNET_NETWORK_DNS_ADDRESS}
     env_file:
       - local.env
     cap_add:
@@ -33,9 +33,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
   peers:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}

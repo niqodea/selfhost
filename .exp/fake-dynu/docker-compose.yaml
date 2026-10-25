@@ -3,7 +3,7 @@ services:
     image: "docker.io/library/python:3.14.8-alpine3.24\
       @sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72"
     networks:
-      main:
+      internet:
         # Dynu's clients have api.dynu.com built in, so the fake answers under
         # that name
         aliases:
@@ -19,6 +19,6 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}

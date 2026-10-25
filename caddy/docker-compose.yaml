@@ -1,11 +1,11 @@
 services:
   caddy:
     build: .
-    dns: ${MAIN_NETWORK_DNS_ADDRESS}
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
-      main:
+      internet:
         gw_priority: 1
-        ipv4_address: ${MAIN_NETWORK_CADDY_ADDRESS}
+        ipv4_address: ${INTERNET_NETWORK_CADDY_ADDRESS}
       caddy:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
@@ -24,9 +24,9 @@ networks:
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
 
 volumes:
   caddy-data:

@@ -8,14 +8,14 @@ services:
     networks:
       gluetun:
         gw_priority: 1
-      main:
-        ipv4_address: ${MAIN_NETWORK_WIREGUARD_WAN_ADDRESS}
+      internet:
+        ipv4_address: ${INTERNET_NETWORK_WIREGUARD_WAN_ADDRESS}
       peers:
     # NOTE: Port forwarding omitted.
     # Docker's port forwarding uses the network gateway, which routes through
     # gluetun's tunnel in this setup, breaking connections back to clients.
     # We handle port forwarding manually on the host to enable port forwarding
-    # via main network instead, see ./route for how.
+    # via the internet network instead, see ./route for how.
     # ports:
     #   - ${WIREGUARD_WAN_HOST_PORT}:51820/udp
     volumes:
@@ -44,9 +44,9 @@ networks:
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
   peers:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}

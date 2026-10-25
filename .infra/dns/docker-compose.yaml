@@ -1,15 +1,15 @@
 services:
 
-  dns-main:
+  dns-internet:
     build: .
     networks:
-      main:
-        ipv4_address: ${MAIN_NETWORK_DNS_ADDRESS}
+      internet:
+        ipv4_address: ${INTERNET_NETWORK_DNS_ADDRESS}
     # Unblocked names go to Docker's resolver, which asks the host's resolvers
     command:
       - -k
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
-      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --address=/${DOMAIN}/${INTERNET_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${PEERS_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${DNS_LOG_FACILITY}
@@ -26,16 +26,16 @@ services:
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
       - --no-resolv
       - --server=${GLUETUN_NETWORK_GATEWAY_ADDRESS}
-      - --address=/${DOMAIN}/${MAIN_NETWORK_CADDY_ADDRESS}
+      - --address=/${DOMAIN}/${INTERNET_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${PEERS_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${DNS_LOG_FACILITY}
     restart: ${DOCKER_RESTART}
 
 networks:
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}

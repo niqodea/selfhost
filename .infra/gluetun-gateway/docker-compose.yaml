@@ -2,7 +2,7 @@ services:
   gluetun-gateway:
     build: .
     networks:
-      main:
+      internet:
         gw_priority: 1
       gluetun:  # NOTE: Needs to be eth0 for the iptables post-rules to work
         ipv4_address: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
@@ -24,9 +24,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}

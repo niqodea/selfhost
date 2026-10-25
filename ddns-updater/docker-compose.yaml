@@ -2,9 +2,9 @@ services:
   ddns-updater:
     image: "docker.io/qmcgaw/ddns-updater:v2.9.0\
       @sha256:ed73f1fb7ab54a8a8fa26001eecc77cc8be56cdf3fb0ca91fee831124bcbb696"
-    dns: ${MAIN_NETWORK_DNS_ADDRESS}
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
-      main:
+      internet:
     volumes:
       - ddns-updater-data:/updater/data
       # Go trusts every certificate file in /etc/ssl/certs. The image has no
@@ -19,9 +19,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  main:
+  internet:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${MAIN_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
 
 volumes:
   ddns-updater-data:
