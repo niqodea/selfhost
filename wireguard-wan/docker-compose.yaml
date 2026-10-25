@@ -21,7 +21,10 @@ services:
     volumes:
       # The image reads the template only from this path, inside the saved
       # /config. A template built into the image would reach only a fresh
-      # install, so the mount is what keeps the template current
+      # install, so the mount is what keeps the template current. The image
+      # builds /config/wg0.conf from it only when that file is missing or a
+      # setting like PEERDNS changes, so deleting volumes/config/wg0.conf applies
+      # a template edit, and keeps every key
       # Ref: https://github.com/linuxserver/docker-wireguard/blob/v1.0.20210914-ls126/root/etc/s6-overlay/s6-rc.d/init-wireguard-confs/run
       # read-only mount causes harmless chown warning at startup
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
@@ -32,7 +35,8 @@ services:
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
       # Tunnel everything through vpn
       - ALLOWEDIPS=0.0.0.0/0  # or 0.0.0.0/1,128.0.0.0/1 for Windows clients
-      # Disable default DNS server since peers' DNS goes to the stack's resolver
+      # Disable the image's own DNS server, which would answer on every network
+      # this container joins, since peers use the DNS server set in PEERDNS
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
       - PEERDNS=${GLUETUN_NETWORK_DNS_ADDRESS}

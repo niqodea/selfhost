@@ -13,9 +13,9 @@
 			api_token {$DYNU_API_KEY}
 			own_domain {$DOMAIN}
 		}
-		# The stack's resolvers answer the domain with Caddy's address and
-		# have none of its TXT records, so Caddy looks up the challenge record
-		# through a public resolver
+		# The DNS servers the containers use answer the domain with Caddy's
+		# address and have none of its TXT records, so Caddy looks up the
+		# challenge record through a public DNS server
 		resolvers {$PUBLIC_RESOLVER_ADDRESS}
 	}
 
