@@ -1,0 +1,6 @@
+# Indexer definitions, which tell Prowlarr how to search each site
+indexers.prowlarr.com
+
+# Add each indexer's domains here. Left out on purpose:
+# - prowlarr.servarr.com, the update check, since the image pin sets the version
+# - sentry.servarr.com, the error reports sent to Prowlarr's developers
