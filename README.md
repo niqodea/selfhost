@@ -56,7 +56,8 @@ docker-compose.yaml               # Shared networks
 ├── dns/                          # DNS resolvers with the blocklist
 └── gluetun-gateway/              # VPN gateway
 .proxies/                         # Images of the proxies through which apps reach the internet
-└── http/                         # HTTPS, only to the domains the app lists
+├── http/                         # HTTPS, only to the domains the app lists
+└── dns/                          # DNS, only for the names the app forwards
 route-failsafe                    # Network failsafe routing script
 prepare-images                    # Download and build the images
 startup                           # Start the services

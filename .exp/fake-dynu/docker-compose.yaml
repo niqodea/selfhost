@@ -4,6 +4,7 @@ services:
       @sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72"
     networks:
       internet:
+        ipv4_address: ${PUBLIC_RESOLVER_ADDRESS}
         # Dynu's clients have api.dynu.com built in, so the fake answers under
         # that name
         aliases:

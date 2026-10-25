@@ -1,10 +1,8 @@
 services:
   caddy:
     build: .
-    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
-      internet:
-        gw_priority: 1
+      caddy:
       peers:
         ipv4_address: ${PEERS_NETWORK_CADDY_ADDRESS}
       webapps:
@@ -17,11 +15,36 @@ services:
       - caddy-config:/config
     environment:
       - DOMAIN=${DOMAIN}
-      - PUBLIC_RESOLVER_ADDRESS=${PUBLIC_RESOLVER_ADDRESS}
+      - HTTPS_PROXY=http://caddy-http-proxy:3128
       - DYNU_API_KEY=${DYNU_API_KEY}
     restart: ${DOCKER_RESTART}
 
+  # Caddy reaches the internet only through these two proxies: HTTPS to the
+  # domains in ./volumes/http-proxy-domains.txt, and DNS for the domain only
+  caddy-http-proxy:
+    build: ./..repo/.proxies/http
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
+    networks:
+      internet:
+        gw_priority: 1
+      caddy:
+    volumes:
+      - ./volumes/http-proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
+    restart: ${DOCKER_RESTART}
+
+  caddy-dns-proxy:
+    build: ./..repo/.proxies/dns
+    networks:
+      internet:
+        gw_priority: 1
+      caddy:
+    command:
+      - --server=/${DOMAIN}/${PUBLIC_RESOLVER_ADDRESS}
+    restart: ${DOCKER_RESTART}
+
 networks:
+  caddy:
+    internal: true
   peers:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}

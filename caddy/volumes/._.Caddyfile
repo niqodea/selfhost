@@ -15,8 +15,8 @@
 		}
 		# The DNS servers the containers use answer the domain with Caddy's
 		# address and have none of its TXT records, so Caddy looks up the
-		# challenge record through a public DNS server
-		resolvers {$PUBLIC_RESOLVER_ADDRESS}
+		# challenge record through its DNS proxy, which asks a public DNS server
+		resolvers caddy-dns-proxy:53
 	}
 
 	@git host git.{$DOMAIN}
