@@ -6,7 +6,7 @@ services:
       peers:
         gw_priority: 1
         ipv4_address: ${PEERS_NETWORK_SYNCTHING_ADDRESS}
-      caddy:
+      webapps:
     volumes:
       - ./volumes/data:/var/syncthing
     environment:
@@ -17,9 +17,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
   peers:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}

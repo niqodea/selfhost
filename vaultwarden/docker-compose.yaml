@@ -3,7 +3,7 @@ services:
     image: "docker.io/vaultwarden/server:1.33.2-alpine\
       @sha256:63cce7624f655f83ad5bab66ef62bc3e3327116b068704bfbbda5d0c1b3003be"
     networks:
-      caddy:
+      webapps:
     volumes:
       - vaultwarden-data:/data
     environment:
@@ -14,9 +14,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
 
 volumes:
   vaultwarden-data:

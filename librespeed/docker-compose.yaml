@@ -3,13 +3,13 @@ services:
     image: "ghcr.io/librespeed/speedtest:5.5.1-alpine\
        @sha256:f68487eda17f8abb8c88a43c0b9d1a2fa4db75c2de0fee75a6c69972bb383e87"
     networks:
-      caddy:
+      webapps:
     environment:
       - MODE=standalone
       - TELEMETRY=false
     restart: ${DOCKER_RESTART}
 
 networks:
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}

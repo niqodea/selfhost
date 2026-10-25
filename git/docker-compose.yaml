@@ -4,13 +4,13 @@ services:
       args:
         ROOT: /var/www/git
     networks:
-      caddy:
+      webapps:
     volumes:
       - ./volumes/root:/var/www/git
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}

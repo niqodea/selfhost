@@ -3,7 +3,7 @@ services:
     image: "docker.io/org/app:tag\
       @sha256:0000000000000000000000000000000000000000000000000000000000000000"
     networks:
-      caddy:
+      webapps:
     volumes:
       - app-config:/app/config
       - app-data:/app/data
@@ -15,9 +15,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
 
 volumes:
   app-config:

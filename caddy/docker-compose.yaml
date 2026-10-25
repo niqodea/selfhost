@@ -7,7 +7,7 @@ services:
         gw_priority: 1
       peers:
         ipv4_address: ${PEERS_NETWORK_CADDY_ADDRESS}
-      caddy:
+      webapps:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
       # Go trusts every certificate file in /etc/ssl/certs, on top of the image's
@@ -25,9 +25,9 @@ networks:
   peers:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
   internet:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}

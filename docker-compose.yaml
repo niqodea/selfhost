@@ -18,6 +18,6 @@ networks:
       config:
         - subnet: ${PEERS_NETWORK_SUBNET}
           ip_range: ${PEERS_NETWORK_IP_RANGE}
-  caddy:
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+  webapps:
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
     internal: true

@@ -4,7 +4,7 @@ services:
       @sha256:5339e9050cfcc0cb5331e9c98610ed9d4ce70ef481a5461ea664a13dda3f1eb0"
     networks:
       prowlarr:
-      caddy:
+      webapps:
     volumes:
       - prowlarr-config:/config
     environment:
@@ -30,9 +30,9 @@ networks:
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
 
 volumes:
   prowlarr-config:

@@ -4,7 +4,7 @@ services:
       @sha256:333b647716631443a43c7fabac4b0c46b4e2f036bad19547e00958f10f721b85"
     networks:
       jellyfin:
-      caddy:
+      webapps:
     volumes:
       - jellyfin-config:/config
       - jellyfin-cache:/cache
@@ -33,9 +33,9 @@ networks:
   internet:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
 
 volumes:
   jellyfin-config:

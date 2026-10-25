@@ -6,7 +6,7 @@ services:
     networks:
       gluetun:
         gw_priority: 1
-      caddy:
+      webapps:
     volumes:
       - qbittorrent-config:/config
       - ./volumes/downloads:/downloads
@@ -22,9 +22,9 @@ networks:
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
-  caddy:
+  webapps:
     external: true
-    name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
 
 volumes:
   qbittorrent-config:
