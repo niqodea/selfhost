@@ -4,14 +4,11 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-docker compose --project-directory "$root" pull
-docker compose --project-directory "$root" build
-
-for app_path in "$root"/*; do
-    if ! [ -d "$app_path" ]; then
+for module_path in "$root"/.infra/* "$root"/*; do
+    if ! [ -d "$module_path" ]; then
         continue
     fi
 
-    docker compose --project-directory "$app_path" pull
-    docker compose --project-directory "$app_path" build
+    docker compose --project-directory "$module_path" pull
+    docker compose --project-directory "$module_path" build
 done

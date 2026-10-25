@@ -6,17 +6,17 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-for app_path in "$root"/*; do
-    if ! [ -d "$app_path" ]; then
+for module_path in "$root"/* "$root"/.infra/*; do
+    if ! [ -d "$module_path" ]; then
         continue
     fi
 
-    docker compose --project-directory "$app_path" down
+    docker compose --project-directory "$module_path" down
 
-    if [ -f "$app_path/route" ]; then
-        "$app_path/route" down
+    if [ -f "$module_path/route" ]; then
+        "$module_path/route" down
     fi
 done
 
-# using "--all-resources create" since "up" won't work if no service is defined
+# This file has only networks, and Compose skips those without "--all-resources"
 docker compose --project-directory "$root" --all-resources down

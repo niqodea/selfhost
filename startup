@@ -9,26 +9,27 @@ root="$(dirname "$(realpath "$0")")"
 # A missing directory socket means lost data, and a missing socket file means
 # missing config, so startup stops instead of creating either. Docker's errors
 # for both do not say a socket is missing
-find "$root"/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
+find "$root"/*/ "$root"/.infra/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
     if ! [ -e "$plug" ]; then
         >&2 echo "Error: $plug points to nothing at $(readlink "$plug")"
         exit 1
     fi
 done
 
-# The apps resolve names through the DNS services defined here, and
-# "--all-resources" also creates the networks those services do not join
+# This file has only networks, and Compose skips those without "--all-resources"
 # Startup never downloads or builds an image, so a boot works without network
 docker compose --project-directory "$root" --all-resources up --detach --pull never --no-build
 
-for app_path in "$root"/*; do
-    if ! [ -d "$app_path" ]; then
+# The infra modules start before the apps, because the apps send their DNS
+# queries to them, and some apps send all their traffic through them
+for module_path in "$root"/.infra/* "$root"/*; do
+    if ! [ -d "$module_path" ]; then
         continue
     fi
 
-    if [ -f "$app_path/route" ]; then
-        "$app_path/route" up
+    if [ -f "$module_path/route" ]; then
+        "$module_path/route" up
     fi
 
-    docker compose --project-directory "$app_path" up --detach --pull never --no-build
+    docker compose --project-directory "$module_path" up --detach --pull never --no-build
 done

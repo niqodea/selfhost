@@ -8,7 +8,6 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 |---------------------|---------------------------------------------------|
 | **caddy**           | Reverse proxy with automatic Let's Encrypt SSL    |
 | **ddns-updater**    | Dynamic DNS for servers without static IPs        |
-| **gluetun-gateway** | VPN gateway for anonymous traffic routing         |
 | **wireguard-lan**   | VPN server for remote access to local services    |
 | **wireguard-wan**   | VPN server with anonymous exit via Gluetun        |
 | **immich**          | Photo and video backup                            |
@@ -20,7 +19,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **git**             | Self-hosted Git server                            |
 | **librespeed**      | Network speed test                                |
 
-**wireguard-wan**, **prowlarr**, and **qbittorrent** route their traffic through the same **gluetun-gateway** for anonymity.
+**wireguard-wan**, **prowlarr**, and **qbittorrent** route their traffic through the same Gluetun VPN gateway for anonymity.
 
 ## Getting Started
 
@@ -52,8 +51,10 @@ To browse exp's apps at `https://<app>.exp.test`, connect a WireGuard client to 
 ## Project Structure
 
 ```
-docker-compose.yaml               # Shared Docker resources (networks, DNS)
-dns.Dockerfile                    # DNS resolver with the blocklist
+docker-compose.yaml               # Shared networks
+.infra/                           # Modules the apps depend on, started before them
+├── dns/                          # DNS resolvers with the blocklist
+└── gluetun-gateway/              # VPN gateway
 route-failsafe                    # Network failsafe routing script
 prepare-images                    # Download and build the images
 startup                           # Start the services
@@ -82,9 +83,11 @@ A few iptables rules on the host solve this, routing all traffic from the `gluet
 Services opt into VPN routing by joining the network with `gw_priority: 1` and setting `dns` to `GLUETUN_NETWORK_DNS_ADDRESS`.
 One Gluetun instance serves all services that need anonymous egress.
 
+Gluetun is in `.infra/gluetun-gateway/`, and startup starts it before the apps. Until the tunnel is up, Gluetun drops the traffic of the apps routed through it.
+
 ### DNS Blocklist
 
-Two dnsmasq resolvers in the root `docker-compose.yaml` answer every app's DNS queries, with the StevenBlack blocklist built into one image.
+Two dnsmasq resolvers in `.infra/dns/` answer every app's DNS queries, with the StevenBlack blocklist built into one image.
 `dns-main` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
 Every app that reaches the internet sets `dns` to its network's resolver, and each WireGuard server gives its peers its side's resolver.
 Both resolvers also answer the domain with Caddy's address and `syncthing.internal` with Syncthing's, so Caddy and ddns-updater check their records through a public resolver.

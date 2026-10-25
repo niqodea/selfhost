@@ -12,7 +12,7 @@ root="$(dirname "$(realpath "$0")")/..repo"
 # Git does not track empty directories, so a clone has no directory sockets,
 # and one with a placeholder file in it would stop Docker from filling the
 # named volume from its image
-find "$root"/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
+find "$root"/*/ "$root"/.infra/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
     socket="$(dirname "$plug")/$(readlink "$plug")"
     case "$(basename "$socket")" in
         .=.*)

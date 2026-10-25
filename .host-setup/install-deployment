@@ -12,17 +12,16 @@ if [ -e "$deployment_path" ]; then
 fi
 
 # - Install key top-level files
-# - Install non-hidden top-level directories
+# - Install non-hidden top-level directories, and .infra/
 # - Ignore sockets anywhere
 rsync -glor \
     --include='/docker-compose.yaml' \
-    --include='/dns.Dockerfile' \
-    --include='/dns.Dockerfile.dockerignore' \
     --include='/route-failsafe' \
     --include='/startup' \
     --include='/prepare-images' \
     --include='/.env' \
     --include='/..repo' \
+    --include='/.infra/' \
     --exclude='/.*' \
     --include='/*/' \
     --exclude='/*' \
@@ -32,7 +31,7 @@ rsync -glor \
 
 # The checkout's socket files are the exp deployment's config, so they become
 # samples for this deployment's own sockets
-find -H "$root" \( -path "$root/.*" -type d -o -name '.=.*' \) -prune \
+find -H "$root" \( -path "$root/.*" ! -path "$root/.infra" ! -path "$root/.infra/*" -type d -o -name '.=.*' \) -prune \
     -o -type f -name '._.*' -print | while IFS= read -r socket; do
     relative_path="${socket#"$root"/}"
     socket_name="$(basename "$relative_path")"
@@ -42,7 +41,7 @@ done
 # A fresh install has no data yet, so its directory sockets start empty. On an
 # app's first start, Docker fills each one from the image and gives it the
 # image's owner and permissions
-find "$deployment_path"/*/ -type l | while IFS= read -r plug; do
+find "$deployment_path"/*/ "$deployment_path"/.infra/*/ -type l | while IFS= read -r plug; do
     socket="$(dirname "$plug")/$(readlink "$plug")"
     case "$(basename "$socket")" in
         .=.*)
