@@ -9,7 +9,7 @@ services:
     command:
       - -k
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
-      - --address=/${DOMAIN}/${INTERNET_NETWORK_CADDY_ADDRESS}
+      - --address=/${DOMAIN}/${PEERS_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${PEERS_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${DNS_LOG_FACILITY}
@@ -26,7 +26,7 @@ services:
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
       - --no-resolv
       - --server=${GLUETUN_NETWORK_GATEWAY_ADDRESS}
-      - --address=/${DOMAIN}/${INTERNET_NETWORK_CADDY_ADDRESS}
+      - --address=/${DOMAIN}/${PEERS_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${PEERS_NETWORK_SYNCTHING_ADDRESS}
       - --log-queries
       - --log-facility=${DNS_LOG_FACILITY}

@@ -5,7 +5,8 @@ services:
     networks:
       internet:
         gw_priority: 1
-        ipv4_address: ${INTERNET_NETWORK_CADDY_ADDRESS}
+      peers:
+        ipv4_address: ${PEERS_NETWORK_CADDY_ADDRESS}
       caddy:
     volumes:
       - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
@@ -21,6 +22,9 @@ services:
     restart: ${DOCKER_RESTART}
 
 networks:
+  peers:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}
   caddy:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${CADDY_NETWORK}
