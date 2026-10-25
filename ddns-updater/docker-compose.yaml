@@ -2,9 +2,8 @@ services:
   ddns-updater:
     image: "docker.io/qmcgaw/ddns-updater:v2.9.0\
       @sha256:ed73f1fb7ab54a8a8fa26001eecc77cc8be56cdf3fb0ca91fee831124bcbb696"
-    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
-      internet:
+      ddns-updater:
     volumes:
       - ddns-updater-data:/updater/data
       # Go trusts every certificate file in /etc/ssl/certs. The image has no
@@ -14,11 +13,37 @@ services:
       - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
     environment:
       SERVER_ENABLED: no
+      HTTPS_PROXY: http://ddns-updater-http-proxy:3128
     env_file:
       - local.env
     restart: ${DOCKER_RESTART}
 
+  # ddns-updater reaches the internet only through these two proxies: HTTPS to
+  # the domains in ./volumes/http-proxy-domains.txt, and DNS for the domain only
+  ddns-updater-http-proxy:
+    build: ./..repo/.proxies/http
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
+    networks:
+      internet:
+        gw_priority: 1
+      ddns-updater:
+    volumes:
+      - ./volumes/http-proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
+    restart: ${DOCKER_RESTART}
+
+  ddns-updater-dns-proxy:
+    build: ./..repo/.proxies/dns
+    networks:
+      internet:
+        gw_priority: 1
+      ddns-updater:
+    command:
+      - --server=/${DOMAIN}/${PUBLIC_RESOLVER_ADDRESS}
+    restart: ${DOCKER_RESTART}
+
 networks:
+  ddns-updater:
+    internal: true
   internet:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}

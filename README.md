@@ -88,11 +88,21 @@ One Gluetun instance serves all services that need anonymous egress.
 
 Gluetun is in `.infra/gluetun-gateway/`, and startup starts it before the apps. Until the tunnel is up, Gluetun drops the traffic of the apps routed through it.
 
+### Internet Access Through Proxies
+
+No app joins the `internet` network: only the infra, the WireGuard servers and the proxies do.
+An app that needs the internet runs its own proxies, built from `.proxies/` and joined to the app's private network:
+- `http-proxy` allows HTTPS only to the domains in the app's `volumes/http-proxy-domains.txt`.
+- `dns-proxy` answers only the names that the app's compose file gives it with `--server`, for apps that look up DNS records themselves.
+
+The HTTP proxy logs each domain it refuses, so letting one through means adding it to the list and restarting the proxy.
+The proxy of an app routed through Gluetun joins `gluetun` instead of `internet`.
+
 ### DNS Blocklist
 
 Two dnsmasq resolvers in `.infra/dns/` answer every app's DNS queries, with the StevenBlack blocklist built into one image.
 `dns-internet` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
-Every app that reaches the internet sets `dns` to its network's resolver, and each WireGuard server gives its peers its side's resolver.
+Every container on `internet` or `gluetun` sets `dns` to its network's resolver, and each WireGuard server gives its peers its side's resolver.
 Both resolvers also answer the domain with Caddy's address and `syncthing.internal` with Syncthing's, so Caddy and ddns-updater check their records through a public resolver.
 
 ### Volume Ownership

@@ -3,6 +3,6 @@ FROM docker.io/library/alpine:3.24.2\
 
 RUN apk add --no-cache dnsmasq
 
-# dnsmasq has no upstream server of its own, so it answers only the names an
-# app forwards with a --server line, and refuses every other name
+# dnsmasq has no upstream server of its own, so it answers only the names that
+# an app's compose file gives it with --server, and refuses every other name
 ENTRYPOINT ["dnsmasq", "--keep-in-foreground", "--no-resolv"]
