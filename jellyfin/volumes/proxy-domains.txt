@@ -1,0 +1,7 @@
+# Metadata and artwork from TMDB, which Jellyfin has built in
+api.themoviedb.org
+image.tmdb.org
+
+# The plugin catalog, and the mirrors that serve plugin downloads
+repo.jellyfin.org
+*.mirror.jellyfin.org

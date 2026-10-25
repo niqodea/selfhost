@@ -2,19 +2,34 @@ services:
   jellyfin:
     image: "docker.io/jellyfin/jellyfin:10.11.6\
       @sha256:333b647716631443a43c7fabac4b0c46b4e2f036bad19547e00958f10f721b85"
-    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
-      internet:
-        gw_priority: 1
+      jellyfin:
       caddy:
     volumes:
       - jellyfin-config:/config
       - jellyfin-cache:/cache
       - ./volumes/movies:/data/movies
       - ./volumes/shows:/data/shows
+    environment:
+      - HTTPS_PROXY=http://jellyfin-proxy:3128
+    restart: ${DOCKER_RESTART}
+
+  # Jellyfin reaches the internet only through this proxy, which allows HTTPS to
+  # the domains in ./volumes/proxy-domains.txt and refuses everything else
+  jellyfin-proxy:
+    build: ./proxy
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
+    networks:
+      internet:
+        gw_priority: 1
+      jellyfin:
+    volumes:
+      - ./volumes/proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
     restart: ${DOCKER_RESTART}
 
 networks:
+  jellyfin:
+    internal: true
   internet:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
