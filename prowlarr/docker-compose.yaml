@@ -8,20 +8,20 @@ services:
     volumes:
       - prowlarr-config:/config
     environment:
-      - HTTPS_PROXY=http://prowlarr-proxy:3128
+      - HTTPS_PROXY=http://prowlarr-http-proxy:3128
     restart: ${DOCKER_RESTART}
 
   # Prowlarr reaches the internet only through this proxy, which leaves through
-  # Gluetun and allows HTTPS to the domains in ./volumes/proxy-domains.txt
-  prowlarr-proxy:
-    build: ./..repo/.proxy
+  # Gluetun and allows HTTPS to the domains in ./volumes/http-proxy-domains.txt
+  prowlarr-http-proxy:
+    build: ./..repo/.proxies/http
     dns: ${GLUETUN_NETWORK_DNS_ADDRESS}
     networks:
       gluetun:
         gw_priority: 1
       prowlarr:
     volumes:
-      - ./volumes/proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
+      - ./volumes/http-proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
     restart: ${DOCKER_RESTART}
 
 networks:

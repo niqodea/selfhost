@@ -11,20 +11,20 @@ services:
       - ./volumes/movies:/data/movies
       - ./volumes/shows:/data/shows
     environment:
-      - HTTPS_PROXY=http://jellyfin-proxy:3128
+      - HTTPS_PROXY=http://jellyfin-http-proxy:3128
     restart: ${DOCKER_RESTART}
 
   # Jellyfin reaches the internet only through this proxy, which allows HTTPS to
-  # the domains in ./volumes/proxy-domains.txt and refuses everything else
-  jellyfin-proxy:
-    build: ./..repo/.proxy
+  # the domains in ./volumes/http-proxy-domains.txt and refuses everything else
+  jellyfin-http-proxy:
+    build: ./..repo/.proxies/http
     dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
       internet:
         gw_priority: 1
       jellyfin:
     volumes:
-      - ./volumes/proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
+      - ./volumes/http-proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
     restart: ${DOCKER_RESTART}
 
 networks:
