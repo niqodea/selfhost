@@ -55,6 +55,7 @@ docker-compose.yaml               # Shared networks
 .infra/                           # Modules the apps depend on, started before them
 ├── dns/                          # DNS resolvers with the blocklist
 └── gluetun-gateway/              # VPN gateway
+.proxy/                           # Image of the proxy that lets an app reach only the domains it lists
 route-failsafe                    # Network failsafe routing script
 prepare-images                    # Download and build the images
 startup                           # Start the services

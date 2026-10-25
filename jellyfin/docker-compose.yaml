@@ -17,7 +17,7 @@ services:
   # Jellyfin reaches the internet only through this proxy, which allows HTTPS to
   # the domains in ./volumes/proxy-domains.txt and refuses everything else
   jellyfin-proxy:
-    build: ./proxy
+    build: ./..repo/.proxy
     dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
       internet:
