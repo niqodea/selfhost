@@ -16,6 +16,9 @@ services:
       - ./..exp/certificates/fake-dynu.key:/fake-dynu/fake-dynu.key:ro
     environment:
       - DOMAIN=${DOMAIN}
+      # From the range reserved for documentation
+      # Ref: https://www.rfc-editor.org/rfc/rfc5737
+      - PUBLIC_IP=203.0.113.1
     command: python server.py
     # Docker starts it on boot, before the startup service starts the apps
     restart: always

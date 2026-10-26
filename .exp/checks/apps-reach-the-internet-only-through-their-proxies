@@ -1,0 +1,39 @@
+#!/bin/sh
+set -eu
+
+# No app joins the internet network, and an app's HTTP proxy lets through only
+# the domains the app lists. Jellyfin stands in for every app with a proxy
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+network="$(sed -n 's/^COMPOSE_PROJECT_NAME=//p' "$root/.env")_$(sed -n 's/^INTERNET_NETWORK=//p' "$root/.env")"
+listed_domain="$(grep -v -e '^#' -e '^$' -e '\*' "$root/jellyfin/volumes/http-proxy-domains.txt" | head -n 1)"
+# Reserved for examples, so no app lists it
+# Ref: https://www.rfc-editor.org/rfc/rfc2606
+unlisted_domain=example.com
+
+for container in $(docker network inspect --format '{{range .Containers}}{{.Name}} {{end}}' "$network"); do
+    service="$(docker inspect --format '{{index .Config.Labels "com.docker.compose.service"}}' "$container")"
+    case "$service" in
+        dns-internet | gluetun-gateway | wireguard-lan | wireguard-wan | *-http-proxy | *-dns-proxy | fake-*)
+            ;;
+        *)
+            >&2 echo "Error: $service is on the internet network"
+            exit 1
+            ;;
+    esac
+done
+
+if ! docker compose --project-directory "$root/jellyfin" exec --no-TTY jellyfin \
+    curl --silent --output /dev/null --max-time 10 "https://$listed_domain"; then
+    >&2 echo "Error: Jellyfin's proxy refuses $listed_domain, which Jellyfin lists"
+    exit 1
+fi
+
+if docker compose --project-directory "$root/jellyfin" exec --no-TTY jellyfin \
+    curl --silent --output /dev/null --max-time 10 "https://$unlisted_domain"; then
+    >&2 echo "Error: Jellyfin's proxy lets through $unlisted_domain, which Jellyfin does not list"
+    exit 1
+fi
+
+echo 'Success'

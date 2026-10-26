@@ -19,7 +19,7 @@ from urllib.parse import parse_qs, urlsplit
 def main() -> None:
     zone = Zone(domain=os.environ["DOMAIN"])
 
-    http_server = HTTPServer(("", 443), partial(DynuHandler, zone))
+    http_server = HTTPServer(("", 443), partial(DynuHandler, zone, os.environ["PUBLIC_IP"]))
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain("fake-dynu.crt", "fake-dynu.key")
     http_server.socket = context.wrap_socket(http_server.socket, server_side=True)
@@ -81,22 +81,21 @@ class DynuHandler(BaseHTTPRequestHandler):
     def __init__(
         self,
         zone: Zone,
+        public_ip: str,
         request: socket.socket,
         client_address: tuple[str, int],
         server: HTTPServer,
     ) -> None:
-        # The base constructor handles the request, so the zone has to be set first
+        # The base constructor handles the request, so the fields have to be set first
         self._zone = zone
+        self._public_ip = public_ip
         super().__init__(request, client_address, server)
 
     def do_GET(self) -> None:
         url = urlsplit(self.path)
         match url.path.strip("/").split("/"):
             case ["ip"]:
-                # A public IP for exp to report, from the range reserved for
-                # documentation
-                # Ref: https://www.rfc-editor.org/rfc/rfc5737
-                self._respond("203.0.113.1")
+                self._respond(self._public_ip)
             case ["nic", "update"]:
                 query = parse_qs(url.query)
                 if query["hostname"] != [self._zone.domain]:

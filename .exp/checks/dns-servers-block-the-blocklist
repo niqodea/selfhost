@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+# The list's first entry blocks 0.0.0.0 itself, so the first real name is the
+# one after it
+blocked_name="$(docker compose --project-directory "$root/.infra/dns" exec --no-TTY dns-internet \
+    awk '$1 == "0.0.0.0" && $2 != "0.0.0.0" { print $2; exit }' /etc/dnsmasq.d/blocklist.hosts)"
+
+for service in dns-internet dns-gluetun; do
+    if ! docker compose --project-directory "$root/.infra/dns" exec --no-TTY "$service" \
+        nslookup "$blocked_name" 127.0.0.1 | grep --quiet '0\.0\.0\.0'; then
+        >&2 echo "Error: $service does not block $blocked_name"
+        exit 1
+    fi
+done
+
+echo 'Success'

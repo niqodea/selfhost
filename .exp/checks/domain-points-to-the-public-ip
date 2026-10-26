@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+# The domain's public record holds the public IP that ddns-updater found
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+domain="$(sed -n 's/^DOMAIN=//p' "$root/.env")"
+public_resolver_address="$(sed -n 's/^PUBLIC_RESOLVER_ADDRESS=//p' "$root/.env")"
+public_ip="$(docker compose --project-directory "$root/.exp/fake-dynu" exec --no-TTY fake-dynu printenv PUBLIC_IP)"
+
+if ! docker compose --project-directory "$root/.infra/dns" exec --no-TTY dns-internet \
+    nslookup "$domain" "$public_resolver_address" | grep --quiet --fixed-strings "$public_ip"; then
+    >&2 echo "Error: $domain does not point to the public IP $public_ip"
+    exit 1
+fi
+
+echo 'Success'

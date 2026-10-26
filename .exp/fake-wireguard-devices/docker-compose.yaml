@@ -1,0 +1,44 @@
+# A device on each WireGuard server, as a phone or a laptop would be. Each
+# brings up a peer config that its server generated, as it is, and trusts exp's
+# CA as a device that installed it does
+
+services:
+  fake-wireguard-lan-device:
+    # No official Docker image exists, using linuxserver.io community image
+    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
+      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    # The device reaches the server at the host's published port, as a device
+    # from outside does
+    network_mode: bridge
+    extra_hosts:
+      - ${DOMAIN}:host-gateway
+    volumes:
+      # laptop is one of the peers in exp's samples
+      - ./..repo/wireguard-lan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg0.conf:ro
+      - ./..exp/certificates/root.crt:/root.crt:ro
+    environment:
+      - CURL_CA_BUNDLE=/root.crt
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1  # for wireguard routing
+
+  fake-wireguard-wan-device:
+    # No official Docker image exists, using linuxserver.io community image
+    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
+      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    # The device reaches the server at the host's published port, as a device
+    # from outside does
+    network_mode: bridge
+    extra_hosts:
+      - ${DOMAIN}:host-gateway
+    volumes:
+      # laptop is one of the peers in exp's samples
+      - ./..repo/wireguard-wan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg0.conf:ro
+      - ./..exp/certificates/root.crt:/root.crt:ro
+    environment:
+      - CURL_CA_BUNDLE=/root.crt
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1  # for wireguard routing

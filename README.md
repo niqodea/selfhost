@@ -44,6 +44,7 @@ Its config is the samples, as they are.
    - `sudo ~/selfh-source/.exp/install-deployment /opt/selfh-exp`, which also plugs the samples and starts the fakes
    - `sudo /opt/selfh-exp/prepare-images`
    - `sudo ~/selfh-source/.host-setup/configure-deployment-startup /opt/selfh-exp up`
+4. In the VM, check that exp keeps each promise: `for check in /opt/selfh-exp/.exp/checks/*; do sudo "$check"; done`
 
 ## Project Structure
 
@@ -89,7 +90,7 @@ Gluetun is in `.infra/gluetun-gateway/`, and startup starts it before the apps. 
 ### Internet Access Through Proxies
 
 No app joins the `internet` network: only the infra, the WireGuard servers and the proxies do.
-An app that needs the internet runs its own proxies, built from `.proxies/` and joined to the app's private network:
+An app that needs the internet runs its own proxies, named `<app>-http-proxy` and `<app>-dns-proxy`, built from `.proxies/` and joined to the app's private network:
 - `http-proxy` allows HTTPS only to the domains in the app's `volumes/http-proxy-domains.txt`.
 - `dns-proxy` answers only the names that the app's compose file gives it with `--server`, for apps that look up DNS records themselves.
 
