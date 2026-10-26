@@ -34,17 +34,16 @@ Startup stops if an image is missing, because it never downloads or builds one.
 
 ### Exp
 
-The exp deployment runs from the repo checkout itself, on rootless Docker, which needs `sudo` only once and does not start on boot.
-Its config is the checkout's socket files, which are committed, so an edit takes effect on the next start.
+The exp deployment runs in a Lima VM on the Mac, with fakes in place of the VPN provider, Dynu and Let's Encrypt.
+Its config is the samples, as they are.
 
-1. Install host prerequisites: `sudo .host-setup/install-rootless-base <user>`
-2. After every boot, from an SSH session or tmux, as `<user>`:
-   - `.exp/start-daemon`
-   - `.exp/route-failsafe-up`
-   - `.exp/prepare-images`, which downloads and builds the images, only after a clone or a pull
-   - `.exp/startup`, which first creates the directory sockets a fresh clone lacks
-
-The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes the containers and their routes with it.
+1. On the Mac, create the VM once: `.exp/vm create`
+2. On the Mac, copy the repo to `~/selfh-source` in the VM: `.exp/vm push`
+3. In the VM (`limactl shell selfh`):
+   - Once per VM: `sudo ~/selfh-source/.host-setup/install-systemd-base`
+   - `sudo ~/selfh-source/.exp/install-deployment /opt/selfh-exp`, which also plugs the samples and starts the fakes
+   - `sudo /opt/selfh-exp/prepare-images`
+   - `sudo ~/selfh-source/.host-setup/configure-deployment-startup /opt/selfh-exp up`
 
 ## Project Structure
 
