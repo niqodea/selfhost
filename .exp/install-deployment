@@ -2,7 +2,8 @@
 set -eu
 
 # Installs a deployment as on a server, and adds exp to it: the fakes and their
-# CA, and the samples plugged as sockets
+# CA, the samples plugged as sockets, and empty content owned by the deployment
+# owner
 
 root="$(dirname "$(realpath "$0")")/..repo"
 
@@ -15,6 +16,13 @@ cp -P -R "$root/.exp" "$deployment_path/.exp"
 find "$deployment_path" -type f -name '.~.*' | while IFS= read -r sample; do
     sample_name="$(basename "$sample")"
     cp "$sample" "$(dirname "$sample")/._.${sample_name#.~.}"
+done
+
+owner="$(sed -n 's/^PUID=//p' "$deployment_path/.env"):$(sed -n 's/^PGID=//p' "$deployment_path/.env")"
+for plug in "$deployment_path"/*/content/*; do
+    socket="$(dirname "$plug")/$(readlink "$plug")"
+    mkdir "$socket"
+    chown "$owner" "$socket"
 done
 
 "$deployment_path/.exp/generate-certificates"

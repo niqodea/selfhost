@@ -8,8 +8,8 @@ services:
     volumes:
       - jellyfin-config:/config
       - jellyfin-cache:/cache
-      - ./volumes/movies:/data/movies
-      - ./volumes/shows:/data/shows
+      - ./content/movies:/data/movies
+      - ./content/shows:/data/shows
     environment:
       - HTTPS_PROXY=http://jellyfin-http-proxy:3128
     restart: ${DOCKER_RESTART}

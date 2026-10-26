@@ -8,7 +8,7 @@ services:
         ipv4_address: ${PEERS_NETWORK_SYNCTHING_ADDRESS}
       webapps:
     volumes:
-      - ./volumes/data:/var/syncthing
+      - ./content/data:/var/syncthing
     environment:
       # The entrypoint switches to these IDs, so synced folders belong to the
       # deployment owner

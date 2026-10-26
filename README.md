@@ -26,7 +26,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 1. Clone the repo and create a deployment directory (e.g., `/opt/selfhost`)
 2. Install base systemd files: `.host-setup/install-systemd-base`
 3. Install deployment: `.host-setup/install-deployment /opt/selfhost`
-4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`)
+4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`), and plug each app's `content/` as the deployment owner, with an empty directory or a link to your data
 5. Download and build the images: `/opt/selfhost/prepare-images`
 6. Enable startup service: `.host-setup/configure-deployment-startup /opt/selfhost up`
 
@@ -66,7 +66,8 @@ startup                           # Start the services
 │
 ├── Dockerfile                    # Custom image build
 ├── route                         # Host-level network routing script
-├── volumes/                      # Persistent data and configs
+├── volumes/                      # App state and configs
+├── content/                      # Your data, which the app works on
 └── local.env                     # Container env vars
 
 .host-setup/                      # Installation and configuration scripts
@@ -107,7 +108,7 @@ Both resolvers also answer the domain with Caddy's address and `syncthing.intern
 
 Each volume is one of three kinds, and the kind decides who owns its files:
 - **App state** (databases, app configs, caches): a named volume backed by the app's folder in `volumes/`, with a name that starts with the app's name. The app runs as its image's default user.
-- **Shared content** (downloads, synced folders, git repositories): a plain bind mount owned by the deployment owner, whose IDs are `PUID` and `PGID`. Only the apps that write there run as those IDs.
+- **Shared content** (downloads, synced folders, git repositories, media): a plain bind mount of the app's folder in `content/`, owned by the deployment owner, whose IDs are `PUID` and `PGID`. Only the apps that write there run as those IDs.
 - **Config you write** (Caddyfile, templates): a read-only bind mount.
 
 See [the ADR](.adr/volume-ownership.md) for why.

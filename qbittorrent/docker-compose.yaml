@@ -9,7 +9,7 @@ services:
       webapps:
     volumes:
       - qbittorrent-config:/config
-      - ./volumes/downloads:/downloads
+      - ./content/downloads:/downloads
     environment:
       - QBT_LEGAL_NOTICE=confirm
       # The entrypoint switches to these IDs, so downloads belong to the

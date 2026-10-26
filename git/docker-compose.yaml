@@ -6,7 +6,7 @@ services:
     networks:
       webapps:
     volumes:
-      - ./volumes/root:/var/www/git
+      - ./content/root:/var/www/git
     user: ${PUID}:${PGID}
     restart: ${DOCKER_RESTART}
 

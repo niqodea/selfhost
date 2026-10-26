@@ -12,7 +12,7 @@ Some images, like radicale, syncthing and qbittorrent, switch to a user of their
 
 Each volume is one of three kinds:
 - **App state** is touched only by its app. It is a named volume backed by the app's folder in `volumes/`. When a named volume is empty, Docker copies the image's content and ownership into it on first start, so nobody prepares the folder and the app runs as its image's default user.
-- **Shared content** is written by you and by apps. It is a plain bind mount owned by the deployment owner, and only the apps that write there run as `PUID` and `PGID`.
+- **Shared content** is written by you and by apps. It is a plain bind mount of the app's folder in `content/`, owned by the deployment owner, and only the apps that write there run as `PUID` and `PGID`.
 - **Config you write** is a read-only bind mount, so its owner does not matter.
 
 Every volume name starts with its app's name, because all apps share one Compose project, where two volumes with the same name are one volume.

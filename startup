@@ -16,6 +16,18 @@ find "$root"/*/ "$root"/.infra/*/ -name '.=.*' -prune -o -type l -print | while 
     fi
 done
 
+# Docker keeps the owner of a bind mount, and the apps that write content run
+# as the deployment owner, so they cannot write into content owned by anyone else
+owner="$(sed -n 's/^PUID=//p' "$root/.env"):$(sed -n 's/^PGID=//p' "$root/.env")"
+for plug in "$root"/*/content/*; do
+    # --numeric-uid-gid, and -L follows the plug to the directory it reaches
+    content_owner="$(ls -n -L -d "$plug" | awk '{ print $3 ":" $4 }')"
+    if [ "$content_owner" != "$owner" ]; then
+        >&2 echo "Error: $plug is owned by $content_owner, expected $owner"
+        exit 1
+    fi
+done
+
 # This file has only networks, and Compose skips those without "--all-resources"
 # Startup never downloads or builds an image, so a boot works without network
 docker compose --project-directory "$root" --all-resources up --detach --pull never --no-build
