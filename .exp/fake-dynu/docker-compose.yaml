@@ -17,7 +17,8 @@ services:
     environment:
       - DOMAIN=${DOMAIN}
     command: python server.py
-    restart: ${DOCKER_RESTART}
+    # Docker starts it on boot, before the startup service starts the apps
+    restart: always
 
 networks:
   internet:

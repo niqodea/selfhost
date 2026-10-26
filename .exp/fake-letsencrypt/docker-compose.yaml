@@ -18,7 +18,8 @@ services:
       - fake-letsencrypt-data:/data
     environment:
       - PUBLIC_RESOLVER_ADDRESS=${PUBLIC_RESOLVER_ADDRESS}
-    restart: ${DOCKER_RESTART}
+    # Docker starts it on boot, before the startup service starts the apps
+    restart: always
 
 networks:
   internet:
