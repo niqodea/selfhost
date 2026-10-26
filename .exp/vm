@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+# Creates the Lima VM that runs exp, or copies the repo into it, at
+# ~/selfh-source
+# Usage: .exp/vm create|push [instance]
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+command="$1"
+instance="${2:-selfh}"
+
+case "$command" in
+    create)
+        limactl start --tty=false --name="$instance" "$root/.exp/vm.yaml"
+        ;;
+    push)
+        # The repo as git sees it: with uncommitted changes, and without what it
+        # ignores. A file deleted but not committed yet is still listed, so it
+        # is left out here
+        git -C "$root" -c core.quotePath=false ls-files --cached --others --exclude-standard |
+            while IFS= read -r path; do
+                if [ -e "$root/$path" ] || [ -L "$root/$path" ]; then
+                    echo "$path"
+                fi
+            done |
+            # macOS's tar adds its file metadata as extra ._ files otherwise
+            tar --create --file=- --no-mac-metadata --directory="$root" --files-from=- |
+            limactl shell --workdir / "$instance" sh -c 'rm -rf ~/selfh-source && mkdir ~/selfh-source && tar --extract --directory ~/selfh-source'
+        ;;
+    *)
+        >&2 echo "Error: unknown command $command, expected create or push"
+        exit 1
+        ;;
+esac

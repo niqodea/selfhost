@@ -46,8 +46,6 @@ Its config is the checkout's socket files, which are committed, so an edit takes
 
 The daemon stops with `kill "$(cat "$XDG_RUNTIME_DIR/docker.pid")"`, and takes the containers and their routes with it.
 
-To browse exp's apps at `https://<app>.exp.test`, connect a WireGuard client to exp's wireguard-lan, create a Firefox profile that trusts exp's CA once with `.exp/create-firefox-profile`, and open it with `firefox --profile .exp/firefox-profile --new-instance`. Creating the profile needs NSS's `certutil` and OpenSSL 3.4 or later on the `PATH`.
-
 ## Project Structure
 
 ```
@@ -72,7 +70,7 @@ startup                           # Start the services
 └── local.env                     # Container env vars
 
 .host-setup/                      # Installation and configuration scripts
-.exp/                             # Scripts that run the checkout as the exp deployment
+.exp/                             # The exp deployment's fakes and scripts
 .adr/                             # Architecture Decision Records
 ```
 
@@ -118,8 +116,8 @@ See [the ADR](.adr/volume-ownership.md) for why.
 
 File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
 - **Plug** (committed): `local.env -> ._.local.env` points to the socket
-- **Socket** (gitignored, except the checkout's file sockets, which are the exp deployment's config): `._.local.env` contains or links to the actual file, and `.=.data` is or links to the actual directory
-- **Sample** (created by `install-deployment` from the checkout's socket): `.~.local.env` shows the expected structure, with exp's placeholder values
+- **Socket** (gitignored): `._.local.env` contains or links to the actual file, and `.=.data` is or links to the actual directory
+- **Sample** (committed): `.~.local.env` shows the expected structure, and its values are exp's config
 
 Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
 

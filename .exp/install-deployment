@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+# Installs a deployment as on a server, and adds exp to it: the fakes and their
+# CA, and the samples plugged as sockets
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+deployment_path="$1"
+
+"$root/.host-setup/install-deployment" "$deployment_path"
+
+cp -P -R "$root/.exp" "$deployment_path/.exp"
+
+find "$deployment_path" -type f -name '.~.*' | while IFS= read -r sample; do
+    sample_name="$(basename "$sample")"
+    cp "$sample" "$(dirname "$sample")/._.${sample_name#.~.}"
+done
+
+"$deployment_path/.exp/generate-certificates"
+
+echo 'Success'

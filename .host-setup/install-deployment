@@ -6,49 +6,19 @@ root="$(dirname "$(realpath "$0")")/..repo"
 
 deployment_path="$1"
 
-if [ -e "$deployment_path" ]; then
-    >&2 echo "File already exists at $deployment_path"
-    exit 1
-fi
+mkdir "$deployment_path"
 
-# - Install key top-level files
-# - Install non-hidden top-level directories, .infra/ and .proxies/
-# - Ignore sockets anywhere
-rsync -glor \
-    --include='/docker-compose.yaml' \
-    --include='/route-failsafe' \
-    --include='/startup' \
-    --include='/prepare-images' \
-    --include='/.env' \
-    --include='/..repo' \
-    --include='/.infra/' \
-    --include='/.proxies/' \
-    --exclude='/.*' \
-    --include='/*/' \
-    --exclude='/*' \
-    --exclude='._.*' \
-    --exclude='.=.*' \
-    "$root/" "$deployment_path"
-
-# The checkout's socket files are the exp deployment's config, so they become
-# samples for this deployment's own sockets
-find -H "$root" \( -path "$root/.*" ! -path "$root/.infra" ! -path "$root/.infra/*" -type d -o -name '.=.*' \) -prune \
-    -o -type f -name '._.*' -print | while IFS= read -r socket; do
-    relative_path="${socket#"$root"/}"
-    socket_name="$(basename "$relative_path")"
-    cp "$socket" "$deployment_path/$(dirname "$relative_path")/.~.${socket_name#._.}"
+cp -P "$root/docker-compose.yaml" "$root/route-failsafe" "$root/startup" "$root/prepare-images" "$root/.env" "$root/.~..env" "$root/..repo" "$deployment_path"
+cp -P -R "$root/.infra" "$deployment_path/.infra"
+cp -P -R "$root/.proxies" "$deployment_path/.proxies"
+for path in "$root"/*/; do
+    cp -P -R "$path" "$deployment_path/$(basename "$path")"
 done
 
-# A fresh install has no data yet, so its directory sockets start empty. On an
-# app's first start, Docker fills each one from the image and gives it the
-# image's owner and permissions
-find "$deployment_path"/*/ "$deployment_path"/.infra/*/ -type l | while IFS= read -r plug; do
-    socket="$(dirname "$plug")/$(readlink "$plug")"
-    case "$(basename "$socket")" in
-        .=.*)
-            mkdir "$socket"
-            ;;
-    esac
+# An app's state starts as an empty directory, which Docker fills from the
+# image on the app's first start
+find "$deployment_path" -type l -path '*/volumes/*' -lname '.=.*' | while IFS= read -r plug; do
+    mkdir "$(dirname "$plug")/$(readlink "$plug")"
 done
 
 echo 'Success'
