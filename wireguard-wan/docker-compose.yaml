@@ -36,10 +36,14 @@ services:
       # Tunnel everything through vpn
       - ALLOWEDIPS=0.0.0.0/0  # or 0.0.0.0/1,128.0.0.0/1 for Windows clients
       # Disable the image's own DNS server, which would answer on every network
-      # this container joins, since peers use the DNS server set in PEERDNS
+      # this container joins, since peers' DNS is forwarded upstream instead
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
       - USE_COREDNS=false
-      - PEERDNS=${GLUETUN_NETWORK_DNS_ADDRESS}
+      # Peers ask this server, whose address in the tunnel stays the same when
+      # the Docker networks change, and it forwards their queries upstream, see
+      # ./volumes/server-template.conf for how
+      - PEERDNS=${WIREGUARD_NETWORK_SERVER_ADDRESS}
+      - UPSTREAM_DNS_ADDRESS=${GLUETUN_NETWORK_DNS_ADDRESS}
     env_file:
       - local.env
     cap_add:
