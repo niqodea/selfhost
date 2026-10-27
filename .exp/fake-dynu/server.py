@@ -1,6 +1,7 @@
 """A fake Dynu for one domain.
 
-Serves the IP update and TXT record endpoints of Dynu's API, and its nameserver.
+Serves the IP update and TXT record endpoints of Dynu's API, its nameserver,
+and ipify's public IP.
 """
 
 import json
@@ -94,7 +95,7 @@ class DynuHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         url = urlsplit(self.path)
         match url.path.strip("/").split("/"):
-            case ["ip"]:
+            case [""]:
                 self._respond(self._public_ip)
             case ["nic", "update"]:
                 query = parse_qs(url.query)

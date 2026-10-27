@@ -1,7 +1,8 @@
 services:
   ddns-updater:
     build: .
-    # A shell that runs as PID 1 ignores TERM, so tini runs it and stops it
+    # Linux drops TERM sent to PID 1 unless it handles it, so tini runs as PID 1
+    # and passes TERM to the shell
     init: true
     dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
@@ -10,8 +11,8 @@ services:
       - ${EXTRA_CA_CERTIFICATE_PATH}:/extra-ca.crt:ro
     environment:
       DOMAIN: ${DOMAIN}
-    env_file:
-      - local.env
+      DYNU_USERNAME: ${DYNU_USERNAME}
+      DYNU_PASSWORD: ${DYNU_PASSWORD}
     restart: ${DOCKER_RESTART}
 
 networks:

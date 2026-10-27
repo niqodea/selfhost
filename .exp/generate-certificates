@@ -44,7 +44,7 @@ openssl req -config /dev/null -x509 \
     -sigopt nonce-type:1 \
     -addext 'basicConstraints=critical,CA:TRUE' \
     -addext 'keyUsage=critical,keyCertSign,cRLSign' \
-    -addext "nameConstraints=critical,permitted;DNS:$domain,permitted;DNS:acme-v02.api.letsencrypt.org,permitted;DNS:acme-staging-v02.api.letsencrypt.org,permitted;DNS:api.dynu.com,permitted;DNS:fake-dynu" \
+    -addext "nameConstraints=critical,permitted;DNS:$domain,permitted;DNS:acme-v02.api.letsencrypt.org,permitted;DNS:acme-staging-v02.api.letsencrypt.org,permitted;DNS:api.dynu.com,permitted;DNS:api.ipify.org" \
     -out "$certificates_path/root.crt"
 
 # Committed and public like the CA's key, so the certificate comes out the same
@@ -67,5 +67,5 @@ openssl req -config /dev/null -x509 \
     -not_after 21260101000000Z \
     -sigopt nonce-type:1 \
     -addext 'basicConstraints=critical,CA:FALSE' \
-    -addext 'subjectAltName=DNS:api.dynu.com,DNS:fake-dynu' \
+    -addext 'subjectAltName=DNS:api.dynu.com,DNS:api.ipify.org' \
     -out "$certificates_path/fake-dynu.crt"

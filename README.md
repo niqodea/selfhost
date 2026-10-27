@@ -50,7 +50,7 @@ Its config is the samples, as they are.
 
 ```
 docker-compose.yaml               # Shared networks
-.infra/                           # Modules the apps depend on, started before them
+.infra/                           # Network modules, started before the apps
 ├── ddns-updater/                 # Points the domain at the public IP
 ├── dns/                          # DNS resolvers with the blocklist
 └── gluetun-gateway/              # VPN gateway

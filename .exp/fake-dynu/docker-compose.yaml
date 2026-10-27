@@ -5,10 +5,11 @@ services:
     networks:
       internet:
         ipv4_address: ${PUBLIC_RESOLVER_ADDRESS}
-        # Dynu's clients have api.dynu.com built in, so the fake answers under
-        # that name
+        # Clients reach Dynu and ipify at fixed names, so the fake answers
+        # under those names
         aliases:
           - api.dynu.com
+          - api.ipify.org
     working_dir: /fake-dynu
     volumes:
       - ./server.py:/fake-dynu/server.py:ro

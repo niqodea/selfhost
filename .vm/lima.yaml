@@ -7,7 +7,7 @@ images:
 containerd:
   user: false
 
-# Nothing in the VM is for the host, so none of its ports are forwarded
+# The host uses none of the VM's services, so none of its ports are forwarded
 portForwards:
   - guestIP: "0.0.0.0"
     guestIPMustBeZero: false
