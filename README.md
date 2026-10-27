@@ -34,17 +34,18 @@ Startup stops if an image is missing, because it never downloads or builds one.
 
 ### Exp
 
-The exp deployment runs in a Lima VM on the Mac, with fakes in place of the VPN provider, Dynu and Let's Encrypt.
+The exp deployment runs in a Lima VM, with fakes in place of the VPN provider, Dynu and Let's Encrypt.
 Its config is the samples, as they are.
 
-1. On the Mac, create the VM once: `.exp/vm create`
-2. On the Mac, copy the repo to `~/selfh-source` in the VM: `.exp/vm push`
-3. In the VM (`limactl shell selfh`):
+1. Once per machine, install QEMU, then log in again: `.vm/install-qemu`
+2. Create the VM once: `.vm/manage create`
+3. Copy the repo to `~/selfh-source` in the VM: `.vm/manage push`
+4. In the VM (`limactl shell selfh`):
    - Once per VM: `sudo ~/selfh-source/.host-setup/install-systemd-base`
    - `sudo ~/selfh-source/.exp/install-deployment /opt/selfh-exp`, which also plugs the samples and starts the fakes
    - `sudo /opt/selfh-exp/prepare-images`
    - `sudo ~/selfh-source/.host-setup/configure-deployment-startup /opt/selfh-exp up`
-4. In the VM, check that exp keeps each promise: `for check in /opt/selfh-exp/.exp/checks/*; do sudo "$check"; done`
+5. In the VM, check that exp keeps each promise: `for check in /opt/selfh-exp/.exp/checks/*; do sudo "$check"; done`
 
 ## Project Structure
 
@@ -72,6 +73,7 @@ startup                           # Start the services
 
 .host-setup/                      # Installation and configuration scripts
 .exp/                             # The exp deployment's fakes and scripts
+.vm/                              # The Lima VM that exp runs in
 .adr/                             # Architecture Decision Records
 ```
 

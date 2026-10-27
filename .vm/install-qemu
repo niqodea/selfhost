@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+
+# Installs QEMU, which Lima runs the VM with, and lets the user use KVM so the
+# VM runs at native speed. The user gets the kvm group at their next login
+
+# apt only knows the packages in its local lists, which can be out of date
+sudo apt update
+sudo apt install qemu-system-x86 qemu-utils ovmf
+sudo usermod --append --groups kvm "$USER"

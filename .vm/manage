@@ -3,7 +3,7 @@ set -eu
 
 # Creates the Lima VM that runs exp, or copies the repo into it, at
 # ~/selfh-source
-# Usage: .exp/vm create|push [instance]
+# Usage: .vm/manage create|push [instance]
 
 root="$(dirname "$(realpath "$0")")/..repo"
 
@@ -12,7 +12,7 @@ instance="${2:-selfh}"
 
 case "$command" in
     create)
-        limactl start --tty=false --name="$instance" "$root/.exp/vm.yaml"
+        limactl start --tty=false --name="$instance" "$root/.vm/lima.yaml"
         ;;
     push)
         # The repo as git sees it: with uncommitted changes, and without what it
@@ -24,8 +24,7 @@ case "$command" in
                     echo "$path"
                 fi
             done |
-            # macOS's tar adds its file metadata as extra ._ files otherwise
-            tar --create --file=- --no-mac-metadata --directory="$root" --files-from=- |
+            tar --create --file=- --directory="$root" --files-from=- |
             limactl shell --workdir / "$instance" sh -c 'rm -rf ~/selfh-source && mkdir ~/selfh-source && tar --extract --directory ~/selfh-source'
         ;;
     *)
