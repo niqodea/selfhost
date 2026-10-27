@@ -44,7 +44,7 @@ openssl req -config /dev/null -x509 \
     -sigopt nonce-type:1 \
     -addext 'basicConstraints=critical,CA:TRUE' \
     -addext 'keyUsage=critical,keyCertSign,cRLSign' \
-    -addext "nameConstraints=critical,permitted;DNS:$domain,permitted;DNS:acme-v02.api.letsencrypt.org,permitted;DNS:acme-staging-v02.api.letsencrypt.org,permitted;DNS:api.dynu.com,permitted;DNS:api.ipify.org" \
+    -addext "nameConstraints=critical,permitted;DNS:$domain,permitted;DNS:acme-v02.api.letsencrypt.org,permitted;DNS:acme-staging-v02.api.letsencrypt.org,permitted;DNS:api.dynu.com,permitted;DNS:api.ipify.org,permitted;DNS:api.nordvpn.com" \
     -out "$certificates_path/root.crt"
 
 # Committed and public like the CA's key, so the certificate comes out the same
@@ -69,3 +69,24 @@ openssl req -config /dev/null -x509 \
     -addext 'basicConstraints=critical,CA:FALSE' \
     -addext 'subjectAltName=DNS:api.dynu.com,DNS:api.ipify.org' \
     -out "$certificates_path/fake-dynu.crt"
+
+cat > "$certificates_path/fake-vpn-servers.key" <<'EOF'
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgFGAI7EY7yFMZj7SD
+pNYIxjW1xNI2rwk1wSLpko7K+vehRANCAATcy1jXAlHy4AUNNqDfHmeuoqyjeSqF
+FTiX5MCcW94fUdkqcS4CnBw7e6ftICdm7HiIzd9y5JyrVx1aDawlIoez
+-----END PRIVATE KEY-----
+EOF
+
+openssl req -config /dev/null -x509 \
+    -key "$certificates_path/fake-vpn-servers.key" \
+    -CA "$certificates_path/root.crt" \
+    -CAkey "$certificates_path/root.key" \
+    -subj '/CN=api.nordvpn.com' \
+    -set_serial 3 \
+    -not_before 20260101000000Z \
+    -not_after 21260101000000Z \
+    -sigopt nonce-type:1 \
+    -addext 'basicConstraints=critical,CA:FALSE' \
+    -addext 'subjectAltName=DNS:api.nordvpn.com' \
+    -out "$certificates_path/fake-vpn-servers.crt"

@@ -16,6 +16,27 @@ services:
     # Docker starts it on boot, before the startup service starts the apps
     restart: always
 
+  fake-vpn-servers:
+    image: "docker.io/library/python:3.14.8-alpine3.24\
+      @sha256:f6a589d43c42b9e7f7dc67a12d37132491f362859a5d750607710cc56da3bc72"
+    networks:
+      internet:
+        # Gluetun downloads Nord's server list from this fixed name
+        aliases:
+          - api.nordvpn.com
+    working_dir: /fake-vpn-servers
+    volumes:
+      - ./servers.py:/fake-vpn-servers/servers.py:ro
+      - ./..exp/certificates/fake-vpn-servers.crt:/fake-vpn-servers/fake-vpn-servers.crt:ro
+      - ./..exp/certificates/fake-vpn-servers.key:/fake-vpn-servers/fake-vpn-servers.key:ro
+    environment:
+      - VPN_ADDRESS=${INTERNET_NETWORK_FAKE_VPN_ADDRESS}
+      # The public key of the private key in ./wg0.conf
+      - VPN_PUBLIC_KEY=CVnMvO0sYvp6iTE2jwPh9uPPBpYb82qQMDthAw463Co=
+    command: python servers.py
+    # Docker starts it on boot, before the startup service starts the apps
+    restart: always
+
 networks:
   internet:
     external: true

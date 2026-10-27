@@ -15,7 +15,7 @@ unlisted_domain=example.com
 for container in $(docker network inspect --format '{{range .Containers}}{{.Name}} {{end}}' "$network"); do
     service="$(docker inspect --format '{{index .Config.Labels "com.docker.compose.service"}}' "$container")"
     case "$service" in
-        ddns-updater | dns-internet | gluetun-gateway | wireguard-lan | wireguard-wan | *-http-proxy | *-dns-proxy | fake-*)
+        ddns-updater | dns-internet | gluetun-gateway | gluetun-servers-updater | wireguard-lan | wireguard-wan | *-http-proxy | *-dns-proxy | fake-*)
             ;;
         *)
             >&2 echo "Error: $service is on the internet network"

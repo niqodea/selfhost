@@ -88,6 +88,7 @@ Services opt into VPN routing by joining the network with `gw_priority: 1` and s
 One Gluetun instance serves all services that need anonymous egress.
 
 Gluetun is in `.infra/gluetun-gateway/`, and startup starts it before the apps. Until the tunnel is up, Gluetun drops the traffic of the apps routed through it.
+Gluetun refreshes its server list only through the tunnel, so `gluetun-servers-updater` refreshes it from the provider each time Gluetun starts.
 
 ### Internet Access Through Proxies
 

@@ -9,7 +9,7 @@ services:
     volumes:
       - gluetun-gateway-config:/gluetun
     environment:
-      - UPDATER_PERIOD=24h
+      - UPDATER_PERIOD=480h
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
     env_file:
       - local.env
@@ -17,7 +17,37 @@ services:
       - NET_ADMIN
     sysctls:
       - net.ipv4.ip_forward=1  # to act as a router
+    depends_on:
+      gluetun-servers-updater:
+        condition: service_completed_successfully
     restart: ${DOCKER_RESTART}
+
+  # Gluetun refreshes its server list only through the tunnel, so a list with
+  # servers the provider has since moved keeps the tunnel from ever coming up.
+  # This refreshes the list before Gluetun starts, and keeps the old one when
+  # the provider cannot be reached
+  gluetun-servers-updater:
+    build: .
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
+    networks:
+      internet:
+    volumes:
+      - gluetun-gateway-config:/gluetun
+      # Go trusts every certificate file in /etc/ssl/certs, on top of the
+      # image's CA bundle
+      - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
+    env_file:
+      - local.env
+    entrypoint:
+      - /bin/sh
+      - -c
+    # 0.8 is Gluetun's own minimum ratio. The custom provider has no server list
+    command:
+      - |
+        if [ "$$VPN_SERVICE_PROVIDER" != custom ]; then
+            /gluetun-entrypoint update -enduser -providers "$$VPN_SERVICE_PROVIDER" -minratio "$${UPDATER_MIN_RATIO:-0.8}" ||
+                echo 'Kept the current server list'
+        fi
 
 networks:
   internet:
