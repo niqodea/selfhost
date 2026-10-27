@@ -44,6 +44,7 @@ services:
       # ./volumes/server-template.conf for how
       - PEERDNS=${WIREGUARD_NETWORK_SERVER_ADDRESS}
       - UPSTREAM_DNS_ADDRESS=${GLUETUN_NETWORK_DNS_ADDRESS}
+      - PEERS_NETWORK_SUBNET=${PEERS_NETWORK_SUBNET}
     env_file:
       - local.env
     cap_add:
