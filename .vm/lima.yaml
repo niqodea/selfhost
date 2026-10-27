@@ -7,8 +7,7 @@ images:
 containerd:
   user: false
 
-# Lima forwards the VM's ports to the host by default, where they could take
-# the ports of the live deployment
+# Nothing in the VM is for the host, so none of its ports are forwarded
 portForwards:
   - guestIP: "0.0.0.0"
     guestIPMustBeZero: false
