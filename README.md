@@ -7,7 +7,6 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | App                 | Description                                       |
 |---------------------|---------------------------------------------------|
 | **caddy**           | Reverse proxy with automatic Let's Encrypt SSL    |
-| **ddns-updater**    | Dynamic DNS for servers without static IPs        |
 | **wireguard-lan**   | VPN server for remote access to local services    |
 | **wireguard-wan**   | VPN server with anonymous exit via Gluetun        |
 | **immich**          | Photo and video backup                            |
@@ -52,6 +51,7 @@ Its config is the samples, as they are.
 ```
 docker-compose.yaml               # Shared networks
 .infra/                           # Modules the apps depend on, started before them
+├── ddns-updater/                 # Points the domain at the public IP
 ├── dns/                          # DNS resolvers with the blocklist
 └── gluetun-gateway/              # VPN gateway
 .proxies/                         # Images of the proxies through which apps reach the internet

@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+# Sets the domain's record at Dynu to the public IP whenever the public IP
+# changes. On any failure it exits, and Docker starts it again after a wait
+# that doubles each time
+
+# curl trusts the CAs in one file only
+cat /etc/ssl/certs/ca-certificates.crt /extra-ca.crt > /tmp/ca-certificates.crt
+
+record_ip=''
+while true; do
+    public_ip="$(curl --fail --silent --show-error --max-time 10 --cacert /tmp/ca-certificates.crt "$PUBLIC_IP_URL")"
+    if [ "$public_ip" != "$record_ip" ]; then
+        response="$(curl --fail --silent --show-error --max-time 10 --cacert /tmp/ca-certificates.crt --get \
+            --data-urlencode "hostname=$DOMAIN" \
+            --data-urlencode "myip=$public_ip" \
+            --data-urlencode "username=$DYNU_USERNAME" \
+            --data-urlencode "password=$DYNU_PASSWORD" \
+            https://api.dynu.com/nic/update)"
+        echo "$response"
+        case "$response" in
+            good* | nochg*) record_ip="$public_ip" ;;
+            *) exit 1 ;;
+        esac
+    fi
+    sleep 300
+done

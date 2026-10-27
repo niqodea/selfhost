@@ -1,0 +1,20 @@
+services:
+  ddns-updater:
+    build: .
+    # A shell that runs as PID 1 ignores TERM, so tini runs it and stops it
+    init: true
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
+    networks:
+      internet:
+    volumes:
+      - ${EXTRA_CA_CERTIFICATE_PATH}:/extra-ca.crt:ro
+    environment:
+      DOMAIN: ${DOMAIN}
+    env_file:
+      - local.env
+    restart: ${DOCKER_RESTART}
+
+networks:
+  internet:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}

@@ -1,6 +1,0 @@
-# Dynu's API, through which ddns-updater sets the record
-api.dynu.com
-
-# The service that answers with the public IP, as set in PUBLIC_IP_URL in
-# local.env
-fake-dynu
