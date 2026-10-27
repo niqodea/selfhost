@@ -12,8 +12,10 @@ However, Docker's `on-failure` policy [restarts containers on daemon/system boot
 This means Docker may auto-restart containers on boot before routes are ready.
 Ideally we'd use a policy that only restarts on actual container failure (not on boot), but Docker doesn't support this behavior.
 
+Docker restarts these containers one by one, without `depends_on`, and `docker compose up` later leaves a running container alone, so a container can also start before what it depends on.
+Each container therefore copes with its dependencies starting late, by retrying, or by exiting so that `on-failure` restarts it.
+
 Docker has no pre-start hooks. Without them, `unless-stopped`/`always` policies offer no advantage over managing startup ourselves via systemd.
-Running `docker compose up` ourselves also guarantees correct `depends_on` ordering across the stack.
 
 ## Solution
 
@@ -42,5 +44,6 @@ However, the upstream blackhole failsafe ensures traffic is safely dropped rathe
 | Pros                             | Cons                                  |
 |----------------------------------|---------------------------------------|
 | Traffic safety via blackhole     | Two systemd services                  |
-| Correct `depends_on` ordering    | Failsafe must complete before Docker  |
-| Runtime crash recovery preserved | Works around Docker policy limitation |
+| Runtime crash recovery preserved | Failsafe must complete before Docker  |
+|                                  | Works around Docker policy limitation |
+|                                  | Boot restarts skip `depends_on`       |
