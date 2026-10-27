@@ -10,7 +10,7 @@
 *.{$DOMAIN} {
 	tls {
 		dns dynu {
-			api_token {$DYNU_API_KEY}
+			api_token {$DNS_API_TOKEN}
 			own_domain {$DOMAIN}
 		}
 		# The DNS servers the containers use answer the domain with Caddy's

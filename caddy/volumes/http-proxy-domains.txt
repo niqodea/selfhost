@@ -1,7 +1,1 @@
-# Let's Encrypt, at its production address and at the staging address Caddy
-# uses when it retries
-acme-v02.api.letsencrypt.org
-acme-staging-v02.api.letsencrypt.org
-
-# Dynu's API, through which Caddy publishes the certificate challenge
-api.dynu.com
+._.http-proxy-domains.txt

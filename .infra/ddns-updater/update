@@ -1,8 +1,9 @@
 #!/bin/sh
 set -eu
 
-# Sets the domain's record at Dynu to the public IP whenever the public IP
-# changes. It exits on any failure
+# Sets the domain's record at the DNS provider to the public IP whenever the
+# public IP changes, through the provider's DynDNS2 endpoint. It exits on any
+# failure
 
 # curl trusts the CAs in one file only
 cat /etc/ssl/certs/ca-certificates.crt /extra-ca.crt > /tmp/ca-certificates.crt
@@ -14,9 +15,9 @@ while true; do
         response="$(curl --fail --silent --show-error --max-time 10 --cacert /tmp/ca-certificates.crt --get \
             --data-urlencode "hostname=$DOMAIN" \
             --data-urlencode "myip=$public_ip" \
-            --data-urlencode "username=$DYNU_USERNAME" \
-            --data-urlencode "password=$DYNU_PASSWORD" \
-            https://api.dynu.com/nic/update)"
+            --data-urlencode "username=$DDNS_USERNAME" \
+            --data-urlencode "password=$DDNS_PASSWORD" \
+            "$DDNS_UPDATE_URL")"
         echo "$response"
         case "$response" in
             good* | nochg*) record_ip="$public_ip" ;;

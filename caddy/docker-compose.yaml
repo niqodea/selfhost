@@ -1,6 +1,9 @@
 services:
   caddy:
-    build: .
+    build:
+      context: .
+      args:
+        CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN}
     networks:
       caddy:
       peers:
@@ -16,7 +19,7 @@ services:
     environment:
       - DOMAIN=${DOMAIN}
       - HTTPS_PROXY=http://caddy-http-proxy:3128
-      - DYNU_API_KEY=${DYNU_API_KEY}
+      - DNS_API_TOKEN=${DNS_API_TOKEN}
     depends_on:
       - caddy-http-proxy
       - caddy-dns-proxy

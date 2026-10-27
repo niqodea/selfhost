@@ -11,8 +11,9 @@ services:
       - ${EXTRA_CA_CERTIFICATE_PATH}:/extra-ca.crt:ro
     environment:
       DOMAIN: ${DOMAIN}
-      DYNU_USERNAME: ${DYNU_USERNAME}
-      DYNU_PASSWORD: ${DYNU_PASSWORD}
+      DDNS_UPDATE_URL: ${DDNS_UPDATE_URL}
+      DDNS_USERNAME: ${DDNS_USERNAME}
+      DDNS_PASSWORD: ${DDNS_PASSWORD}
     restart: ${DOCKER_RESTART}
 
 networks:
