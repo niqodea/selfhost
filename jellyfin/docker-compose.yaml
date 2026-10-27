@@ -12,6 +12,8 @@ services:
       - ./content/shows:/data/shows
     environment:
       - HTTPS_PROXY=http://jellyfin-http-proxy:3128
+    depends_on:
+      - jellyfin-http-proxy
     restart: ${DOCKER_RESTART}
 
   # Jellyfin reaches the internet only through this proxy, which allows HTTPS to

@@ -17,6 +17,9 @@ services:
       - DOMAIN=${DOMAIN}
       - HTTPS_PROXY=http://caddy-http-proxy:3128
       - DYNU_API_KEY=${DYNU_API_KEY}
+    depends_on:
+      - caddy-http-proxy
+      - caddy-dns-proxy
     restart: ${DOCKER_RESTART}
 
   # Caddy reaches the internet only through these two proxies: HTTPS to the
