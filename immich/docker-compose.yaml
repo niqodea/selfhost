@@ -8,6 +8,10 @@ services:
       webapps:
     volumes:
       - immich-data:/data
+      # Your photos, which Immich shows as an external library: it indexes
+      # them where they are and never moves or renames them. Read-only, so
+      # Immich cannot change them
+      - ./content/photos:/photos:ro
     environment:
       DB_HOSTNAME: immich-postgres
       DB_USERNAME: admin
