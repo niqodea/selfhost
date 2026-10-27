@@ -1,0 +1,48 @@
+#!/bin/sh
+set -eu
+
+# Sets the domain's record at Dynu to the public IP whenever the public IP
+# changes. After a failure it retries in 1 second, then doubles the wait each
+# time up to the period, so it does not wait a whole period for a proxy that
+# starts a few seconds after it
+
+# Docker restarts a container that exited with an error on boot, before its
+# proxy, so a stop has to exit with 0.
+# The shell runs the trap only once the foreground command returns. Docker
+# kills the container 10 seconds after TERM, so each request gets 5 seconds,
+# and each sleep runs in the background, since wait returns on a signal
+trap 'exit 0' TERM
+
+# curl trusts the CAs in one file only
+cat /etc/ssl/certs/ca-certificates.crt /extra-ca.crt > /tmp/ca-certificates.crt
+
+period_seconds=300
+retry_delay_seconds=1
+record_ip=''
+while true; do
+    if public_ip="$(curl --fail --silent --show-error --max-time 5 --cacert /tmp/ca-certificates.crt "$PUBLIC_IP_URL" |
+        grep --line-regexp --extended-regexp '[0-9]{1,3}(\.[0-9]{1,3}){3}')" &&
+        { [ "$public_ip" = "$record_ip" ] ||
+            # Dynu's answer does not end its line
+            curl --fail --silent --show-error --max-time 5 --cacert /tmp/ca-certificates.crt --write-out '\n' --get \
+                --data-urlencode "hostname=$DOMAIN" \
+                --data-urlencode "myip=$public_ip" \
+                --data-urlencode "username=$DYNU_USERNAME" \
+                --data-urlencode "password=$DYNU_PASSWORD" \
+                https://api.dynu.com/nic/update |
+                tee /dev/stderr |
+                grep --quiet --extended-regexp '^(good|nochg)'; }; then
+        record_ip="$public_ip"
+        retry_delay_seconds=1
+        sleep "$period_seconds" &
+        wait "$!"
+    else
+        >&2 echo "Error: could not set the record, retrying in ${retry_delay_seconds}s"
+        sleep "$retry_delay_seconds" &
+        wait "$!"
+        retry_delay_seconds=$((retry_delay_seconds * 2))
+        if [ "$retry_delay_seconds" -gt "$period_seconds" ]; then
+            retry_delay_seconds="$period_seconds"
+        fi
+    fi
+done

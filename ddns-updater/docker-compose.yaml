@@ -1,25 +1,21 @@
 services:
   ddns-updater:
-    image: "docker.io/qmcgaw/ddns-updater:v2.9.0\
-      @sha256:ed73f1fb7ab54a8a8fa26001eecc77cc8be56cdf3fb0ca91fee831124bcbb696"
+    build: .
     networks:
       ddns-updater:
     volumes:
-      - ddns-updater-data:/updater/data
-      # Go trusts every certificate file in /etc/ssl/certs. The image has no
-      # such files, and its built-in public CAs are Go's fallback, which Go
-      # only uses while it finds no certificate there
-      # Ref: https://pkg.go.dev/crypto/x509#SetFallbackRoots
-      - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
+      - ${EXTRA_CA_CERTIFICATE_PATH}:/extra-ca.crt:ro
     environment:
-      SERVER_ENABLED: no
+      DOMAIN: ${DOMAIN}
       HTTPS_PROXY: http://ddns-updater-http-proxy:3128
     env_file:
       - local.env
+    depends_on:
+      - ddns-updater-http-proxy
     restart: ${DOCKER_RESTART}
 
-  # ddns-updater reaches the internet only through these two proxies: HTTPS to
-  # the domains in ./volumes/http-proxy-domains.txt, and DNS for the domain only
+  # ddns-updater reaches the internet only through this proxy, which allows
+  # HTTPS to the domains in ./volumes/http-proxy-domains.txt
   ddns-updater-http-proxy:
     build: ./..repo/.proxies/http
     dns: ${INTERNET_NETWORK_DNS_ADDRESS}
@@ -31,27 +27,9 @@ services:
       - ./volumes/http-proxy-domains.txt:/etc/tinyproxy/domains.txt:ro
     restart: ${DOCKER_RESTART}
 
-  ddns-updater-dns-proxy:
-    build: ./..repo/.proxies/dns
-    networks:
-      internet:
-        gw_priority: 1
-      ddns-updater:
-    command:
-      - --server=/${DOMAIN}/${PUBLIC_RESOLVER_ADDRESS}
-    restart: ${DOCKER_RESTART}
-
 networks:
   ddns-updater:
     internal: true
   internet:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
-
-volumes:
-  ddns-updater-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/data

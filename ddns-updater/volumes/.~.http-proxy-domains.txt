@@ -1,9 +1,6 @@
 # Dynu's API, through which ddns-updater sets the record
 api.dynu.com
 
-# The service that reports the public IP, as set in PUBLICIP_HTTP_PROVIDERS in
+# The service that answers with the public IP, as set in PUBLIC_IP_URL in
 # local.env
 fake-dynu
-
-# Left out on purpose: github.com, which ddns-updater only uses for a check at
-# startup that logs a warning when it fails
