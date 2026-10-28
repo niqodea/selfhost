@@ -132,6 +132,8 @@ File dependencies are declared using plugs, a two-layer symlink system that make
 
 Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
 
+Every env socket (`._..env` and each `._.local.env`) is treated as holding secrets: its mode is 600, and startup stops if anyone but its owner can read it.
+
 This makes dependencies visible in version control without committing environment-specific paths or secrets.
 Learn more at the [plugs repo](https://github.com/niqodea/plugs).
 
