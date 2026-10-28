@@ -39,8 +39,8 @@ done
 # Startup never downloads or builds an image, so a boot works without network
 docker compose --project-directory "$root" --all-resources up --detach --pull never --no-build
 
-# The infra modules start before the apps, because the apps send their DNS
-# queries to them, and some apps send all their traffic through them
+# The infra modules start before the apps, since the apps reach the internet
+# through them, and devices reach the apps through them
 for module_path in "$root"/infra/* "$root"/apps/*; do
     if [ -f "$module_path/route" ]; then
         "$module_path/route" up
