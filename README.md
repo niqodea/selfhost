@@ -113,7 +113,7 @@ Both resolvers also answer the domain with Caddy's address and `syncthing.intern
 ### Volume Ownership
 
 Every app writes as the deployment owner, a system user named after the Compose project, whose IDs are `PUID` and `PGID`.
-It owns all state and content, and you join its group to edit content and read state without `sudo`, except Postgres's, which Postgres keeps private.
+It owns all state and content, and you join its group to edit content and read state without `sudo`, except what an app keeps private, like Postgres's data and WireGuard's keys.
 - **App state** (databases, app configs, caches): a plain bind mount of the app's directory in `volumes/`.
 - **Shared content** (downloads, synced directories, git repositories, media): a plain bind mount of the app's directory in `content/`, whose setgid bit and default ACL keep what you and the apps create there writable by the group.
 - **Config you write** (templates): a read-only bind mount.
