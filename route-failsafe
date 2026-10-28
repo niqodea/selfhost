@@ -29,9 +29,9 @@ for rule in 'blackhole' "to $GLUETUN_NETWORK_SUBNET lookup main"; do
     while ip rule del from "$GLUETUN_NETWORK_SUBNET" $rule 2> /dev/null; do :; done
 done
 
-# A rule added without a priority comes before every other rule, so these take
-# the last priorities before the main table's, behind the Gluetun route rule
-# however often they are added again
+# The last priorities before the main table at 32766, so these only catch
+# traffic that no earlier rule routes
+# Ref: adr/systemd-startup.md
 if [ "$1" = up ]; then
     # allow local traffic
     ip rule add priority 32760 from "$GLUETUN_NETWORK_SUBNET" to "$GLUETUN_NETWORK_SUBNET" lookup main

@@ -36,7 +36,10 @@ ip \
     route "$OP" \
     default via "$GLUETUN_NETWORK_GATEWAY_ADDRESS" \
     table "$GLUETUN_TABLE"
+# A fixed priority, since a rule added without one comes before all others
+# Ref: adr/systemd-startup.md
 ip \
     rule "$OP" \
+    priority 32750 \
     from "$GLUETUN_NETWORK_SUBNET" \
     table "$GLUETUN_TABLE"
