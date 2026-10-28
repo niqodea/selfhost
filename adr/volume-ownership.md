@@ -19,7 +19,12 @@ Each volume is one of three kinds:
 - **Shared content** is a plain bind mount of the app's directory in `content/`.
 - **Config you write** is a read-only bind mount, so its owner does not matter.
 
-State is not a named volume, because Docker copies the image's directory and its owner into an empty named volume, which replaces the owner install set.
+## Considered Options
+
+- **Named volumes for state**: Docker copies the image's directory and its owner into an empty named volume, so the volume loses the owner install set.
+- **`userns-remap`**: root in every container becomes an unprivileged host user, but every app that writes content must set `userns_mode: host`, Gluetun needs the host's tunnel device passed in, and Docker downloads every image again.
+- **A user per app**: stops an app that escapes its container from reading the other apps' data, at the cost of a host user with its own IDs for every app.
+- **ID-mapped mounts or bindfs**: a container writes as its own user and the file is stored as owned by you, but Docker has no option for ID-mapped mounts, and bindfs passes every file access through a userspace program.
 
 ## Trade-offs
 
