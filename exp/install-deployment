@@ -23,6 +23,7 @@ find "$deployment_path" -type f -name '.~.*' | while IFS= read -r sample; do
     sample_name="$(basename "$sample")"
     cp "$sample" "$(dirname "$sample")/._.${sample_name#.~.}"
 done
+chmod 600 "$deployment_path"/._..env "$deployment_path"/*/*/._.local.env
 
 for plug in "$deployment_path"/apps/*/content/*; do
     socket="$(dirname "$plug")/$(readlink "$plug")"

@@ -6,6 +6,12 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
+# Env sockets hold tokens and passwords
+find "$root" -name '.=.*' -prune -o -name '._.*env' -perm /077 -print | while IFS= read -r socket; do
+    >&2 echo "Error: $socket is readable by others than its owner"
+    exit 1
+done
+
 # A missing directory socket means lost data, and a missing socket file means
 # missing config, so startup stops instead of creating either. Docker's errors
 # for both do not say a socket is missing
