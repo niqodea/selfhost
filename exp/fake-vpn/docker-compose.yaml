@@ -1,14 +1,14 @@
 services:
   fake-vpn:
     # No official Docker image exists, using linuxserver.io community image
-    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
-      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    image: "lscr.io/linuxserver/wireguard:1.0.20260223-r0-ls127\
+      @sha256:e2f655e1956a6db476bc879bf721f3f8bfed49c6d8fbcf39495d7ecb991d8228"
     networks:
       internet:
         ipv4_address: ${INTERNET_NETWORK_FAKE_VPN_ADDRESS}
     volumes:
       # Without PEERS, the image brings up the wg0.conf it is given as it is
-      - ./wg0.conf:/config/wg0.conf:ro
+      - ./wg0.conf:/config/wg_confs/wg0.conf:ro
     cap_add:
       - NET_ADMIN
     sysctls:

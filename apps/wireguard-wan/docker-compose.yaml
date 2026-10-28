@@ -2,8 +2,8 @@ services:
 
   wireguard-wan:
     # No official Docker image exists, using linuxserver.io community image
-    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
-      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    image: "lscr.io/linuxserver/wireguard:1.0.20260223-r0-ls127\
+      @sha256:e2f655e1956a6db476bc879bf721f3f8bfed49c6d8fbcf39495d7ecb991d8228"
     dns: ${GLUETUN_NETWORK_DNS_ADDRESS}
     networks:
       gluetun:
@@ -22,10 +22,11 @@ services:
       # The image reads the template only from this path, inside the saved
       # /config. A template built into the image would reach only a fresh
       # install, so the mount is what keeps the template current. The image
-      # builds /config/wg0.conf from it only when that file is missing or a
-      # setting like PEERDNS changes, so deleting volumes/config/wg0.conf applies
-      # a template edit, and keeps every key
-      # Ref: https://github.com/linuxserver/docker-wireguard/blob/v1.0.20210914-ls126/root/etc/s6-overlay/s6-rc.d/init-wireguard-confs/run
+      # builds /config/wg_confs/wg0.conf from it only when that file is missing
+      # or a setting like PEERDNS changes, so deleting
+      # volumes/config/wg_confs/wg0.conf applies a template edit, and keeps every
+      # key
+      # Ref: https://github.com/linuxserver/docker-wireguard/blob/1.0.20260223-r0-ls127/root/etc/s6-overlay/s6-rc.d/init-wireguard-confs/run
       # read-only mount causes harmless chown warning at startup
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
       - wireguard-wan-config:/config

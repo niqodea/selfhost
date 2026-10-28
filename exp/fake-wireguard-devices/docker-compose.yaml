@@ -5,8 +5,8 @@
 services:
   fake-wireguard-lan-device:
     # No official Docker image exists, using linuxserver.io community image
-    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
-      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    image: "lscr.io/linuxserver/wireguard:1.0.20260223-r0-ls127\
+      @sha256:e2f655e1956a6db476bc879bf721f3f8bfed49c6d8fbcf39495d7ecb991d8228"
     # The device reaches the server at the host's published port, as a device
     # from outside does
     network_mode: bridge
@@ -14,7 +14,7 @@ services:
       - ${DOMAIN}:host-gateway
     volumes:
       # laptop is one of the peers in exp's samples
-      - ./..repo/apps/wireguard-lan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg0.conf:ro
+      - ./..repo/apps/wireguard-lan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg_confs/wg0.conf:ro
       - ./..exp/certificates/root.crt:/root.crt:ro
     environment:
       - CURL_CA_BUNDLE=/root.crt
@@ -25,8 +25,8 @@ services:
 
   fake-wireguard-wan-device:
     # No official Docker image exists, using linuxserver.io community image
-    image: "lscr.io/linuxserver/wireguard:v1.0.20210914-ls126\
-      @sha256:a27dc2b63245fa1c20fc55edf9aebf7cf3add71000557177c9fa62dba65b5d29"
+    image: "lscr.io/linuxserver/wireguard:1.0.20260223-r0-ls127\
+      @sha256:e2f655e1956a6db476bc879bf721f3f8bfed49c6d8fbcf39495d7ecb991d8228"
     # The device reaches the server at the host's published port, as a device
     # from outside does
     network_mode: bridge
@@ -34,7 +34,7 @@ services:
       - ${DOMAIN}:host-gateway
     volumes:
       # laptop is one of the peers in exp's samples
-      - ./..repo/apps/wireguard-wan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg0.conf:ro
+      - ./..repo/apps/wireguard-wan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg_confs/wg0.conf:ro
       - ./..exp/certificates/root.crt:/root.crt:ro
     environment:
       - CURL_CA_BUNDLE=/root.crt
