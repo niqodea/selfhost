@@ -6,9 +6,6 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 
 | App                 | Description                                       |
 |---------------------|---------------------------------------------------|
-| **caddy**           | Reverse proxy with automatic Let's Encrypt SSL    |
-| **wireguard-lan**   | VPN server for remote access to local services    |
-| **wireguard-wan**   | VPN server with anonymous exit via Gluetun        |
 | **immich**          | Photo and video backup                            |
 | **jellyfin**        | Media streaming server                            |
 | **prowlarr**        | Indexer manager with anonymous exit via Gluetun   |
@@ -57,9 +54,12 @@ prepare-images                    # Download and build the images
 startup                           # Start the services
 shutdown                          # Stop the services
 infra/                            # Network modules, started before the apps
+├── caddy/                        # Reverse proxy to the apps, with automatic certificates
 ├── ddns-updater/                 # Points the domain at the public IP
 ├── dns/                          # DNS resolvers with the blocklist
-└── gluetun-gateway/              # VPN gateway
+├── gluetun-gateway/              # VPN gateway
+├── wireguard-lan/                # VPN server for reaching the apps
+└── wireguard-wan/                # VPN server with anonymous exit via Gluetun
 proxies/                          # Images of the proxies through which apps reach the internet
 ├── http/                         # HTTPS, only to the domains the app lists
 └── dns/                          # DNS, only for the names the app forwards
@@ -143,7 +143,7 @@ Breadcrumbs are a navigation pattern using specially-named symlinks (prefixed wi
 Each breadcrumb points either further up the chain (`../..foo`) or to the current directory (`.`) when the target is reached.
 
 ```
-./caddy/..repo  ->  ../..repo  (points up one level)
+./infra/caddy/..repo  ->  ../..repo  (points up one level)
 ./..repo        ->  .          (marks arrival at ./)
 ```
 

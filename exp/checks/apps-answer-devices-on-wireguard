@@ -16,7 +16,7 @@ for device in fake-wireguard-lan-device fake-wireguard-wan-device; do
         sleep 1
     done
 
-    for app in $(sed -n 's/^\t@\([a-z]*\) host .*/\1/p' "$root/apps/caddy/Caddyfile"); do
+    for app in $(sed -n 's/^\t@\([a-z]*\) host .*/\1/p' "$root/infra/caddy/Caddyfile"); do
         # Caddy answers 502 when it cannot reach the app, so any other answer
         # comes from the app
         if ! code="$(docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" \

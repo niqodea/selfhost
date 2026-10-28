@@ -14,7 +14,7 @@ services:
       - ${DOMAIN}:host-gateway
     volumes:
       # laptop is one of the peers in exp's samples
-      - ./..repo/apps/wireguard-lan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg_confs/wg0.conf:ro
+      - ./..repo/infra/wireguard-lan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg_confs/wg0.conf:ro
       - ./..exp/certificates/root.crt:/root.crt:ro
     environment:
       - CURL_CA_BUNDLE=/root.crt
@@ -34,7 +34,7 @@ services:
       - ${DOMAIN}:host-gateway
     volumes:
       # laptop is one of the peers in exp's samples
-      - ./..repo/apps/wireguard-wan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg_confs/wg0.conf:ro
+      - ./..repo/infra/wireguard-wan/volumes/config/peer_laptop/peer_laptop.conf:/config/wg_confs/wg0.conf:ro
       - ./..exp/certificates/root.crt:/root.crt:ro
     environment:
       - CURL_CA_BUNDLE=/root.crt
