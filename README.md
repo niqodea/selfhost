@@ -116,6 +116,11 @@ Each volume is one of three kinds, and the kind decides who owns its files:
 - **Shared content** (downloads, synced folders, git repositories, media): a plain bind mount of the app's folder in `content/`, owned by the deployment owner, whose IDs are `PUID` and `PGID`. Only the apps that write there run as those IDs.
 - **Config you write** (templates): a read-only bind mount.
 
+The user an app runs as owns its state, and each app runs as one of three:
+- **Root**: caddy, gluetun-gateway, immich, jellyfin and vaultwarden.
+- **The deployment owner**: git, qbittorrent and syncthing, which write shared content.
+- **The image's own user**: immich-postgres (999), radicale (2999), prowlarr (911), and wireguard-lan and wireguard-wan (911).
+
 See [the ADR](adr/volume-ownership.md) for why.
 
 ### Plugs
