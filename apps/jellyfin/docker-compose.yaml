@@ -2,12 +2,13 @@ services:
   jellyfin:
     image: "docker.io/jellyfin/jellyfin:10.11.6\
       @sha256:333b647716631443a43c7fabac4b0c46b4e2f036bad19547e00958f10f721b85"
+    user: ${PUID}:${PGID}
     networks:
       jellyfin:
       webapps:
     volumes:
-      - jellyfin-config:/config
-      - jellyfin-cache:/cache
+      - ./volumes/config:/config
+      - ./volumes/cache:/cache
       - ./content/movies:/data/movies
       - ./content/shows:/data/shows
     environment:
@@ -38,17 +39,3 @@ networks:
   webapps:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
-
-volumes:
-  jellyfin-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/config
-  jellyfin-cache:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/cache

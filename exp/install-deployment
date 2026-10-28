@@ -9,7 +9,13 @@ root="$(dirname "$(realpath "$0")")/..repo"
 
 deployment_path="$1"
 
-"$root/host-setup/install-deployment" "$deployment_path"
+# Exp is the only deployment in its VM, so its owner takes index 0
+if ! getent passwd selfh > /dev/null; then
+    groupadd --system --gid 900 selfh
+    useradd --system --uid 900 --gid 900 --no-create-home --shell /usr/sbin/nologin selfh
+fi
+
+"$root/host-setup/install-deployment" "$deployment_path" selfh
 
 cp -P -R "$root/exp" "$deployment_path/exp"
 
@@ -18,11 +24,10 @@ find "$deployment_path" -type f -name '.~.*' | while IFS= read -r sample; do
     cp "$sample" "$(dirname "$sample")/._.${sample_name#.~.}"
 done
 
-owner="$(sed -n 's/^PUID=//p' "$deployment_path/.env"):$(sed -n 's/^PGID=//p' "$deployment_path/.env")"
 for plug in "$deployment_path"/apps/*/content/*; do
     socket="$(dirname "$plug")/$(readlink "$plug")"
-    mkdir "$socket"
-    chown "$owner" "$socket"
+    install -d -o selfh -g selfh -m 2770 "$socket"
+    setfacl -d -m g::rwX "$socket"
 done
 
 "$deployment_path/exp/generate-certificates"

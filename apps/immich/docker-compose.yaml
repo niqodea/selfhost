@@ -3,11 +3,12 @@ services:
   immich:
     image: "ghcr.io/immich-app/immich-server:v3.3.3\
       @sha256:bae7664ff3aa4c2c1fcbdcdd86b40b105643c5f861f3e6a770fc760089f25862"
+    user: ${PUID}:${PGID}
     networks:
       immich:
       webapps:
     volumes:
-      - immich-data:/data
+      - ./volumes/data:/data
       # Your photos, which Immich shows as an external library: it indexes
       # them where they are and never moves or renames them. Read-only, so
       # Immich cannot change them
@@ -33,10 +34,11 @@ services:
   immich-postgres:
     image: "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0\
       @sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23"
+    user: ${PUID}:${PGID}
     networks:
       immich:
     volumes:
-      - immich-postgres:/var/lib/postgresql/data
+      - ./volumes/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
@@ -51,17 +53,3 @@ networks:
   webapps:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
-
-volumes:
-  immich-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/data
-  immich-postgres:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/postgres

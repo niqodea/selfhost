@@ -6,8 +6,10 @@ services:
       prowlarr:
       webapps:
     volumes:
-      - prowlarr-config:/config
+      - ./volumes/config:/config
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - HTTPS_PROXY=http://prowlarr-http-proxy:3128
     depends_on:
       - prowlarr-http-proxy
@@ -35,11 +37,3 @@ networks:
   webapps:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
-
-volumes:
-  prowlarr-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/config

@@ -2,6 +2,7 @@ services:
   syncthing:
     image: "docker.io/syncthing/syncthing:2.0.14\
       @sha256:6d2ab058383b533e045cf2c32fc4c6bbe87c612c92bc2aca9f552fb099b2e123"
+    user: ${PUID}:${PGID}
     networks:
       peers:
         gw_priority: 1
@@ -9,11 +10,6 @@ services:
       webapps:
     volumes:
       - ./content/data:/var/syncthing
-    environment:
-      # The entrypoint switches to these IDs, so synced folders belong to the
-      # deployment owner
-      - PUID=${PUID}
-      - PGID=${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:

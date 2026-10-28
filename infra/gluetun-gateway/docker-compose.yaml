@@ -7,8 +7,10 @@ services:
       gluetun:  # NOTE: Needs to be eth0 for the iptables post-rules to work
         ipv4_address: ${GLUETUN_NETWORK_GATEWAY_ADDRESS}
     volumes:
-      - gluetun-gateway-config:/gluetun
+      - ./volumes/config:/gluetun
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - UPDATER_PERIOD=480h
       - HEALTH_SERVER_ADDRESS=0.0.0.0:9999
     env_file:
@@ -28,11 +30,12 @@ services:
   # the provider cannot be reached
   gluetun-servers-updater:
     build: .
+    user: ${PUID}:${PGID}
     dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
       internet:
     volumes:
-      - gluetun-gateway-config:/gluetun
+      - ./volumes/config:/gluetun
       # Go trusts every certificate file in /etc/ssl/certs, on top of the
       # image's CA bundle
       - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
@@ -56,11 +59,3 @@ networks:
   gluetun:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
-
-volumes:
-  gluetun-gateway-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/config

@@ -22,10 +22,11 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 
 ## Getting Started
 
-1. Clone the repo and create a deployment directory (e.g., `/opt/selfhost`)
+1. Clone the repo, install `acl`, and create the deployment owner, then join its group. Its user and group ID is 900 plus the deployment's index, like `selfh` with 900 and `selfh-dev` with 901:
+   `groupadd --system --gid 900 selfh && useradd --system --uid 900 --gid 900 --no-create-home --shell /usr/sbin/nologin selfh && usermod -aG selfh "$USER"`
 2. Install base systemd files: `host-setup/install-systemd-base`
-3. Install deployment: `host-setup/install-deployment /opt/selfhost`
-4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`), and plug each app's `content/` as the deployment owner, with an empty directory or a link to your data
+3. Install deployment: `host-setup/install-deployment /opt/selfhost selfh`
+4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`), and plug each app's `content/` with a directory owned by the deployment owner, or a link to one, made shared with the group: `install -d -o selfh -g selfh -m 2770 <dir> && setfacl -d -m g::rwX <dir>`
 5. Download and build the images: `/opt/selfhost/prepare-images`
 6. Enable startup service: `host-setup/configure-deployment-startup /opt/selfhost up`
 
@@ -111,17 +112,14 @@ Both resolvers also answer the domain with Caddy's address and `syncthing.intern
 
 ### Volume Ownership
 
-Each volume is one of three kinds, and the kind decides who owns its files:
-- **App state** (databases, app configs, caches): a named volume backed by the app's folder in `volumes/`, with a name that starts with the app's name. The app runs as its image's default user.
-- **Shared content** (downloads, synced folders, git repositories, media): a plain bind mount of the app's folder in `content/`, owned by the deployment owner, whose IDs are `PUID` and `PGID`. Only the apps that write there run as those IDs.
+Every app writes as the deployment owner, a system user named after the Compose project, whose IDs are `PUID` and `PGID`.
+It owns all state and content, and you join its group to edit content and read state without `sudo`, except Postgres's, which Postgres keeps private.
+- **App state** (databases, app configs, caches): a plain bind mount of the app's folder in `volumes/`.
+- **Shared content** (downloads, synced folders, git repositories, media): a plain bind mount of the app's folder in `content/`, whose setgid bit and default ACL keep what you and the apps create there writable by the group.
 - **Config you write** (templates): a read-only bind mount.
 
-The user an app runs as owns its state, and decides what the app can reach if it is hacked:
-- **Root**, only for an app that needs it, and only while it does: gluetun-gateway, and wireguard-lan and wireguard-wan, whose image sets up the network as root and gives their state to its own user (911).
-- **The deployment owner**, only for an app that writes shared content: git, qbittorrent and syncthing.
-- **A user of its own**, for every other app, so that it reaches only its own state: immich-postgres (999), radicale (2999) and prowlarr (911).
-
-Caddy, immich, jellyfin and vaultwarden still run as root without needing it.
+An app runs as the deployment owner through `user:`, or through `PUID` and `PGID` for an image that starts as root and switches to them.
+Only gluetun-gateway, wireguard-lan and wireguard-wan run as root, to set up their network, and they still write their files as the deployment owner.
 
 See [the ADR](adr/volume-ownership.md) for why.
 

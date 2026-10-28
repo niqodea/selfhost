@@ -2,10 +2,11 @@ services:
   vaultwarden:
     image: "docker.io/vaultwarden/server:1.33.2-alpine\
       @sha256:63cce7624f655f83ad5bab66ef62bc3e3327116b068704bfbbda5d0c1b3003be"
+    user: ${PUID}:${PGID}
     networks:
       webapps:
     volumes:
-      - vaultwarden-data:/data
+      - ./volumes/data:/data
     environment:
       # Enable more efficient multi-device sync
       - WEBSOCKET_ENABLED=true
@@ -17,11 +18,3 @@ networks:
   webapps:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
-
-volumes:
-  vaultwarden-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/data

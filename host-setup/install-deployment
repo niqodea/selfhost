@@ -5,6 +5,7 @@ set -eu
 root="$(dirname "$(realpath "$0")")/..repo"
 
 deployment_path="$1"
+owner="$2"
 
 mkdir "$deployment_path"
 
@@ -13,10 +14,10 @@ cp -P -R "$root/infra" "$deployment_path/infra"
 cp -P -R "$root/proxies" "$deployment_path/proxies"
 cp -P -R "$root/apps" "$deployment_path/apps"
 
-# An app's state starts as an empty directory, which Docker fills from the
-# image on the app's first start
+# An app's state starts as an empty directory owned by the deployment owner,
+# whom every app writes as
 find "$deployment_path" -type l -path '*/volumes/*' -lname '.=.*' | while IFS= read -r plug; do
-    mkdir "$(dirname "$plug")/$(readlink "$plug")"
+    install -d -o "$owner" -g "$owner" -m 750 "$(dirname "$plug")/$(readlink "$plug")"
 done
 
 echo 'Success'

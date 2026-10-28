@@ -4,6 +4,7 @@ services:
       context: .
       args:
         CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN}
+    user: ${PUID}:${PGID}
     networks:
       caddy:
       peers:
@@ -13,8 +14,8 @@ services:
       # Go trusts every certificate file in /etc/ssl/certs, on top of the image's
       # CA bundle
       - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
-      - caddy-data:/data
-      - caddy-config:/config
+      - ./volumes/data:/data
+      - ./volumes/config:/config
     environment:
       - DOMAIN=${DOMAIN}
       - HTTPS_PROXY=http://caddy-http-proxy:3128
@@ -59,17 +60,3 @@ networks:
   internet:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
-
-volumes:
-  caddy-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/data
-  caddy-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/config

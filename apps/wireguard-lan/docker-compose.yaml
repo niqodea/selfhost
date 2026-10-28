@@ -22,8 +22,10 @@ services:
       # Ref: https://github.com/linuxserver/docker-wireguard/blob/1.0.20260223-r0-ls127/root/etc/s6-overlay/s6-rc.d/init-wireguard-confs/run
       # read-only mount causes harmless chown warning at startup
       - ./volumes/server-template.conf:/config/templates/server.conf:ro
-      - wireguard-lan-config:/config
+      - ./volumes/config:/config
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_LAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
@@ -54,11 +56,3 @@ networks:
   peers:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}
-
-volumes:
-  wireguard-lan-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/config

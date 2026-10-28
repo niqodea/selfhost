@@ -2,20 +2,17 @@ services:
   qbittorrent:
     image: "docker.io/qbittorrentofficial/qbittorrent-nox:5.1.4-2\
        @sha256:85fe2690f418dabffc4907276b3cdffcb7880c7114157b32f932d3b97bac45af"
+    user: ${PUID}:${PGID}
     dns: ${GLUETUN_NETWORK_DNS_ADDRESS}
     networks:
       gluetun:
         gw_priority: 1
       webapps:
     volumes:
-      - qbittorrent-config:/config
+      - ./volumes/config:/config
       - ./content/downloads:/downloads
     environment:
       - QBT_LEGAL_NOTICE=confirm
-      # The entrypoint switches to these IDs, so downloads belong to the
-      # deployment owner
-      - PUID=${PUID}
-      - PGID=${PGID}
     restart: ${DOCKER_RESTART}
 
 networks:
@@ -25,11 +22,3 @@ networks:
   webapps:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
-
-volumes:
-  qbittorrent-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./volumes/config
