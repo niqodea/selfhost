@@ -114,7 +114,7 @@ Both resolvers also answer the domain with Caddy's address and `syncthing.intern
 Each volume is one of three kinds, and the kind decides who owns its files:
 - **App state** (databases, app configs, caches): a named volume backed by the app's folder in `volumes/`, with a name that starts with the app's name. The app runs as its image's default user.
 - **Shared content** (downloads, synced folders, git repositories, media): a plain bind mount of the app's folder in `content/`, owned by the deployment owner, whose IDs are `PUID` and `PGID`. Only the apps that write there run as those IDs.
-- **Config you write** (Caddyfile, templates): a read-only bind mount.
+- **Config you write** (templates): a read-only bind mount.
 
 See [the ADR](adr/volume-ownership.md) for why.
 

@@ -10,7 +10,6 @@ services:
         ipv4_address: ${PEERS_NETWORK_CADDY_ADDRESS}
       webapps:
     volumes:
-      - ./volumes/Caddyfile:/etc/caddy/Caddyfile:ro
       # Go trusts every certificate file in /etc/ssl/certs, on top of the image's
       # CA bundle
       - ${EXTRA_CA_CERTIFICATE_PATH}:/etc/ssl/certs/extra-ca.crt:ro
