@@ -34,8 +34,10 @@ services:
       - SERVERURL=${DOMAIN}
       - SERVERPORT=${WIREGUARD_WAN_HOST_PORT}
       - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
-      # Tunnel everything through vpn
-      - ALLOWEDIPS=0.0.0.0/0  # or 0.0.0.0/1,128.0.0.0/1 for Windows clients
+      # With ::/0, devices send IPv6 into the tunnel instead of outside the VPN,
+      # and the server drops it: WireGuard accepts from a device only its IPv4
+      # tunnel address
+      - ALLOWEDIPS=0.0.0.0/0,::/0  # or 0.0.0.0/1,128.0.0.0/1,::/1,8000::/1 for Windows clients
       # Disable the image's own DNS server, which would answer on every network
       # this container joins, since peers' DNS is forwarded upstream instead
       # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
