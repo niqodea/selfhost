@@ -8,12 +8,10 @@ deployment_path="$1"
 
 mkdir "$deployment_path"
 
-cp -P "$root/docker-compose.yaml" "$root/route-failsafe" "$root/startup" "$root/prepare-images" "$root/.env" "$root/.~..env" "$root/..repo" "$deployment_path"
-cp -P -R "$root/.infra" "$deployment_path/.infra"
-cp -P -R "$root/.proxies" "$deployment_path/.proxies"
-for path in "$root"/*/; do
-    cp -P -R "$path" "$deployment_path/$(basename "$path")"
-done
+cp -P "$root/docker-compose.yaml" "$root/route-failsafe" "$root/startup" "$root/shutdown" "$root/prepare-images" "$root/.env" "$root/.~..env" "$root/..repo" "$deployment_path"
+cp -P -R "$root/infra" "$deployment_path/infra"
+cp -P -R "$root/proxies" "$deployment_path/proxies"
+cp -P -R "$root/apps" "$deployment_path/apps"
 
 # An app's state starts as an empty directory, which Docker fills from the
 # image on the app's first start

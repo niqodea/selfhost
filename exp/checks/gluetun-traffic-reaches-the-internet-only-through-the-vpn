@@ -9,44 +9,44 @@ root="$(dirname "$(realpath "$0")")/..repo"
 
 network="$(sed -n 's/^COMPOSE_PROJECT_NAME=//p' "$root/.env")_$(sed -n 's/^INTERNET_NETWORK=//p' "$root/.env")"
 vpn_address="$(sed -n 's/^INTERNET_NETWORK_FAKE_VPN_ADDRESS=//p' "$root/.env")"
-vpn_container="$(docker compose --project-directory "$root/.exp/fake-vpn" ps --quiet fake-vpn)"
+vpn_container="$(docker compose --project-directory "$root/exp/fake-vpn" ps --quiet fake-vpn)"
 # Cloudflare's DNS server, which also answers HTTP, stands in for the internet
 internet_address=1.1.1.1
 
-docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet up --detach fake-wireguard-wan-device
-trap 'docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet down' EXIT
-until docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-wan-device wg show wg0 > /dev/null 2>&1; do
+docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet up --detach fake-wireguard-wan-device
+trap 'docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet down' EXIT
+until docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-wan-device wg show wg0 > /dev/null 2>&1; do
     sleep 1
 done
 
-if ! docker compose --project-directory "$root/qbittorrent" exec --no-TTY qbittorrent \
+if ! docker compose --project-directory "$root/apps/qbittorrent" exec --no-TTY qbittorrent \
     curl --silent --output /dev/null --max-time 10 "http://$internet_address"; then
     >&2 echo 'Error: qbittorrent does not reach the internet'
     exit 1
 fi
-if ! docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-wan-device \
+if ! docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-wan-device \
     curl --silent --output /dev/null --max-time 10 "http://$internet_address"; then
     >&2 echo 'Error: a device on wireguard-wan does not reach the internet'
     exit 1
 fi
 
 docker network disconnect "$network" "$vpn_container"
-trap 'docker network connect --ip "$vpn_address" "$network" "$vpn_container"; docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet down' EXIT
+trap 'docker network connect --ip "$vpn_address" "$network" "$vpn_container"; docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet down' EXIT
 
-if docker compose --project-directory "$root/qbittorrent" exec --no-TTY qbittorrent \
+if docker compose --project-directory "$root/apps/qbittorrent" exec --no-TTY qbittorrent \
     curl --silent --output /dev/null --max-time 10 "http://$internet_address"; then
     >&2 echo 'Error: qbittorrent reaches the internet while the VPN is cut off'
     exit 1
 fi
-if docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-wan-device \
+if docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-wan-device \
     curl --silent --output /dev/null --max-time 10 "http://$internet_address"; then
     >&2 echo 'Error: a device on wireguard-wan reaches the internet while the VPN is cut off'
     exit 1
 fi
 
 docker network connect --ip "$vpn_address" "$network" "$vpn_container"
-trap 'docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet down' EXIT
-until docker compose --project-directory "$root/qbittorrent" exec --no-TTY qbittorrent \
+trap 'docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet down' EXIT
+until docker compose --project-directory "$root/apps/qbittorrent" exec --no-TTY qbittorrent \
     curl --silent --output /dev/null --max-time 10 "http://$internet_address"; do
     sleep 1
 done

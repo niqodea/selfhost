@@ -9,7 +9,7 @@ root="$(dirname "$(realpath "$0")")"
 # A missing directory socket means lost data, and a missing socket file means
 # missing config, so startup stops instead of creating either. Docker's errors
 # for both do not say a socket is missing
-find "$root"/*/ "$root"/.infra/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
+find "$root"/apps/*/ "$root"/infra/*/ -name '.=.*' -prune -o -type l -print | while IFS= read -r plug; do
     if ! [ -e "$plug" ]; then
         >&2 echo "Error: $plug points to nothing at $(readlink "$plug")"
         exit 1
@@ -19,7 +19,7 @@ done
 # Docker keeps the owner of a bind mount, and the apps that write content run
 # as the deployment owner, so they cannot write into content owned by anyone else
 owner="$(sed -n 's/^PUID=//p' "$root/.env"):$(sed -n 's/^PGID=//p' "$root/.env")"
-for plug in "$root"/*/content/*; do
+for plug in "$root"/apps/*/content/*; do
     # --numeric-uid-gid, and -L follows the plug to the directory it reaches
     content_owner="$(ls -n -L -d "$plug" | awk '{ print $3 ":" $4 }')"
     if [ "$content_owner" != "$owner" ]; then
@@ -34,11 +34,7 @@ docker compose --project-directory "$root" --all-resources up --detach --pull ne
 
 # The infra modules start before the apps, because the apps send their DNS
 # queries to them, and some apps send all their traffic through them
-for module_path in "$root"/.infra/* "$root"/*; do
-    if ! [ -d "$module_path" ]; then
-        continue
-    fi
-
+for module_path in "$root"/infra/* "$root"/apps/*; do
     if [ -f "$module_path/route" ]; then
         "$module_path/route" up
     fi

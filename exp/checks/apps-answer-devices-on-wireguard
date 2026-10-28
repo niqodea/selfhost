@@ -8,18 +8,18 @@ root="$(dirname "$(realpath "$0")")/..repo"
 
 domain="$(sed -n 's/^DOMAIN=//p' "$root/.env")"
 
-docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet up --detach
-trap 'docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet down' EXIT
+docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet up --detach
+trap 'docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet down' EXIT
 
 for device in fake-wireguard-lan-device fake-wireguard-wan-device; do
-    until docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY "$device" wg show wg0 > /dev/null 2>&1; do
+    until docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" wg show wg0 > /dev/null 2>&1; do
         sleep 1
     done
 
-    for app in $(sed -n 's/^\t@\([a-z]*\) host .*/\1/p' "$root/caddy/volumes/Caddyfile"); do
+    for app in $(sed -n 's/^\t@\([a-z]*\) host .*/\1/p' "$root/apps/caddy/volumes/Caddyfile"); do
         # Caddy answers 502 when it cannot reach the app, so any other answer
         # comes from the app
-        if ! code="$(docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY "$device" \
+        if ! code="$(docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" \
             curl --silent --output /dev/null --max-time 10 --write-out '%{http_code}' "https://$app.$domain")" || [ "$code" = 502 ]; then
             >&2 echo "Error: $app does not answer $device at https://$app.$domain"
             exit 1

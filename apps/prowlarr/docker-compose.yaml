@@ -16,7 +16,7 @@ services:
   # Prowlarr reaches the internet only through this proxy, which leaves through
   # Gluetun and allows HTTPS to the domains in ./volumes/http-proxy-domains.txt
   prowlarr-http-proxy:
-    build: ./..repo/.proxies/http
+    build: ./..repo/proxies/http
     dns: ${GLUETUN_NETWORK_DNS_ADDRESS}
     networks:
       gluetun:

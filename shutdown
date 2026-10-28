@@ -6,11 +6,7 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-for module_path in "$root"/* "$root"/.infra/*; do
-    if ! [ -d "$module_path" ]; then
-        continue
-    fi
-
+for module_path in "$root"/apps/* "$root"/infra/*; do
     docker compose --project-directory "$module_path" down
 
     if [ -f "$module_path/route" ]; then

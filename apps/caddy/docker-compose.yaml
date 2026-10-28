@@ -28,7 +28,7 @@ services:
   # Caddy reaches the internet only through these two proxies: HTTPS to the
   # domains in ./volumes/http-proxy-domains.txt, and DNS for the domain only
   caddy-http-proxy:
-    build: ./..repo/.proxies/http
+    build: ./..repo/proxies/http
     dns: ${INTERNET_NETWORK_DNS_ADDRESS}
     networks:
       internet:
@@ -39,7 +39,7 @@ services:
     restart: ${DOCKER_RESTART}
 
   caddy-dns-proxy:
-    build: ./..repo/.proxies/dns
+    build: ./..repo/proxies/dns
     networks:
       internet:
         gw_priority: 1

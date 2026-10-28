@@ -11,28 +11,28 @@ dns_address="$(sed -n 's/^INTERNET_NETWORK_DNS_ADDRESS=//p' "$root/.env")"
 # Cloudflare's DNS server, which also answers HTTP, stands in for the internet
 internet_address=1.1.1.1
 
-docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet up --detach
-trap 'docker compose --project-directory "$root/.exp/fake-wireguard-devices" --progress=quiet down' EXIT
+docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet up --detach
+trap 'docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet down' EXIT
 for device in fake-wireguard-lan-device fake-wireguard-wan-device; do
-    until docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY "$device" wg show wg0 > /dev/null 2>&1; do
+    until docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" wg show wg0 > /dev/null 2>&1; do
         sleep 1
     done
 done
 
-docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-lan-device sh -c "
+docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-lan-device sh -c "
     wg set wg0 peer \"\$(wg show wg0 peers)\" allowed-ips 0.0.0.0/0
     ip route add $internet_address dev wg0
     ip route add $dns_address dev wg0
 "
 
-if docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-lan-device \
+if docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY fake-wireguard-lan-device \
     curl --silent --output /dev/null --max-time 10 "http://$internet_address"; then
     >&2 echo 'Error: a device on wireguard-lan reaches the internet'
     exit 1
 fi
 
 for device in fake-wireguard-lan-device fake-wireguard-wan-device; do
-    if docker compose --project-directory "$root/.exp/fake-wireguard-devices" exec --no-TTY "$device" \
+    if docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" \
         nslookup -timeout=5 example.com "$dns_address" > /dev/null 2>&1; then
         >&2 echo "Error: $device reaches the DNS server at $dns_address directly"
         exit 1

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-# Writes the certificates of exp's fakes into .exp/certificates. The CA
+# Writes the certificates of exp's fakes into exp/certificates. The CA
 # certificate comes out byte for byte the same on every machine, so a client can
 # trust it without a copy from the machine that runs exp
 

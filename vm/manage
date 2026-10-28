@@ -3,7 +3,7 @@ set -eu
 
 # Creates the Lima VM that runs exp, or copies the repo into it, at
 # ~/selfh-source
-# Usage: .vm/manage create|push [instance]
+# Usage: vm/manage create|push [instance]
 
 root="$(dirname "$(realpath "$0")")/..repo"
 
@@ -12,7 +12,7 @@ instance="${2:-selfh}"
 
 case "$command" in
     create)
-        limactl start --tty=false --name="$instance" "$root/.vm/lima.yaml"
+        limactl start --tty=false --name="$instance" "$root/vm/lima.yaml"
         ;;
     push)
         # The repo as git sees it: with uncommitted changes, and without what it
