@@ -17,14 +17,14 @@ find "$root"/apps/*/ "$root"/infra/*/ -name '.=.*' -prune -o -type l -print | wh
 done
 
 # Docker keeps the owner of a bind mount, and every app writes as the
-# deployment owner, so an app cannot write into a folder owned by anyone else
+# deployment owner, so an app cannot write into a directory owned by anyone else
 owner="$(sed -n 's/^PUID=//p' "$root/.env"):$(sed -n 's/^PGID=//p' "$root/.env")"
 for plug in "$root"/apps/*/volumes/* "$root"/infra/*/volumes/* "$root"/apps/*/content/*; do
     [ -d "$plug" ] || continue
     # --numeric-uid-gid, and -L follows the plug to the directory it reaches
-    folder_owner="$(ls -n -L -d "$plug" | awk '{ print $3 ":" $4 }')"
-    if [ "$folder_owner" != "$owner" ]; then
-        >&2 echo "Error: $plug is owned by $folder_owner, expected $owner"
+    directory_owner="$(ls -n -L -d "$plug" | awk '{ print $3 ":" $4 }')"
+    if [ "$directory_owner" != "$owner" ]; then
+        >&2 echo "Error: $plug is owned by $directory_owner, expected $owner"
         exit 1
     fi
 done
