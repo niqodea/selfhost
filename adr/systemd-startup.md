@@ -1,6 +1,6 @@
 # ADR: Systemd-Managed Startup with Pre-Docker Failsafe Routing
 
-**Decision:** Use systemd to configure a failsafe blackhole route before Docker starts, then run a startup script that handles app-specific routes and containers.
+**Decision:** Have Docker configure a failsafe blackhole route before it starts, then run a startup script that handles app-specific routes and containers.
 
 ## Context
 
@@ -19,11 +19,14 @@ Docker has no pre-start hooks. Without them, `unless-stopped`/`always` policies 
 
 ## Solution
 
-### selfh-route-failsafe (Before Docker)
+### route-failsafe (Before Docker)
 
 Configures a blackhole on the Gluetun network so any prematurely-started container drops traffic rather than leaking it.
 
-A systemd drop-in makes `docker.service` depend on this unit (`Requires=` + `After=`), ensuring the failsafe is always active before Docker can start containers.
+A systemd drop-in per deployment makes `docker.service` run it as `ExecStartPre=`, so Docker closes the failsafe before every start, and does not start when that fails.
+The script removes its earlier copies first, since it runs on every Docker start.
+
+It is not a unit of its own, because Docker would then need `Requires=` on it, and stopping one deployment's failsafe unit would stop Docker and every other deployment with it.
 
 ### selfh-startup (After Docker)
 
@@ -35,15 +38,14 @@ However, the upstream blackhole failsafe ensures traffic is safely dropped rathe
 
 ## Boot Sequence
 
-1. `selfh-route-failsafe` -> blackhole active
+1. `docker.service` runs each deployment's `route-failsafe up` -> blackhole active
 2. `docker.service` starts -> rogue containers hit blackhole
 3. `selfh-startup` -> configures routes, starts containers properly
 
 ## Trade-offs
 
-| Pros                             | Cons                                  |
-|----------------------------------|---------------------------------------|
-| Traffic safety via blackhole     | Two systemd services                  |
-| Runtime crash recovery preserved | Failsafe must complete before Docker  |
-|                                  | Works around Docker policy limitation |
-|                                  | Boot restarts skip `depends_on`       |
+| Pros                             | Cons                                                      |
+|----------------------------------|-----------------------------------------------------------|
+| Traffic safety via blackhole     | A failing failsafe keeps Docker down for every deployment |
+| Runtime crash recovery preserved | Works around Docker policy limitation                     |
+| No unit whose stop stops Docker  | Boot restarts skip `depends_on`                           |

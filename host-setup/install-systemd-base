@@ -22,29 +22,11 @@ docker_dropins_path='/etc/systemd/system/docker.service.d'
 mkdir "$docker_dropins_path"
 echo "Initialized Docker service drop-in units directory at $docker_dropins_path"
 
-route_failsafe_service_path="/etc/systemd/system/selfh-route-failsafe@.service"
 startup_service_path="/etc/systemd/system/selfh-startup@.service"
-
-for path in "$route_failsafe_service_path" "$startup_service_path"; do
-    if [ -e "$path" ]; then
-        >&2 echo "Error: file already exists at $path"
-        exit 1
-    fi
-done
-
-cat > "$route_failsafe_service_path" << 'EOF'
-[Unit]
-Description=Network failsafe routing for selfh at %f
-
-[Service]
-Type=oneshot
-ExecStart=%f/route-failsafe up
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-echo "Installed at $route_failsafe_service_path"
+if [ -e "$startup_service_path" ]; then
+    >&2 echo "Error: file already exists at $startup_service_path"
+    exit 1
+fi
 
 cat > "$startup_service_path" << 'EOF'
 [Unit]

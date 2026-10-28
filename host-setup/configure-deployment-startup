@@ -22,23 +22,24 @@ if [ ! -e "$docker_dropins_path" ]; then
 fi
 
 docker_dropin_path="$docker_dropins_path/selfh-route-failsafe-$systemd_escaped_deployment_path.conf"
+# Docker closes the failsafe before every start, and does not start when that
+# fails. A failsafe unit of its own would stop Docker whenever it is stopped
 docker_dropin_content="$(cat << EOF
-[Unit]
-Requires=selfh-route-failsafe@$systemd_escaped_deployment_path.service
-After=selfh-route-failsafe@$systemd_escaped_deployment_path.service
+[Service]
+ExecStartPre=$deployment_path/route-failsafe up
 EOF
 )"
 
 case "$action" in
     up)
-        systemctl enable "selfh-route-failsafe@${systemd_escaped_deployment_path}.service"
         printf '%s\n' "$docker_dropin_content" > "$docker_dropin_path"
+        # Docker is already running, so the failsafe closes now too
+        "$deployment_path/route-failsafe" up
         systemctl enable "selfh-startup@${systemd_escaped_deployment_path}.service"
         ;;
     down)
         systemctl disable "selfh-startup@${systemd_escaped_deployment_path}.service"
         rm "$docker_dropin_path"
-        systemctl disable "selfh-route-failsafe@${systemd_escaped_deployment_path}.service"
         ;;
     *)
         echo "Usage: $0 <deployment_path> {up|down}" >&2

@@ -15,11 +15,7 @@ get_env_var() {
 GLUETUN_NETWORK_SUBNET="$(get_env_var 'GLUETUN_NETWORK_SUBNET')"
 
 case "${1:-}" in
-    up)
-        OP="add"
-        ;;
-    down)
-        OP="del"
+    up|down)
         ;;
     *)
         echo "Usage: $0 {up|down}" >&2
@@ -27,13 +23,18 @@ case "${1:-}" in
         ;;
 esac
 
-# drop traffic by default
-ip \
-    rule "$OP" \
-    from "$GLUETUN_NETWORK_SUBNET" \
-    blackhole
-# allow local traffic
-ip rule "$OP" \
-    from "$GLUETUN_NETWORK_SUBNET" \
-    to "$GLUETUN_NETWORK_SUBNET" \
-    lookup main
+# Docker runs up before every start, so up first removes the copies that
+# earlier starts added
+for rule in 'blackhole' "to $GLUETUN_NETWORK_SUBNET lookup main"; do
+    while ip rule del from "$GLUETUN_NETWORK_SUBNET" $rule 2> /dev/null; do :; done
+done
+
+# A rule added without a priority comes before every other rule, so these take
+# the last priorities before the main table's, behind the Gluetun route rule
+# however often they are added again
+if [ "$1" = up ]; then
+    # allow local traffic
+    ip rule add priority 32760 from "$GLUETUN_NETWORK_SUBNET" to "$GLUETUN_NETWORK_SUBNET" lookup main
+    # drop traffic by default
+    ip rule add priority 32761 from "$GLUETUN_NETWORK_SUBNET" blackhole
+fi
