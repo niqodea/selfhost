@@ -6,7 +6,7 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-# Env sockets hold tokens and passwords
+# Any env socket may hold a secret
 find "$root" -name '.=.*' -prune -o -name '._.*env' -perm /077 -print | while IFS= read -r socket; do
     >&2 echo "Error: $socket is readable by others than its owner"
     exit 1
