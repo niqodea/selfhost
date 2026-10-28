@@ -25,10 +25,10 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 1. Clone the repo, install `acl`, and create the deployment owner, then join its group. Its user and group ID is 900 plus the deployment's index, like `selfh` with 900 and `selfh-dev` with 901:
    `groupadd --system --gid 900 selfh && useradd --system --uid 900 --gid 900 --no-create-home --shell /usr/sbin/nologin selfh && usermod -aG selfh "$USER"`
 2. Install base systemd files: `host-setup/install-systemd-base`
-3. Install deployment: `host-setup/install-deployment /opt/selfhost selfh`
+3. Install deployment: `host-setup/install-deployment /opt/selfh selfh`
 4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`), with mode 600 for the `.env` ones, and plug each app's `content/` with a directory owned by the deployment owner, or a link to one, made shared with the group: `install -d -o selfh -g selfh -m 2770 <dir> && setfacl -d -m g::rwX <dir>`
-5. Download and build the images: `/opt/selfhost/prepare-images`
-6. Enable startup service: `host-setup/configure-deployment-startup /opt/selfhost up`
+5. Download and build the images: `/opt/selfh/prepare-images`
+6. Enable startup service: `host-setup/configure-deployment-startup /opt/selfh up`
 
 Startup stops if an image is missing, because it never downloads or builds one.
 

@@ -19,13 +19,13 @@ Docker has no pre-start hooks. Without them, `unless-stopped`/`always` policies 
 
 ## Solution
 
-### selfhost-route-failsafe (Before Docker)
+### selfh-route-failsafe (Before Docker)
 
 Configures a blackhole on the Gluetun network so any prematurely-started container drops traffic rather than leaking it.
 
 A systemd drop-in makes `docker.service` depend on this unit (`Requires=` + `After=`), ensuring the failsafe is always active before Docker can start containers.
 
-### selfhost-startup (After Docker)
+### selfh-startup (After Docker)
 
 For each app: runs `./route` if present, then `docker compose up --detach`.
 App-specific routes are configured immediately before their containers start.
@@ -35,9 +35,9 @@ However, the upstream blackhole failsafe ensures traffic is safely dropped rathe
 
 ## Boot Sequence
 
-1. `selfhost-route-failsafe` -> blackhole active
+1. `selfh-route-failsafe` -> blackhole active
 2. `docker.service` starts -> rogue containers hit blackhole
-3. `selfhost-startup` -> configures routes, starts containers properly
+3. `selfh-startup` -> configures routes, starts containers properly
 
 ## Trade-offs
 

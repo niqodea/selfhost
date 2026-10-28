@@ -22,8 +22,8 @@ docker_dropins_path='/etc/systemd/system/docker.service.d'
 mkdir "$docker_dropins_path"
 echo "Initialized Docker service drop-in units directory at $docker_dropins_path"
 
-route_failsafe_service_path="/etc/systemd/system/selfhost-route-failsafe@.service"
-startup_service_path="/etc/systemd/system/selfhost-startup@.service"
+route_failsafe_service_path="/etc/systemd/system/selfh-route-failsafe@.service"
+startup_service_path="/etc/systemd/system/selfh-startup@.service"
 
 for path in "$route_failsafe_service_path" "$startup_service_path"; do
     if [ -e "$path" ]; then
@@ -34,7 +34,7 @@ done
 
 cat > "$route_failsafe_service_path" << 'EOF'
 [Unit]
-Description=Network failsafe routing for selfhost at %f
+Description=Network failsafe routing for selfh at %f
 
 [Service]
 Type=oneshot
@@ -48,7 +48,7 @@ echo "Installed at $route_failsafe_service_path"
 
 cat > "$startup_service_path" << 'EOF'
 [Unit]
-Description=Start selfhost at %f
+Description=Start selfh at %f
 Requires=docker.service
 After=docker.service
 
