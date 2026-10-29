@@ -19,13 +19,14 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 
 ## Getting Started
 
-1. Clone the repo, install `acl`, and create the deployment owner, then join its group. Its user and group ID is 900 plus the deployment's index, like `selfh` with 900 and `selfh-dev` with 901:
+1. Clone the repo, install `acl`, `rsync` and `restic`, and create the deployment owner, then join its group. Its user and group ID is 900 plus the deployment's index, like `selfh` with 900 and `selfh-dev` with 901:
    `groupadd --system --gid 900 selfh && useradd --system --uid 900 --gid 900 --no-create-home --shell /usr/sbin/nologin selfh && usermod -aG selfh "$USER"`
 2. Install base systemd files: `host-setup/install-systemd-base`
 3. Install deployment: `host-setup/install-deployment /opt/selfh selfh`
 4. Copy socket samples to create actual sockets (`.~.foo` -> `._.foo`), with mode 600 for the `.env` ones, and plug each app's `content/` with a directory owned by the deployment owner, or a link to one, made shared with the group: `install -d -o selfh -g selfh -m 2770 <dir> && setfacl -d -m g::rwX <dir>`
 5. Download and build the images: `/opt/selfh/prepare-images`
 6. Enable startup service: `host-setup/configure-deployment-startup /opt/selfh up`
+7. To back up every night, plug `backup/repo` with an empty directory outside the deployment, or a link to one, write the backup's passphrase to `backup/._.password` with mode 600, then run `host-setup/configure-deployment-backup /opt/selfh up`
 
 Startup stops if an image is missing, because it never downloads or builds one.
 
@@ -53,7 +54,11 @@ route-failsafe                    # Network failsafe routing script
 prepare-images                    # Download and build the images
 startup                           # Start the services
 shutdown                          # Stop the services
-infra/                            # Network modules, started before the apps
+backup/                           # See Backups
+├── run                           # Back up state and content
+├── repo                          # The restic repository
+└── password                      # The repository's passphrase
+infra/                            # Network modules: how the apps reach the internet and devices reach the apps
 ├── caddy/                        # Reverse proxy to the apps, with automatic certificates
 ├── ddns-updater/                 # Points the domain at the public IP
 ├── dns/                          # DNS resolvers with the blocklist
@@ -123,6 +128,14 @@ Only gluetun-gateway, wireguard-lan and wireguard-wan run as root, to set up the
 
 See [the ADR](adr/volume-ownership.md) for why.
 
+### Backups
+
+`backup/run` stores two snapshots in the restic repository that `backup/repo` points to, and keeps 7 daily, 4 weekly and 6 monthly of each:
+- **State**: the apps stop, the deployment directory is backed up, and the apps start again, so each app's databases and files are backed up as of one moment. The infra modules keep running, since their state does not change while they run.
+- **Content**: the directories the content plugs point to, read while the apps run, since they are too large to back up within a short stop.
+
+To restore, stop the deployment, restore the state and content snapshots of the same night with `restic restore <snapshot> --target /`, which puts each file back at its own path.
+
 ### Plugs
 
 File dependencies are declared using plugs, a two-layer symlink system that makes external dependencies explicit:
@@ -132,7 +145,7 @@ File dependencies are declared using plugs, a two-layer symlink system that make
 
 Bootstrap by copying the sample: `cp .~.local.env ._.local.env`
 
-Any env socket (`._..env`, `._.local.env`) may hold a secret, so each is mode 600, and startup stops if anyone but its owner can read one.
+Any env socket (`._..env`, `._.local.env`) may hold a secret, and the backup password (`backup/._.password`) is one, so each is mode 600, and startup stops if anyone but its owner can read one.
 
 This makes dependencies visible in version control without committing environment-specific paths or secrets.
 Learn more at the [plugs repo](https://github.com/niqodea/plugs).

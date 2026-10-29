@@ -13,6 +13,7 @@ cp -P "$root/docker-compose.yaml" "$root/route-failsafe" "$root/startup" "$root/
 cp -P -R "$root/infra" "$deployment_path/infra"
 cp -P -R "$root/proxies" "$deployment_path/proxies"
 cp -P -R "$root/apps" "$deployment_path/apps"
+cp -P -R "$root/backup" "$deployment_path/backup"
 
 # An app's state starts as an empty directory owned by the deployment owner,
 # whom every app writes as

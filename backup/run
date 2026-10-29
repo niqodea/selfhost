@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -eu
+
+# The real path, since Docker labels each container with it
+root="$(realpath "$(dirname "$(realpath "$0")")/..repo")"
+
+export RESTIC_REPOSITORY="$root/backup/repo"
+export RESTIC_PASSWORD_FILE="$root/backup/password"
+
+# All modules share one Compose project, so each app's containers are found by
+# the directory of their compose file
+containers="$(for module_path in "$root"/apps/*; do
+    docker ps --quiet --filter "label=com.docker.compose.project.working_dir=$module_path"
+done)"
+
+# The apps stop while their state is backed up, so every database and the files
+# next to it are backed up as of one moment. The infra modules keep running,
+# since their state does not change while they run
+stopped_at="$(date +%s)"
+backed_up=false
+if docker stop $containers > /dev/null; then
+    restic backup --tag state "$root" && backed_up=true
+fi
+docker start $containers > /dev/null
+echo "The apps were down for $(( $(date +%s) - stopped_at ))s"
+if [ "$backed_up" = false ]; then
+    >&2 echo "Error: backing up the state failed"
+    exit 1
+fi
+
+# Content is too large to back up within a short stop, so the apps run meanwhile
+set --
+for plug in "$root"/apps/*/content/*; do
+    set -- "$@" "$(realpath "$plug")"
+done
+restic backup --tag content "$@"
+restic forget --quiet --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune

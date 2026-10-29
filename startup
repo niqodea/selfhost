@@ -6,8 +6,8 @@ set -eu
 
 root="$(dirname "$(realpath "$0")")"
 
-# Any env socket may hold a secret
-find "$root" -name '.=.*' -prune -o -name '._.*env' -perm /077 -print | while IFS= read -r socket; do
+# Any env socket may hold a secret, and the backup password is one
+find "$root" -name '.=.*' -prune -o \( -name '._.*env' -o -name '._.password' \) -perm /077 -print | while IFS= read -r socket; do
     >&2 echo "Error: $socket is readable by others than its owner"
     exit 1
 done

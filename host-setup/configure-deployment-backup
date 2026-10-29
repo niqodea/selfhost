@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+deployment_path="$1"
+action="$2"
+
+backup_timer="selfh-backup@$(systemd-escape --path "$deployment_path").timer"
+
+case "$action" in
+    up)
+        RESTIC_REPOSITORY="$deployment_path/backup/repo" \
+            RESTIC_PASSWORD_FILE="$deployment_path/backup/password" \
+            restic init
+        systemctl enable --now "$backup_timer"
+        ;;
+    down)
+        systemctl disable --now "$backup_timer"
+        ;;
+    *)
+        echo "Usage: $0 <deployment_path> {up|down}" >&2
+        exit 1
+        ;;
+esac
+
+echo 'Success'

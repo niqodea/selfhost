@@ -23,13 +23,16 @@ find "$deployment_path" -type f -name '.~.*' | while IFS= read -r sample; do
     sample_name="$(basename "$sample")"
     cp "$sample" "$(dirname "$sample")/._.${sample_name#.~.}"
 done
-chmod 600 "$deployment_path"/._..env "$deployment_path"/*/*/._.local.env
+chmod 600 "$deployment_path"/._..env "$deployment_path"/*/*/._.local.env "$deployment_path"/backup/._.password
 
 for plug in "$deployment_path"/apps/*/content/*; do
     socket="$(dirname "$plug")/$(readlink "$plug")"
     install -d -o selfh -g selfh -m 2770 "$socket"
     setfacl -d -m g::rwX "$socket"
 done
+# Outside the deployment, since backup backs up the deployment as state
+mkdir -p /var/backups/selfh-exp
+ln -s /var/backups/selfh-exp "$deployment_path/backup/.=.repo"
 
 "$deployment_path/exp/generate-certificates"
 

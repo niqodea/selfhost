@@ -23,10 +23,14 @@ mkdir "$docker_dropins_path"
 echo "Initialized Docker service drop-in units directory at $docker_dropins_path"
 
 startup_service_path="/etc/systemd/system/selfh-startup@.service"
-if [ -e "$startup_service_path" ]; then
-    >&2 echo "Error: file already exists at $startup_service_path"
-    exit 1
-fi
+backup_service_path="/etc/systemd/system/selfh-backup@.service"
+backup_timer_path="/etc/systemd/system/selfh-backup@.timer"
+for path in "$startup_service_path" "$backup_service_path" "$backup_timer_path"; do
+    if [ -e "$path" ]; then
+        >&2 echo "Error: file already exists at $path"
+        exit 1
+    fi
+done
 
 cat > "$startup_service_path" << 'EOF'
 [Unit]
@@ -43,6 +47,31 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 echo "Installed at $startup_service_path"
+
+cat > "$backup_service_path" << 'EOF'
+[Unit]
+Description=Back up selfh at %f
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=%f/backup/run
+CacheDirectory=restic
+Environment=RESTIC_CACHE_DIR=%C/restic
+EOF
+cat > "$backup_timer_path" << 'EOF'
+[Unit]
+Description=Back up selfh at %f every night
+
+[Timer]
+OnCalendar=*-*-* 04:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+echo "Installed at $backup_service_path and $backup_timer_path"
 
 systemctl daemon-reload
 
