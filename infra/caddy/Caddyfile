@@ -39,6 +39,11 @@
 		reverse_proxy librespeed:8080
 	}
 
+	@ntfy host ntfy.{$DOMAIN}
+	handle @ntfy {
+		reverse_proxy ntfy:80
+	}
+
 	@prowlarr host prowlarr.{$DOMAIN}
 	handle @prowlarr {
 		reverse_proxy prowlarr:9696

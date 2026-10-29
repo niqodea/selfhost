@@ -14,6 +14,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **radicale**        | CalDAV/CardDAV server for contacts and calendars  |
 | **git**             | Self-hosted Git server                            |
 | **librespeed**      | Network speed test                                |
+| **ntfy**            | Push notifications for the deployment's alerts    |
 
 **wireguard-wan**, **prowlarr**, and **qbittorrent** route their traffic through the same Gluetun VPN gateway for anonymity.
 
@@ -52,6 +53,7 @@ docker-compose.yaml               # Shared networks
 .env                              # Shared config
 route-failsafe                    # Network failsafe routing script
 prepare-images                    # Download and build the images
+alert                             # Send an alert through ntfy
 startup                           # Start the services
 shutdown                          # Stop the services
 backup/                           # See Backups
@@ -133,6 +135,8 @@ See [the ADR](adr/volume-ownership.md) for why.
 `backup/run` stores two snapshots in the restic repository that `backup/repo` points to, and keeps 7 daily, 4 weekly and 6 monthly of each:
 - **State**: the apps stop, the deployment directory is backed up, and the apps start again, so each app's databases and files are backed up as of one moment. The infra modules keep running, since their state does not change while they run.
 - **Content**: the directories the content plugs point to, read while the apps run, since they are too large to back up within a short stop.
+
+If a backup fails, `alert` sends a notification through ntfy to the topic named after `COMPOSE_PROJECT_NAME`. Subscribe to it from a phone that stays on WireGuard, logged in as `phone`. No alert comes when the whole server is down, since ntfy runs on it.
 
 To restore, stop the deployment, restore the state and content snapshots of the same night with `restic restore <snapshot> --target /`, which puts each file back at its own path.
 

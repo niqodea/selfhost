@@ -25,7 +25,8 @@ echo "Initialized Docker service drop-in units directory at $docker_dropins_path
 startup_service_path="/etc/systemd/system/selfh-startup@.service"
 backup_service_path="/etc/systemd/system/selfh-backup@.service"
 backup_timer_path="/etc/systemd/system/selfh-backup@.timer"
-for path in "$startup_service_path" "$backup_service_path" "$backup_timer_path"; do
+backup_failed_service_path="/etc/systemd/system/selfh-backup-failed@.service"
+for path in "$startup_service_path" "$backup_service_path" "$backup_timer_path" "$backup_failed_service_path"; do
     if [ -e "$path" ]; then
         >&2 echo "Error: file already exists at $path"
         exit 1
@@ -53,6 +54,7 @@ cat > "$backup_service_path" << 'EOF'
 Description=Back up selfh at %f
 Requires=docker.service
 After=docker.service
+OnFailure=selfh-backup-failed@%i.service
 
 [Service]
 Type=oneshot
@@ -71,7 +73,15 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 EOF
-echo "Installed at $backup_service_path and $backup_timer_path"
+cat > "$backup_failed_service_path" << 'EOF'
+[Unit]
+Description=Alert that backing up selfh at %f failed
+
+[Service]
+Type=oneshot
+ExecStart=%f/alert "Backing up selfh at %f failed"
+EOF
+echo "Installed at $backup_service_path, $backup_timer_path and $backup_failed_service_path"
 
 systemctl daemon-reload
 

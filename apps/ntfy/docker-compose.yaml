@@ -1,0 +1,27 @@
+services:
+  ntfy:
+    image: "docker.io/binwiederhier/ntfy:v2.34.0\
+      @sha256:901e14503d3f605f445be0e68f2ac71f0aa73391897ce6ceb599f8c48d8b3792"
+    command: serve
+    user: ${PUID}:${PGID}
+    networks:
+      webapps:
+    volumes:
+      - ./volumes/data:/var/lib/ntfy
+    environment:
+      # ntfy rate-limits by client address, and behind a proxy every request
+      # has the proxy's address
+      - NTFY_BEHIND_PROXY=true
+      # ntfy keeps messages in memory by default, and a restart drops them
+      - NTFY_CACHE_FILE=/var/lib/ntfy/cache.db
+      - NTFY_AUTH_FILE=/var/lib/ntfy/user.db
+      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+      - NTFY_AUTH_ACCESS=phone:${COMPOSE_PROJECT_NAME}:read-only,alert:${COMPOSE_PROJECT_NAME}:write-only
+    env_file:
+      - local.env
+    restart: ${DOCKER_RESTART}
+
+networks:
+  webapps:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}

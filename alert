@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+# One topic per deployment, so a phone can subscribe to each separately
+
+root="$(dirname "$(realpath "$0")")"
+
+topic="$(sed -n 's/^COMPOSE_PROJECT_NAME=//p' "$root/.env")"
+
+docker compose --project-directory "$root/apps/ntfy" exec --no-TTY ntfy \
+    ntfy publish --quiet "http://localhost/$topic" "$1"

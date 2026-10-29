@@ -9,7 +9,7 @@ owner="$2"
 
 mkdir "$deployment_path"
 
-cp -P "$root/docker-compose.yaml" "$root/route-failsafe" "$root/startup" "$root/shutdown" "$root/prepare-images" "$root/.env" "$root/.~..env" "$root/..repo" "$deployment_path"
+cp -P "$root/docker-compose.yaml" "$root/route-failsafe" "$root/startup" "$root/shutdown" "$root/prepare-images" "$root/alert" "$root/.env" "$root/.~..env" "$root/..repo" "$deployment_path"
 cp -P -R "$root/infra" "$deployment_path/infra"
 cp -P -R "$root/proxies" "$deployment_path/proxies"
 cp -P -R "$root/apps" "$deployment_path/apps"
