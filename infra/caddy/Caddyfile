@@ -59,6 +59,11 @@
 		reverse_proxy radicale:5232
 	}
 
+	@streamling host streamling.{$DOMAIN}
+	handle @streamling {
+		reverse_proxy streamling:8080
+	}
+
 	@syncthing host syncthing.{$DOMAIN}
 	handle @syncthing {
 		reverse_proxy syncthing:8384

@@ -15,6 +15,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **git**             | Self-hosted Git server                            |
 | **librespeed**      | Network speed test                                |
 | **ntfy**            | Push notifications for the deployment's alerts    |
+| **streamling**      | Serves a torrent's files while they download      |
 
 **wireguard-wan**, **prowlarr**, and **qbittorrent** route their traffic through the same Gluetun VPN gateway for anonymity.
 
