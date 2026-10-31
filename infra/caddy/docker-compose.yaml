@@ -23,6 +23,9 @@ services:
     depends_on:
       - caddy-http-proxy
       - caddy-dns-proxy
+    sysctls:
+      # BBR does not slow down when a packet is lost at random
+      - net.ipv4.tcp_congestion_control=bbr
     restart: ${DOCKER_RESTART}
 
   # Caddy reaches the internet only through these two proxies: HTTPS to the
