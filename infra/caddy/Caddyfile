@@ -19,6 +19,17 @@
 		resolvers caddy-dns-proxy:53
 	}
 
+	# Caddy runs only the first handle block that matches, and keeps blocks with
+	# named matchers in the order written, so this one stays above the apps'
+	# Ref: https://caddyserver.com/docs/caddyfile/directives#sorting-algorithm
+	@guest-unshared {
+		remote_ip {$PEERS_NETWORK_WIREGUARD_GUEST_ADDRESS}
+		not host streamling.{$DOMAIN}
+	}
+	handle @guest-unshared {
+		respond "Not found" 404
+	}
+
 	@git host git.{$DOMAIN}
 	handle @git {
 		reverse_proxy git:80

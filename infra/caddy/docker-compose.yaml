@@ -18,6 +18,7 @@ services:
       - ./volumes/config:/config
     environment:
       - DOMAIN=${DOMAIN}
+      - PEERS_NETWORK_WIREGUARD_GUEST_ADDRESS=${PEERS_NETWORK_WIREGUARD_GUEST_ADDRESS}
       - HTTPS_PROXY=http://caddy-http-proxy:3128
       - DNS_API_TOKEN=${DNS_API_TOKEN}
     depends_on:

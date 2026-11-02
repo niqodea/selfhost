@@ -1,0 +1,59 @@
+services:
+
+  wireguard-guest:
+    # No official Docker image exists, using linuxserver.io community image
+    image: "lscr.io/linuxserver/wireguard:1.0.20260223-r0-ls127\
+      @sha256:e2f655e1956a6db476bc879bf721f3f8bfed49c6d8fbcf39495d7ecb991d8228"
+    dns: ${INTERNET_NETWORK_DNS_ADDRESS}
+    networks:
+      internet:
+        gw_priority: 1
+      peers:
+        ipv4_address: ${PEERS_NETWORK_WIREGUARD_GUEST_ADDRESS}
+    ports:
+      - ${WIREGUARD_GUEST_HOST_PORT}:51820/udp
+    volumes:
+      # The image reads the template only from this path, inside the saved
+      # /config. A template built into the image would reach only a fresh
+      # install, so the mount is what keeps the template current. The image
+      # builds /config/wg_confs/wg0.conf from it only when that file is missing
+      # or a setting like PEERDNS changes, so deleting
+      # volumes/config/wg_confs/wg0.conf applies a template edit, and keeps every
+      # key
+      # Ref: https://github.com/linuxserver/docker-wireguard/blob/1.0.20260223-r0-ls127/root/etc/s6-overlay/s6-rc.d/init-wireguard-confs/run
+      # read-only mount causes harmless chown warning at startup
+      - ./volumes/server-template.conf:/config/templates/server.conf:ro
+      - ./volumes/config:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - SERVERURL=${DOMAIN}
+      - SERVERPORT=${WIREGUARD_GUEST_HOST_PORT}
+      - INTERNAL_SUBNET=${WIREGUARD_NETWORK_SUBNET}
+      - ALLOWEDIPS=${WIREGUARD_NETWORK_SERVER_ADDRESS}/32,${PEERS_NETWORK_CADDY_ADDRESS}/32
+      # Disable the image's own DNS server, which would answer on every network
+      # this container joins, since peers' DNS is forwarded upstream instead
+      # Ref: https://github.com/linuxserver/docker-wireguard/issues/62#issuecomment-2010533285
+      - USE_COREDNS=false
+      # The upstream DNS server is not on the peers network, so that the
+      # containers there cannot send data out through DNS. Peers ask this server
+      # instead, which forwards their queries upstream, see
+      # ./volumes/server-template.conf for how
+      - PEERDNS=${WIREGUARD_NETWORK_SERVER_ADDRESS}
+      - UPSTREAM_DNS_ADDRESS=${INTERNET_NETWORK_DNS_ADDRESS}
+      - PEERS_NETWORK_CADDY_ADDRESS=${PEERS_NETWORK_CADDY_ADDRESS}
+    env_file:
+      - local.env
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1  # for wireguard routing
+    restart: ${DOCKER_RESTART}
+
+networks:
+  internet:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${INTERNET_NETWORK}
+  peers:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${PEERS_NETWORK}

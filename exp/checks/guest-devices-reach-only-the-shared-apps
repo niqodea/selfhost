@@ -1,0 +1,58 @@
+#!/bin/sh
+set -eu
+
+# A device on wireguard-guest gets streamling, a 404 from every other app, and
+# reaches nothing else, even when it sends everything into the tunnel
+
+root="$(dirname "$(realpath "$0")")/..repo"
+
+domain="$(sed -n 's/^DOMAIN=//p' "$root/.env")"
+server_address="$(sed -n 's/^WIREGUARD_NETWORK_SERVER_ADDRESS=//p' "$root/.env")"
+syncthing_address="$(sed -n 's/^PEERS_NETWORK_SYNCTHING_ADDRESS=//p' "$root/.env")"
+# Cloudflare's DNS server, which also answers HTTP, stands in for the internet
+internet_address=1.1.1.1
+
+device=fake-wireguard-guest-device
+
+docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet up --detach "$device"
+trap 'docker compose --project-directory "$root/exp/fake-wireguard-devices" --progress=quiet down' EXIT
+until docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" wg show wg0 > /dev/null 2>&1; do
+    sleep 1
+done
+
+for app in $(sed -n 's/^\t@\([a-z]*\) host .*/\1/p' "$root/infra/caddy/Caddyfile"); do
+    if ! code="$(docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" \
+        curl --silent --output /dev/null --max-time 10 --write-out '%{http_code}' "https://$app.$domain")"; then
+        >&2 echo "Error: Caddy does not answer $device at https://$app.$domain"
+        exit 1
+    fi
+    if [ "$app" = streamling ]; then
+        # Caddy answers 502 when the app is down, and 404 when a guest asks for
+        # an app that is not shared
+        if [ "$code" = 502 ] || [ "$code" = 404 ]; then
+            >&2 echo "Error: streamling does not answer $device"
+            exit 1
+        fi
+    elif [ "$code" != 404 ]; then
+        >&2 echo "Error: $app answers $device with $code"
+        exit 1
+    fi
+done
+
+docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" sh -c "
+    wg set wg0 peer \"\$(wg show wg0 peers)\" allowed-ips 0.0.0.0/0
+    ip route add $internet_address dev wg0
+    ip route add $syncthing_address dev wg0
+"
+
+for target in "$internet_address 80" "$syncthing_address 22000" "$server_address 22"; do
+    # OpenBSD nc has no long flags: -z closes the connection once it opens, and
+    # -w 5 gives up after 5 seconds
+    if docker compose --project-directory "$root/exp/fake-wireguard-devices" exec --no-TTY "$device" \
+        nc -z -w 5 $target; then
+        >&2 echo "Error: $device reaches $target"
+        exit 1
+    fi
+done
+
+echo 'Success'

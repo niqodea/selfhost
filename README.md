@@ -67,7 +67,8 @@ infra/                            # Network modules: how the apps reach the inte
 ├── dns/                          # DNS resolvers with the blocklist
 ├── gluetun-gateway/              # VPN gateway
 ├── wireguard-lan/                # VPN server for reaching the apps
-└── wireguard-wan/                # VPN server with anonymous exit via Gluetun
+├── wireguard-wan/                # VPN server with anonymous exit via Gluetun
+└── wireguard-guest/              # VPN server for guests, reaching only the shared apps
 proxies/                          # Images of the proxies through which apps reach the internet
 ├── http/                         # HTTPS, only to the domains the app lists
 └── dns/                          # DNS, only for the names the app forwards
@@ -119,6 +120,12 @@ Every container on `internet` or `gluetun` sets `dns` to its network's resolver,
 Both resolvers also answer the domain with Caddy's address and `syncthing.internal` with Syncthing's, so Caddy checks its records through a public resolver.
 They answer `server.internal` with the WireGuard servers' address, so one name reaches whichever deployment's WireGuard you are on.
 
+### Guests
+
+A guest's device may be compromised, so guests join `wireguard-guest`, which forwards only what goes to Caddy and to its DNS server.
+It sends every guest's traffic from its own address on `peers`, and Caddy answers that address with a 404 for every app but the shared ones.
+Share another app by adding its host to the `@guest-unshared` matcher in the Caddyfile.
+
 ### Volume Ownership
 
 Every app writes as the deployment owner, a system user named after the Compose project, whose IDs are `PUID` and `PGID`.
@@ -128,7 +135,7 @@ It owns all state and content, and you join its group to edit content and read s
 - **Config you write** (templates): a read-only bind mount.
 
 An app runs as the deployment owner through `user:`, or through `PUID` and `PGID` for an image that starts as root and switches to them.
-Only gluetun-gateway, wireguard-lan and wireguard-wan run as root, to set up their network, and they still write their files as the deployment owner.
+Only gluetun-gateway and the WireGuard servers run as root, to set up their network, and they still write their files as the deployment owner.
 
 See [the ADR](adr/volume-ownership.md) for why.
 
