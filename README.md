@@ -117,6 +117,7 @@ Two dnsmasq resolvers in `infra/dns/` answer every app's DNS queries, with the S
 `dns-internet` sends the remaining queries out directly, and `dns-gluetun` sends them through Gluetun, so routed apps never resolve names outside the tunnel.
 Every container on `internet` or `gluetun` sets `dns` to its network's resolver, and each WireGuard server gives its peers its side's resolver.
 Both resolvers also answer the domain with Caddy's address and `syncthing.internal` with Syncthing's, so Caddy checks its records through a public resolver.
+They answer `server.internal` with the WireGuard servers' address, so one name reaches whichever deployment's WireGuard you are on.
 
 ### Volume Ownership
 

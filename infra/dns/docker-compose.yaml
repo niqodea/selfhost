@@ -11,6 +11,7 @@ services:
       - --addn-hosts=/etc/dnsmasq.d/blocklist.hosts
       - --address=/${DOMAIN}/${PEERS_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${PEERS_NETWORK_SYNCTHING_ADDRESS}
+      - --address=/server.internal/${WIREGUARD_NETWORK_SERVER_ADDRESS}
       - --log-queries
       - --log-facility=${DNS_LOG_FACILITY}
     restart: ${DOCKER_RESTART}
@@ -28,6 +29,7 @@ services:
       - --server=${GLUETUN_NETWORK_GATEWAY_ADDRESS}
       - --address=/${DOMAIN}/${PEERS_NETWORK_CADDY_ADDRESS}
       - --address=/syncthing.internal/${PEERS_NETWORK_SYNCTHING_ADDRESS}
+      - --address=/server.internal/${WIREGUARD_NETWORK_SERVER_ADDRESS}
       - --log-queries
       - --log-facility=${DNS_LOG_FACILITY}
     restart: ${DOCKER_RESTART}
