@@ -1,0 +1,20 @@
+services:
+  importer:
+    build: .
+    user: ${PUID}:${PGID}
+    environment:
+      - MEDIA_DIR=/media
+      - STATE_FILE=/state/importer.json
+    volumes:
+      - ./volumes/state:/state
+      # One mount for downloads, shows and movies, since a hard link fails
+      # across mounts even on one filesystem
+      - ./content/media:/media
+    networks:
+      webapps:
+    restart: ${DOCKER_RESTART}
+
+networks:
+  webapps:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}
