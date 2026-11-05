@@ -16,7 +16,7 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **librespeed**      | Network speed test                                |
 | **ntfy**            | Push notifications for the deployment's alerts    |
 | **streamling**      | Serves a torrent's files while they download      |
-| **importer**        | Links downloads into the library, asks if unsure  |
+| **importling**      | Reads the episodes of downloads, asks if unsure   |
 | **seedling**        | Downloads torrents into the library's downloads   |
 
 **wireguard-wan**, **prowlarr**, **qbittorrent**, **streamling** and **seedling** route their traffic through the same Gluetun VPN gateway for anonymity.
@@ -48,7 +48,7 @@ Its config is the samples, as they are.
    - `sudo /opt/selfh-exp/prepare-images`
    - `sudo ~/selfh-source/host-setup/configure-deployment-startup /opt/selfh-exp up`
 5. In the VM, check that exp keeps each promise: `for check in /opt/selfh-exp/exp/checks/*; do sudo "$check"; done`
-6. To try the importer on toy torrents, or start it over: `sudo /opt/selfh-exp/exp/fill-importer-media /opt/selfh-exp`
+6. To try importling on toy torrents, or start it over: `sudo /opt/selfh-exp/exp/fill-importling-media /opt/selfh-exp`
 
 ## Project Structure
 

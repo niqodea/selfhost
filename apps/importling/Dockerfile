@@ -5,13 +5,13 @@ WORKDIR /src
 COPY .build/go.mod ./
 COPY .build/*.go ./
 # Without cgo, the binary needs no C library
-RUN CGO_ENABLED=0 go build -o /importer .
+RUN CGO_ENABLED=0 go build -o /importling .
 
 FROM docker.io/library/alpine:3.24.2\
 @sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
 
-COPY --from=build /importer /usr/local/bin/importer
+COPY --from=build /importling /usr/local/bin/importling
 
 EXPOSE 8080
 
-ENTRYPOINT ["importer"]
+ENTRYPOINT ["importling"]

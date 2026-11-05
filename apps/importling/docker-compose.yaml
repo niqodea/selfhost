@@ -1,14 +1,15 @@
 services:
-  importer:
+  importling:
     build: .
     user: ${PUID}:${PGID}
     environment:
-      - MEDIA_DIR=/media
-      - STATE_FILE=/state/importer.json
+      - DOWNLOADS_DIR=/media/downloads
+      - IMPORTED_DIR=/media/imported
+      - STATE_FILE=/state/importling.json
     volumes:
       - ./volumes/state:/state
-      # One mount for downloads, shows and movies, since a hard link fails
-      # across mounts even on one filesystem
+      # One mount for downloads and imported, since a hard link fails across
+      # mounts even on one filesystem
       - ./content/media:/media
     networks:
       webapps:

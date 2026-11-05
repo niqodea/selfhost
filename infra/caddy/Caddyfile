@@ -40,9 +40,9 @@
 		reverse_proxy immich:2283
 	}
 
-	@importer host importer.{$DOMAIN}
-	handle @importer {
-		reverse_proxy importer:8080
+	@importling host importling.{$DOMAIN}
+	handle @importling {
+		reverse_proxy importling:8080
 	}
 
 	@jellyfin host jellyfin.{$DOMAIN}
