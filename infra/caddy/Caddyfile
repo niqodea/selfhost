@@ -75,6 +75,11 @@
 		reverse_proxy radicale:5232
 	}
 
+	@seedling host seedling.{$DOMAIN}
+	handle @seedling {
+		reverse_proxy seedling:8080
+	}
+
 	@streamling host streamling.{$DOMAIN}
 	handle @streamling {
 		reverse_proxy streamling:8080

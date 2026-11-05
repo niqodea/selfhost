@@ -1,0 +1,28 @@
+services:
+  seedling:
+    build: .
+    user: ${PUID}:${PGID}
+    dns: ${GLUETUN_NETWORK_DNS_ADDRESS}
+    environment:
+      - INBOX_DIR=/inbox
+      - MEDIA_DIR=/media
+      - STATE_DIR=/state
+    volumes:
+      - ./volumes/state:/state
+      - ./content/inbox:/inbox
+      # One mount for incoming and downloads, since a rename fails across
+      # mounts even on one filesystem
+      - ./content/media:/media
+    networks:
+      gluetun:
+        gw_priority: 1
+      webapps:
+    restart: ${DOCKER_RESTART}
+
+networks:
+  gluetun:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${GLUETUN_NETWORK}
+  webapps:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME}_${WEBAPPS_NETWORK}

@@ -17,8 +17,9 @@ A modular Docker Compose setup for self-hosting services on a personal server.
 | **ntfy**            | Push notifications for the deployment's alerts    |
 | **streamling**      | Serves a torrent's files while they download      |
 | **importer**        | Links downloads into the library, asks if unsure  |
+| **seedling**        | Downloads torrents into the library's downloads   |
 
-**wireguard-wan**, **prowlarr**, and **qbittorrent** route their traffic through the same Gluetun VPN gateway for anonymity.
+**wireguard-wan**, **prowlarr**, **qbittorrent**, **streamling** and **seedling** route their traffic through the same Gluetun VPN gateway for anonymity.
 
 ## Getting Started
 
