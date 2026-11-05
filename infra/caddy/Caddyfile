@@ -30,6 +30,11 @@
 		respond "Not found" 404
 	}
 
+	@catalogling host catalogling.{$DOMAIN}
+	handle @catalogling {
+		reverse_proxy catalogling:8080
+	}
+
 	@git host git.{$DOMAIN}
 	handle @git {
 		reverse_proxy git:80
